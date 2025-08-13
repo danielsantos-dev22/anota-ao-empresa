@@ -1,1193 +1,1741 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema de Anotações - Empresa</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <style>
-    /* ====== Variables & Reset ====== */
-    :root {
-      --primary: #4f46e5;
-      --primary-dark: #3730a3;
-      --primary-light: #eef2ff;
-      --success: #059669;
-      --danger: #dc2626;
-      --warning: #d97706;
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --border: #e2e8f0;
-      --text: #1e293b;
-      --text-muted: #64748b;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      --radius: 12px;
-      --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    /* ====== Layout ====== */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
-    }
-
-    .header {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 400px;
-      gap: 2rem;
-    }
-
-    /* ====== Auth Section ====== */
-    .auth-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .auth-form {
-      display: flex;
-      gap: 0.75rem;
-      align-items: center;
-      padding: 1rem;
-      background: var(--primary-light);
-    }
-
-    .user-area {
-      display: none;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem;
-      background: var(--success);
-      color: white;
-    }
-
-    .user-area.active {
-      display: flex;
-    }
-
-    /* ====== Form Elements ====== */
-    input, textarea, select {
-      padding: 0.75rem;
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.875rem;
-      transition: all 0.2s ease;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    }
-
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    .form-label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      font-size: 0.875rem;
-    }
-
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    /* ====== Buttons ====== */
-    .btn {
-      padding: 0.75rem 1.25rem;
-      border: none;
-      border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-dark);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow);
-    }
-
-    .btn-secondary {
-      background: var(--border);
-      color: var(--text);
-    }
-
-    .btn-secondary:hover {
-      background: #cbd5e1;
-    }
-
-    .btn-success {
-      background: var(--success);
-      color: white;
-    }
-
-    .btn-danger {
-      background: var(--danger);
-      color: white;
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--text-muted);
-      border: 2px solid var(--border);
-    }
-
-    .btn-ghost:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    .btn-sm {
-      padding: 0.5rem 0.75rem;
-      font-size: 0.8125rem;
-    }
-
-    /* ====== Cards ====== */
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .card-header {
-      padding: 1.25rem 1.5rem;
-      border-bottom: 2px solid var(--border);
-      background: var(--primary-light);
-    }
-
-    .card-title {
-      font-size: 1.125rem;
-      font-weight: 600;
-      margin: 0;
-    }
-
-    .card-body {
-      padding: 1.5rem;
-    }
-
-    /* ====== Tabs ====== */
-    .tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-      background: var(--border);
-      padding: 0.25rem;
-      border-radius: 10px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 0.75rem 1rem;
-      background: transparent;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-weight: 500;
-      font-size: 0.875rem;
-    }
-
-    .tab-btn.active {
-      background: var(--primary);
-      color: white;
-      box-shadow: var(--shadow);
-    }
-
-    /* ====== Search ====== */
-    .search-container {
-      position: relative;
-      margin-bottom: 1.5rem;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 0.75rem 1rem 0.75rem 2.5rem;
-      background: var(--primary-light);
-      border: 2px solid transparent;
-      border-radius: 10px;
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-    }
-
-    /* ====== Notes List ====== */
-    .notes-container {
-      max-height: 600px;
-      overflow-y: auto;
-      padding-right: 0.5rem;
-    }
-
-    .note-item {
-      background: var(--card);
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem;
-      margin-bottom: 1rem;
-      transition: all 0.2s ease;
-      position: relative;
-    }
-
-    .note-item:hover {
-      border-color: var(--primary);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .note-item.reminder-due {
-      border-left: 4px solid var(--warning);
-      background: linear-gradient(90deg, #fef3c7 0%, var(--card) 10%);
-    }
-
-    .note-item.private {
-      border-left: 4px solid var(--primary);
-    }
-
-    .note-title {
-      font-size: 1.125rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: var(--text);
-    }
-
-    .note-meta {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      margin-bottom: 0.75rem;
-      font-size: 0.8125rem;
-      color: var(--text-muted);
-    }
-
-    .note-badge {
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
-
-    .badge-public {
-      background: var(--success);
-      color: white;
-    }
-
-    .badge-private {
-      background: var(--primary);
-      color: white;
-    }
-
-    .note-content {
-      margin-bottom: 1rem;
-      line-height: 1.6;
-    }
-
-    .note-reminder {
-      background: var(--warning);
-      color: white;
-      padding: 0.5rem;
-      border-radius: 6px;
-      font-size: 0.8125rem;
-      margin-bottom: 1rem;
-    }
-
-    .note-actions {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    /* ====== Status & Messages ====== */
-    .status-card {
-      padding: 1rem;
-      border-radius: var(--radius);
-      margin-bottom: 1rem;
-    }
-
-    .status-connected {
-      background: #ecfdf5;
-      color: var(--success);
-      border: 2px solid #a7f3d0;
-    }
-
-    .status-disconnected {
-      background: #fef2f2;
-      color: var(--danger);
-      border: 2px solid #fca5a5;
-    }
-
-    .message {
-      padding: 0.75rem;
-      border-radius: 8px;
-      margin-top: 0.5rem;
-      font-size: 0.875rem;
-    }
-
-    .message-success {
-      background: #ecfdf5;
-      color: var(--success);
-      border: 1px solid #a7f3d0;
-    }
-
-    .message-error {
-      background: #fef2f2;
-      color: var(--danger);
-      border: 1px solid #fca5a5;
-    }
-
-    /* ====== Animations ====== */
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .note-item {
-      animation: slideIn 0.3s ease;
-    }
-
-    /* ====== Loading ====== */
-    .loading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 2rem;
-      color: var(--text-muted);
-    }
-
-    .spinner {
-      border: 2px solid var(--border);
-      border-top: 2px solid var(--primary);
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      animation: spin 1s linear infinite;
-      margin-right: 0.5rem;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* ====== Responsive ====== */
-    @media (max-width: 1024px) {
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .header {
-        flex-direction: column;
-        text-align: center;
-      }
-
-      .auth-form {
-        flex-wrap: wrap;
-        justify-content: center;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .container {
-        padding: 1rem;
-      }
-
-      .tabs {
-        flex-direction: column;
-      }
-
-      .note-actions {
-        justify-content: center;
-      }
-    }
-
-    /* ====== Custom Scrollbar ====== */
-    .notes-container::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .notes-container::-webkit-scrollbar-track {
-      background: var(--border);
-      border-radius: 3px;
-    }
-
-    .notes-container::-webkit-scrollbar-thumb {
-      background: var(--text-muted);
-      border-radius: 3px;
-    }
-
-    .notes-container::-webkit-scrollbar-thumb:hover {
-      background: var(--primary);
-    }
-
-    /* ====== Footer ====== */
-    .footer {
-      text-align: center;
-      margin-top: 2rem;
-      padding: 1.5rem;
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-
-    .footer-text {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-    }
-  </style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="icon" href="icon-192.png" sizes="192x192">
+    <link rel="icon" href="icon-512.png" sizes="512x512">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Anotações - Empresa</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* ====== Variables & Reset ====== */
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-light: #eef2ff;
+            --success: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --info: #0284c7;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* ====== Login Screen ====== */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-screen.hidden {
+            display: none;
+        }
+
+        .login-card {
+            background: var(--card);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            margin: 1rem;
+            text-align: center;
+        }
+
+        .login-logo {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .login-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .login-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .login-form {
+            text-align: left;
+        }
+
+        .login-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .login-btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .login-btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .login-btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .login-btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+        }
+
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .login-divider span {
+            padding: 0 1rem;
+            font-size: 0.875rem;
+        }
+
+        /* ====== Layout ====== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+
+        /* ====== Auth Section ====== */
+        .auth-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--success);
+            color: white;
+        }
+
+        /* ====== Form Elements ====== */
+        input,
+        textarea,
+        select {
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* ====== Buttons ====== */
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
+            border: 2px solid var(--border);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8125rem;
+        }
+
+        /* ====== Cards ====== */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 2px solid var(--border);
+            background: var(--primary-light);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* ====== Tabs ====== */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--border);
+            padding: 0.25rem;
+            border-radius: 10px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        /* ====== Search ====== */
+        .search-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            background: var(--primary-light);
+            border: 2px solid transparent;
+            border-radius: 10px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* ====== Notes List ====== */
+        .notes-container {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .note-item {
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .note-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .note-item.reminder-due {
+            border-left: 4px solid var(--warning);
+            background: linear-gradient(90deg, #fef3c7 0%, var(--card) 10%);
+        }
+
+        .note-item.private {
+            border-left: 4px solid var(--primary);
+        }
+
+        .note-item.completed {
+            border-left: 4px solid var(--success);
+            background: linear-gradient(90deg, #ecfdf5 0%, var(--card) 10%);
+            opacity: 0.8;
+        }
+
+        .note-item.completed .note-title {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .note-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .note-meta {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .note-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-public {
+            background: var(--success);
+            color: white;
+        }
+
+        .badge-private {
+            background: var(--primary);
+            color: white;
+        }
+
+        .badge-completed {
+            background: var(--info);
+            color: white;
+        }
+
+        .note-content {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .note-reminder {
+            background: var(--warning);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            margin-bottom: 1rem;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* ====== Status & Messages ====== */
+        .status-card {
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+        }
+
+        .status-connected {
+            background: #ecfdf5;
+            color: var(--success);
+            border: 2px solid #a7f3d0;
+        }
+
+        .status-disconnected {
+            background: #fef2f2;
+            color: var(--danger);
+            border: 2px solid #fca5a5;
+        }
+
+        .message {
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .message-success {
+            background: #ecfdf5;
+            color: var(--success);
+            border: 1px solid #a7f3d0;
+        }
+
+        .message-error {
+            background: #fef2f2;
+            color: var(--danger);
+            border: 1px solid #fca5a5;
+        }
+
+        /* ====== Animacao ====== */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .note-item {
+            animation: slideIn 0.3s ease;
+        }
+
+        /* ====== Loading ====== */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            border: 2px solid var(--border);
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ====== Completion Info Styles ====== */
+        .completion-info {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 1px solid #a7f3d0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .completion-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--success);
+            margin-bottom: 0.75rem;
+        }
+
+        .completion-details {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .completion-details span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .completion-observation {
+            font-size: 0.875rem;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .completion-observation i {
+            color: var(--info);
+            margin-right: 0.25rem;
+        }
+
+        /* ====== Modal Styles ====== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal {
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+            margin: 1rem;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--success);
+            margin: 0;
+        }
+
+        .modal-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: flex-end;
+        }
+
+        .modal-actions .btn {
+            min-width: 100px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .note-actions {
+                justify-content: center;
+            }
+
+            .login-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        /* ====== barra de rolagem personalizada ====== */
+        .notes-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .notes-container::-webkit-scrollbar-track {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .notes-container::-webkit-scrollbar-thumb {
+            background: var(--text-muted);
+            border-radius: 3px;
+        }
+
+        .notes-container::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* ====== Rodapé ====== */
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .footer-text {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* ====== Hide main when not logged in ====== */
+        .main-content.hidden {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-  <div class="container">
-    <!-- Header -->
-    <header class="header">
-      <div class="logo">
-        <i class="fas fa-sticky-note"></i>
-        <span>Sistema de Anotações</span>
-      </div>
-      
-      <!-- Auth Section -->
-      <div class="auth-card">
-        <div class="user-area" id="userArea">
-          <i class="fas fa-user-circle"></i>
-          <span id="userEmail"></span>
-          <button class="btn btn-secondary btn-sm" id="btnLogout">
-            <i class="fas fa-sign-out-alt"></i>
-            Sair
-          </button>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="fas fa-sticky-note"></i>
+            </div>
+            <h1 class="login-title">Sistema de Anotações</h1>
+            <p class="login-subtitle">Gerencie suas notas de forma simples e eficiente</p>
+
+            <form class="login-form">
+                <div class="login-form-group">
+                    <input type="email" class="login-input" id="loginEmail" placeholder="Seu email" required>
+                </div>
+
+                <div class="login-form-group">
+                    <input type="password" class="login-input" id="loginPassword" placeholder="Sua senha" required>
+                </div>
+
+                <button type="button" class="login-btn login-btn-primary" id="btnLoginMain">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Entrar
+                </button>
+
+                <div class="login-divider">
+                    <span>ou</span>
+                </div>
+
+                <button type="button" class="login-btn login-btn-secondary" id="btnSignupMain">
+                    <i class="fas fa-user-plus"></i>
+                    Criar nova conta
+                </button>
+            </form>
+
+            <div id="loginMessage"></div>
         </div>
-        
-        <div class="auth-form" id="loginArea">
-          <input type="email" id="inpEmail" placeholder="Email" style="width: 200px;">
-          <input type="password" id="inpPassword" placeholder="Senha" style="width: 150px;">
-          <button class="btn btn-primary" id="btnLogin">
-            <i class="fas fa-sign-in-alt"></i>
-            Entrar
-          </button>
-          <button class="btn btn-success" id="btnSignup">
-            <i class="fas fa-user-plus"></i>
-            Criar Conta
-          </button>
-        </div>
-        <div id="authMessage"></div>
-      </div>
-    </header>
+    </div>
 
     <!-- Main Content -->
-    <main class="main-grid">
-      <!-- Left Column - Notes List -->
-      <section class="card">
-        <div class="card-header">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-            <h2 class="card-title">
-              <i class="fas fa-list"></i>
-              Suas Anotações
-            </h2>
-            <button class="btn btn-primary" id="btnNew">
-              <i class="fas fa-plus"></i>
-              Nova Nota
-            </button>
-          </div>
+    <div class="main-content hidden" id="mainContent">
+        <div class="container">
+            <!-- Header -->
+            <header class="header">
+                <div class="logo">
+                    <i class="fas fa-sticky-note"></i>
+                    <span>Sistema de Anotações</span>
+                </div>
+
+                <!-- User Area -->
+                <div class="auth-card">
+                    <div class="user-area" id="userArea">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userEmail"></span>
+                        <button class="btn btn-secondary btn-sm" id="btnLogout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Sair
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Grid -->
+            <main class="main-grid">
+                <!-- Left Column - Notes List -->
+                <section class="card">
+                    <div class="card-header">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <h2 class="card-title">
+                                <i class="fas fa-list"></i>
+                                Suas Anotações
+                            </h2>
+                            <button class="btn btn-primary" id="btnNew">
+                                <i class="fas fa-plus"></i>
+                                Nova Nota
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Tabs -->
+                        <div class="tabs">
+                            <button class="tab-btn active" data-filter="all">
+                                <i class="fas fa-globe"></i>
+                                Todas Públicas
+                            </button>
+                            <button class="tab-btn" data-filter="mine">
+                                <i class="fas fa-lock"></i>
+                                Minhas Privadas
+                            </button>
+                            <button class="tab-btn" data-filter="both">
+                                <i class="fas fa-layer-group"></i>
+                                Minhas + Públicas
+                            </button>
+                            <button class="tab-btn" data-filter="completed">
+                                <i class="fas fa-check-circle"></i>
+                                Concluídas
+                            </button>
+                        </div>
+
+                        <!-- Search -->
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" id="searchInput"
+                                placeholder="Buscar por título ou conteúdo...">
+                        </div>
+
+                        <!-- Notes List -->
+                        <div class="notes-container" id="notesContainer">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                Carregando anotações...
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Right Column - Editor & Status -->
+                <aside>
+                    <!-- Editor Card -->
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-edit"></i>
+                                Editor de Notas
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">Título</label>
+                                <input type="text" id="noteTitle" placeholder="Digite o título da nota...">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Conteúdo</label>
+                                <textarea id="noteContent" placeholder="Digite o conteúdo da sua nota..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Visibilidade</label>
+                                <select id="notePublic">
+                                    <option value="true">🌐 Pública (visível a todos)</option>
+                                    <option value="false">🔒 Privada (apenas você)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+                                <select id="noteCompleted">
+                                    <option value="false">📝 Em andamento</option>
+                                    <option value="true">✅ Concluída</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-clock"></i>
+                                    Lembrete (opcional)
+                                </label>
+                                <input type="datetime-local" id="noteReminder">
+                            </div>
+
+                            <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+                                <button class="btn btn-primary" id="btnSave" style="flex: 1;">
+                                    <i class="fas fa-save"></i>
+                                    Salvar
+                                </button>
+                                <button class="btn btn-secondary" id="btnCancel">
+                                    <i class="fas fa-times"></i>
+                                    Cancelar
+                                </button>
+                            </div>
+
+                            <div id="saveMessage"></div>
+                        </div>
+                    </div>
+
+                    <!-- Status Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">
+                                <i class="fas fa-info-circle"></i>
+                                Status da Conexão
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="statusArea" class="status-card status-disconnected">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Sistema não conectado
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </main>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <p class="footer-text">
+                    <i class="fas fa-info-circle"></i>
+                    Notas públicas são visíveis a todos os usuários. Notas privadas são visíveis apenas ao proprietário.
+                    <br>
+                    Os lembretes aparecem como notificações do navegador quando permitidas.
+                </p>
+            </footer>
         </div>
+    </div>
 
-        <div class="card-body">
-          <!-- Tabs -->
-          <div class="tabs">
-            <button class="tab-btn active" data-filter="all">
-              <i class="fas fa-globe"></i>
-              Todas Públicas
-            </button>
-            <button class="tab-btn" data-filter="mine">
-              <i class="fas fa-lock"></i>
-              Minhas Privadas
-            </button>
-            <button class="tab-btn" data-filter="both">
-              <i class="fas fa-layer-group"></i>
-              Minhas + Públicas
-            </button>
-          </div>
-
-          <!-- Search -->
-          <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" id="searchInput" placeholder="Buscar por título ou conteúdo...">
-          </div>
-
-          <!-- Notes List -->
-          <div class="notes-container" id="notesContainer">
-            <div class="loading">
-              <div class="spinner"></div>
-              Carregando anotações...
+    <!-- Completion Modal -->
+    <div class="modal-overlay hidden" id="completionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <i class="fas fa-check-circle"></i>
+                <h3 class="modal-title">Marcar como Feita</h3>
             </div>
-          </div>
-        </div>
-      </section>
+            <p class="modal-subtitle">
+                Você está marcando esta nota como concluída. Adicione uma observação opcional sobre a conclusão.
+            </p>
 
-      <!-- Right Column - Editor & Status -->
-      <aside>
-        <!-- Editor Card -->
-        <div class="card" style="margin-bottom: 1.5rem;">
-          <div class="card-header">
-            <h3 class="card-title">
-              <i class="fas fa-edit"></i>
-              Editor de Notas
-            </h3>
-          </div>
-          <div class="card-body">
             <div class="form-group">
-              <label class="form-label">Título</label>
-              <input type="text" id="noteTitle" placeholder="Digite o título da nota...">
+                <label class="form-label">
+                    <i class="fas fa-comment"></i>
+                    Observação (opcional)
+                </label>
+                <textarea id="completionObservation"
+                    placeholder="Ex: Tarefa concluída com sucesso, Problema resolvido, etc..."
+                    style="min-height: 100px;"></textarea>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Conteúdo</label>
-              <textarea id="noteContent" placeholder="Digite o conteúdo da sua nota..."></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelCompletion">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button class="btn btn-success" id="confirmCompletion">
+                    <i class="fas fa-check"></i>
+                    Marcar como Feita
+                </button>
             </div>
-
-            <div class="form-group">
-              <label class="form-label">Visibilidade</label>
-              <select id="notePublic">
-                <option value="true">
-                  <i class="fas fa-globe"></i>
-                  Pública (visível a todos)
-                </option>
-                <option value="false">
-                  <i class="fas fa-lock"></i>
-                  Privada (apenas você)
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">
-                <i class="fas fa-clock"></i>
-                Lembrete (opcional)
-              </label>
-              <input type="datetime-local" id="noteReminder">
-            </div>
-
-            <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
-              <button class="btn btn-primary" id="btnSave" style="flex: 1;">
-                <i class="fas fa-save"></i>
-                Salvar
-              </button>
-              <button class="btn btn-secondary" id="btnCancel">
-                <i class="fas fa-times"></i>
-                Cancelar
-              </button>
-            </div>
-
-            <div id="saveMessage"></div>
-          </div>
         </div>
+    </div>
 
-        <!-- Status Card -->
-        <div class="card">
-          <div class="card-header">
-            <h4 class="card-title">
-              <i class="fas fa-info-circle"></i>
-              Status da Conexão
-            </h4>
-          </div>
-          <div class="card-body">
-            <div id="statusArea" class="status-card status-disconnected">
-              <i class="fas fa-exclamation-triangle"></i>
-              Sistema não conectado
-            </div>
-          </div>
-        </div>
-      </aside>
-    </main>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <p class="footer-text">
-        <i class="fas fa-info-circle"></i>
-        Notas públicas são visíveis a todos os usuários. Notas privadas são visíveis apenas ao proprietário.
-        <br>
-        Os lembretes aparecem como notificações do navegador quando permitidas.
-      </p>
-    </footer>
-  </div>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <script>
-    // ================== FIREBASE CONFIGURATION ==================
-    const firebaseConfig = {
-      apiKey: "AIzaSyAsd9ywXXxibVZseCTZ_P0uejq9Ttk5VUI",
-      authDomain: "notas-empresa.firebaseapp.com",
-      projectId: "notas-empresa",
-      storageBucket: "notas-empresa.firebasestorage.app",
-      messagingSenderId: "1036347296997",
-      appId: "1:1036347296997:web:6be1cc59ab70ced9a2580c",
-      measurementId: "G-N0639WT6Y6"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    console.log('Firebase inicializado:', firebase.app().name);
-
-    // ================== UI REFERENCES ==================
-    const inpEmail = document.getElementById('inpEmail');
-    const inpPassword = document.getElementById('inpPassword');
-    const btnLogin = document.getElementById('btnLogin');
-    const btnSignup = document.getElementById('btnSignup');
-    const btnLogout = document.getElementById('btnLogout');
-    const userArea = document.getElementById('userArea');
-    const loginArea = document.getElementById('loginArea');
-    const userEmail = document.getElementById('userEmail');
-    const notesContainer = document.getElementById('notesContainer');
-    const searchInput = document.getElementById('searchInput');
-    const tabs = document.querySelectorAll('.tab-btn');
-    const btnNew = document.getElementById('btnNew');
-    const noteTitle = document.getElementById('noteTitle');
-    const noteContent = document.getElementById('noteContent');
-    const notePublic = document.getElementById('notePublic');
-    const noteReminder = document.getElementById('noteReminder');
-    const btnSave = document.getElementById('btnSave');
-    const btnCancel = document.getElementById('btnCancel');
-    const statusArea = document.getElementById('statusArea');
-    const authMessage = document.getElementById('authMessage');
-    const saveMessage = document.getElementById('saveMessage');
-
-    let currentUser = null;
-    let editId = null;
-    let activeFilter = 'all';
-    let allNotes = [];
-
-    // ================== HELPER FUNCTIONS ==================
-    function showMessage(element, message, type = 'info') {
-      const messageClass = type === 'error' ? 'message-error' : 'message-success';
-      element.innerHTML = `<div class="message ${messageClass}">
-        <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'check-circle'}"></i>
-        ${message}
-      </div>`;
-      setTimeout(() => {
-        element.innerHTML = '';
-      }, 5000);
-    }
-
-    function formatDate(timestamp) {
-      return new Date(timestamp).toLocaleString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    }
-
-    // ================== AUTH HANDLERS ==================
-    btnSignup.addEventListener('click', async () => {
-      const email = inpEmail.value.trim();
-      const pwd = inpPassword.value;
-      
-      if (!email || !pwd) {
-        showMessage(authMessage, 'Por favor, informe email e senha', 'error');
-        return;
-      }
-      
-      btnSignup.disabled = true;
-      btnSignup.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando...';
-      
-      try {
-        console.log('Tentando criar conta para:', email);
-        const userCredential = await auth.createUserWithEmailAndPassword(email, pwd);
-        console.log('Conta criada com sucesso:', userCredential.user.email);
-        showMessage(authMessage, 'Conta criada com sucesso!', 'success');
-        inpEmail.value = '';
-        inpPassword.value = '';
-      } catch (error) {
-        console.error('Erro ao criar conta:', error);
-        let errorMsg = 'Erro ao criar conta';
-        if (error.code === 'auth/email-already-in-use') {
-          errorMsg = 'Este email já está em uso';
-        } else if (error.code === 'auth/weak-password') {
-          errorMsg = 'Senha muito fraca (mínimo 6 caracteres)';
-        } else if (error.code === 'auth/invalid-email') {
-          errorMsg = 'Email inválido';
-        }
-        showMessage(authMessage, errorMsg, 'error');
-      } finally {
-        btnSignup.disabled = false;
-        btnSignup.innerHTML = '<i class="fas fa-user-plus"></i> Criar Conta';
-      }
-    });
-
-    btnLogin.addEventListener('click', async () => {
-      const email = inpEmail.value.trim();
-      const pwd = inpPassword.value;
-      
-      if (!email || !pwd) {
-        showMessage(authMessage, 'Por favor, informe email e senha', 'error');
-        return;
-      }
-      
-      btnLogin.disabled = true;
-      btnLogin.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
-      
-      try {
-        console.log('Tentando fazer login para:', email);
-        await auth.signInWithEmailAndPassword(email, pwd);
-        console.log('Login realizado com sucesso');
-        inpEmail.value = '';
-        inpPassword.value = '';
-      } catch (error) {
-        console.error('Erro ao fazer login:', error);
-        let errorMsg = 'Erro ao fazer login';
-        if (error.code === 'auth/user-not-found') {
-          errorMsg = 'Usuário não encontrado';
-        } else if (error.code === 'auth/wrong-password') {
-          errorMsg = 'Senha incorreta';
-        } else if (error.code === 'auth/invalid-email') {
-          errorMsg = 'Email inválido';
-        }
-        showMessage(authMessage, errorMsg, 'error');
-      } finally {
-        btnLogin.disabled = false;
-        btnLogin.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
-      }
-    });
-
-    btnLogout.addEventListener('click', () => {
-      auth.signOut();
-    });
-
-    auth.onAuthStateChanged(user => {
-      console.log('Estado de autenticação mudou:', user ? user.email : 'não autenticado');
-      currentUser = user;
-      
-      if (user) {
-        userArea.classList.add('active');
-        loginArea.style.display = 'none';
-        userEmail.textContent = user.email;
-        statusArea.className = 'status-card status-connected';
-        statusArea.innerHTML = `
-          <i class="fas fa-check-circle"></i>
-          Conectado como <strong>${user.email}</strong>
-        `;
-      } else {
-        userArea.classList.remove('active');
-        loginArea.style.display = 'flex';
-        userEmail.textContent = '';
-        statusArea.className = 'status-card status-disconnected';
-        statusArea.innerHTML = `
-          <i class="fas fa-exclamation-triangle"></i>
-          Sistema não conectado
-        `;
-      }
-      
-      renderNotes();
-    });
-
-    // ================== NOTES CRUD ==================
-    db.collection('notes').orderBy('createdAt', 'desc').onSnapshot(
-      (snapshot) => {
-        console.log('Notas atualizadas:', snapshot.size, 'documentos');
-        allNotes = [];
-        snapshot.forEach(doc => {
-          allNotes.push({ id: doc.id, ...doc.data() });
-        });
-        renderNotes();
-      },
-      (error) => {
-        console.error('Erro ao carregar notas:', error);
-        notesContainer.innerHTML = `
-          <div class="message message-error">
-            <i class="fas fa-exclamation-triangle"></i>
-            Erro ao carregar notas. Verifique as permissões do Firestore.
-          </div>
-        `;
-      }
-    );
-
-    function renderNotes() {
-      const query = searchInput.value.trim().toLowerCase();
-      notesContainer.innerHTML = '';
-      
-      let filtered = allNotes.filter(note => {
-        if (activeFilter === 'all') {
-          return note.public === true;
-        } else if (activeFilter === 'mine') {
-          return currentUser && note.ownerUID === currentUser.uid && note.public === false;
-        } else {
-          return (note.public === true) || (currentUser && note.ownerUID === currentUser.uid);
-        }
-      });
-      
-      if (query) {
-        filtered = filtered.filter(note => {
-          const searchText = ((note.title || '') + ' ' + (note.content || '')).toLowerCase();
-          return searchText.includes(query);
-        });
-      }
-
-      if (filtered.length === 0) {
-        notesContainer.innerHTML = `
-          <div class="loading">
-            <i class="fas fa-sticky-note"></i>
-            Nenhuma nota encontrada
-          </div>
-        `;
-        return;
-      }
-
-      filtered.forEach(note => {
-        const noteElement = createNoteElement(note);
-        notesContainer.appendChild(noteElement);
-      });
-    }
-
-    function createNoteElement(note) {
-      const item = document.createElement('div');
-      item.className = 'note-item';
-      
-      if (isReminderDue(note)) item.classList.add('reminder-due');
-      if (!note.public) item.classList.add('private');
-
-      const isOwner = currentUser && note.ownerUID === currentUser.uid;
-
-      item.innerHTML = `
-        <div class="note-title">${note.title || '(sem título)'}</div>
-        
-        <div class="note-meta">
-          <span class="note-badge ${note.public ? 'badge-public' : 'badge-private'}">
-            <i class="fas fa-${note.public ? 'globe' : 'lock'}"></i>
-            ${note.public ? 'Pública' : 'Privada'}
-          </span>
-          <span>
-            <i class="fas fa-user"></i>
-            ${note.ownerEmail || '—'}
-          </span>
-          ${note.createdAt ? `
-          <span>
-            <i class="fas fa-calendar-alt"></i>
-            ${formatDate(note.createdAt)}
-          </span>
-          ` : ''}
-        </div>
-
-        ${note.reminderTimestamp ? `
-        <div class="note-reminder">
-          <i class="fas fa-bell"></i>
-          Lembrete: ${formatDate(note.reminderTimestamp)}
-        </div>
-        ` : ''}
-
-        <div class="note-content">${note.content || ''}</div>
-
-        ${isOwner ? `
-        <div class="note-actions">
-          <button class="btn btn-ghost btn-sm edit-btn" data-id="${note.id}">
-            <i class="fas fa-edit"></i>
-            Editar
-          </button>
-          <button class="btn btn-secondary btn-sm toggle-btn" data-id="${note.id}">
-            <i class="fas fa-${note.public ? 'lock' : 'globe'}"></i>
-            ${note.public ? 'Tornar Privada' : 'Tornar Pública'}
-          </button>
-          <button class="btn btn-danger btn-sm delete-btn" data-id="${note.id}">
-            <i class="fas fa-trash"></i>
-            Excluir
-          </button>
-        </div>
-        ` : ''}
-      `;
-
-      // Event listeners for buttons
-      if (isOwner) {
-        const editBtn = item.querySelector('.edit-btn');
-        const toggleBtn = item.querySelector('.toggle-btn');
-        const deleteBtn = item.querySelector('.delete-btn');
-
-        editBtn.addEventListener('click', () => openEditor(note));
-        toggleBtn.addEventListener('click', () => toggleNoteVisibility(note));
-        deleteBtn.addEventListener('click', () => deleteNote(note));
-      }
-
-      return item;
-    }
-
-    async function toggleNoteVisibility(note) {
-      try {
-        await db.collection('notes').doc(note.id).update({
-          public: !note.public,
-          updatedAt: Date.now()
-        });
-        console.log('Visibilidade alterada:', note.id);
-      } catch (error) {
-        console.error('Erro ao alterar visibilidade:', error);
-        alert('Erro ao alterar visibilidade da nota');
-      }
-    }
-
-    async function deleteNote(note) {
-      if (!confirm(`Tem certeza que deseja excluir a nota "${note.title || 'sem título'}"?`)) {
-        return;
-      }
-
-      try {
-        await db.collection('notes').doc(note.id).delete();
-        console.log('Nota excluída:', note.id);
-      } catch (error) {
-        console.error('Erro ao excluir nota:', error);
-        alert('Erro ao excluir a nota');
-      }
-    }
-
-    // ================== EVENT LISTENERS ==================
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        activeFilter = tab.dataset.filter;
-        renderNotes();
-      });
-    });
-
-    searchInput.addEventListener('input', renderNotes);
-
-    btnNew.addEventListener('click', () => {
-      editId = null;
-      noteTitle.value = '';
-      noteContent.value = '';
-      notePublic.value = 'false';
-      noteReminder.value = '';
-      saveMessage.innerHTML = '';
-      noteTitle.focus();
-    });
-
-    btnCancel.addEventListener('click', () => {
-      editId = null;
-      noteTitle.value = '';
-      noteContent.value = '';
-      noteReminder.value = '';
-      saveMessage.innerHTML = '';
-    });
-
-    btnSave.addEventListener('click', async () => {
-      if (!currentUser) {
-        showMessage(saveMessage, 'Faça login para salvar notas', 'error');
-        return;
-      }
-
-      const title = noteTitle.value.trim();
-      const content = noteContent.value.trim();
-      
-      if (!title && !content) {
-        showMessage(saveMessage, 'Informe pelo menos o título ou conteúdo', 'error');
-        return;
-      }
-
-      const isPublic = notePublic.value === 'true';
-      const reminderValue = noteReminder.value ? new Date(noteReminder.value).getTime() : null;
-
-      const noteData = {
-        title,
-        content,
-        public: isPublic,
-        ownerUID: currentUser.uid,
-        ownerEmail: currentUser.email,
-        reminderTimestamp: reminderValue,
-        updatedAt: Date.now()
-      };
-
-      btnSave.disabled = true;
-      btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
-
-      try {
-        if (editId) {
-          await db.collection('notes').doc(editId).update(noteData);
-          console.log('Nota atualizada:', editId);
-          showMessage(saveMessage, 'Nota atualizada com sucesso!', 'success');
-          editId = null;
-        } else {
-          noteData.createdAt = Date.now();
-          const docRef = await db.collection('notes').add(noteData);
-          console.log('Nova nota criada:', docRef.id);
-          showMessage(saveMessage, 'Nota criada com sucesso!', 'success');
-        }
-
-        // Clear form
-        noteTitle.value = '';
-        noteContent.value = '';
-        noteReminder.value = '';
-      } catch (error) {
-        console.error('Erro ao salvar nota:', error);
-        showMessage(saveMessage, 'Erro ao salvar nota: ' + error.message, 'error');
-      } finally {
-        btnSave.disabled = false;
-        btnSave.innerHTML = '<i class="fas fa-save"></i> Salvar';
-      }
-    });
-
-    function openEditor(note) {
-      editId = note.id;
-      noteTitle.value = note.title || '';
-      noteContent.value = note.content || '';
-      notePublic.value = note.public ? 'true' : 'false';
-      noteReminder.value = note.reminderTimestamp ? 
-        new Date(note.reminderTimestamp).toISOString().slice(0, 16) : '';
-      saveMessage.innerHTML = '';
-      
-      // Scroll to editor
-      document.querySelector('.card-header h3').scrollIntoView({ 
-        behavior: 'smooth' 
-      });
-    }
-
-    // ================== REMINDERS ==================
-    if ('Notification' in window) {
-      if (Notification.permission === 'default') {
-        Notification.requestPermission().then(permission => {
-          console.log('Permissão para notificações:', permission);
-        }).catch(() => {
-          console.log('Erro ao solicitar permissão para notificações');
-        });
-      }
-    }
-
-    function isReminderDue(note) {
-      if (!note.reminderTimestamp) return false;
-      return note.reminderTimestamp <= Date.now();
-    }
-
-    const notifiedReminders = new Set();
-    
-    // Check reminders every 30 seconds
-    setInterval(() => {
-      if (!currentUser) return;
-      
-      allNotes.forEach(note => {
-        if (!note.reminderTimestamp) return;
-        if (note.ownerUID !== currentUser.uid) return;
-        if (notifiedReminders.has(note.id)) return;
-        
-        if (note.reminderTimestamp <= Date.now()) {
-          notifyReminder(note);
-          notifiedReminders.add(note.id);
-        }
-      });
-    }, 30000);
-
-    function notifyReminder(note) {
-      const title = 'Lembrete: ' + (note.title || 'Sem título');
-      const body = note.content || 'Sem conteúdo';
-      
-      if ('Notification' in window && Notification.permission === 'granted') {
-        const notification = new Notification(title, { 
-          body,
-          icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234f46e5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
-          requireInteraction: true
-        });
-        
-        notification.onclick = () => {
-          window.focus();
-          notification.close();
+    <script>
+        // ================== FIREBASE CONFIGURATION ==================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsd9ywXXxibVZseCTZ_P0uejq9Ttk5VUI",
+            authDomain: "notas-empresa.firebaseapp.com",
+            projectId: "notas-empresa",
+            storageBucket: "notas-empresa.firebasestorage.app",
+            messagingSenderId: "1036347296997",
+            appId: "1:1036347296997:web:6be1cc59ab70ced9a2580c",
+            measurementId: "G-N0639WT6Y6"
         };
-      } else {
-        // Fallback alert
-        alert(`${title}\n\n${body}`);
-      }
-    }
 
-    // ================== KEYBOARD SHORTCUTS ==================
-    document.addEventListener('keydown', (e) => {
-      // Ctrl/Cmd + N for new note
-      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
-        e.preventDefault();
-        btnNew.click();
-      }
-      
-      // Ctrl/Cmd + S for save note
-      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault();
-        if (noteTitle.value.trim() || noteContent.value.trim()) {
-          btnSave.click();
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        console.log('Firebase inicializado:', firebase.app().name);
+
+        // ================== UI REFERENCES ==================
+        const loginScreen = document.getElementById('loginScreen');
+        const mainContent = document.getElementById('mainContent');
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        const btnLoginMain = document.getElementById('btnLoginMain');
+        const btnSignupMain = document.getElementById('btnSignupMain');
+        const loginMessage = document.getElementById('loginMessage');
+        const btnLogout = document.getElementById('btnLogout');
+        const userArea = document.getElementById('userArea');
+        const userEmail = document.getElementById('userEmail');
+        const notesContainer = document.getElementById('notesContainer');
+        const searchInput = document.getElementById('searchInput');
+        const tabs = document.querySelectorAll('.tab-btn');
+        const btnNew = document.getElementById('btnNew');
+        const noteTitle = document.getElementById('noteTitle');
+        const noteContent = document.getElementById('noteContent');
+        const notePublic = document.getElementById('notePublic');
+        const noteCompleted = document.getElementById('noteCompleted');
+        const noteReminder = document.getElementById('noteReminder');
+        const btnSave = document.getElementById('btnSave');
+        const btnCancel = document.getElementById('btnCancel');
+        const statusArea = document.getElementById('statusArea');
+        const saveMessage = document.getElementById('saveMessage');
+
+        let currentUser = null;
+        let editId = null;
+        let activeFilter = 'all';
+        let allNotes = [];
+
+        // ================== HELPER FUNCTIONS ==================
+        function showMessage(element, message, type = 'info') {
+            const messageClass = type === 'error' ? 'message-error' : 'message-success';
+            element.innerHTML = `<div class="message ${messageClass}">
+                <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'check-circle'}"></i>
+                ${message}
+            </div>`;
+            setTimeout(() => {
+                element.innerHTML = '';
+            }, 5000);
         }
-      }
-      
-      // Escape to cancel editing
-      if (e.key === 'Escape') {
-        btnCancel.click();
-      }
-    });
 
-    // ================== INITIAL SETUP ==================
-    console.log('Sistema de anotações carregado');
-    
-    // Auto-focus email field if not logged in
-    setTimeout(() => {
-      if (!currentUser && inpEmail) {
-        inpEmail.focus();
-      }
-    }, 500);
-  </script>
+        function formatDate(timestamp) {
+            return new Date(timestamp).toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // ================== AUTH HANDLERS ==================
+        btnSignupMain.addEventListener('click', async () => {
+            const email = loginEmail.value.trim();
+            const pwd = loginPassword.value;
+
+            if (!email || !pwd) {
+                showMessage(loginMessage, 'Por favor, informe email e senha', 'error');
+                return;
+            }
+
+            btnSignupMain.disabled = true;
+            btnSignupMain.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando conta...';
+
+            try {
+                console.log('Tentando criar conta para:', email);
+                const userCredential = await auth.createUserWithEmailAndPassword(email, pwd);
+                console.log('Conta criada com sucesso:', userCredential.user.email);
+                showMessage(loginMessage, 'Conta criada com sucesso!', 'success');
+            } catch (error) {
+                console.error('Erro ao criar conta:', error);
+                let errorMsg = 'Erro ao criar conta';
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMsg = 'Este email já está em uso';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMsg = 'Senha muito fraca (mínimo 6 caracteres)';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg = 'Email inválido';
+                }
+                showMessage(loginMessage, errorMsg, 'error');
+            } finally {
+                btnSignupMain.disabled = false;
+                btnSignupMain.innerHTML = '<i class="fas fa-user-plus"></i> Criar nova conta';
+            }
+        });
+
+        btnLoginMain.addEventListener('click', async () => {
+            const email = loginEmail.value.trim();
+            const pwd = loginPassword.value;
+
+            if (!email || !pwd) {
+                showMessage(loginMessage, 'Por favor, informe email e senha', 'error');
+                return;
+            }
+
+            btnLoginMain.disabled = true;
+            btnLoginMain.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+
+            try {
+                console.log('Tentando fazer login para:', email);
+                await auth.signInWithEmailAndPassword(email, pwd);
+                console.log('Login realizado com sucesso');
+            } catch (error) {
+                console.error('Erro ao fazer login:', error);
+                let errorMsg = 'Erro ao fazer login';
+                if (error.code === 'auth/user-not-found') {
+                    errorMsg = 'Usuário não encontrado';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMsg = 'Senha incorreta';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg = 'Email inválido';
+                }
+                showMessage(loginMessage, errorMsg, 'error');
+            } finally {
+                btnLoginMain.disabled = false;
+                btnLoginMain.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+            }
+        });
+
+        btnLogout.addEventListener('click', () => {
+            auth.signOut();
+        });
+
+        // Handle Enter key on login form
+        loginEmail.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loginPassword.focus();
+            }
+        });
+
+        loginPassword.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                btnLoginMain.click();
+            }
+        });
+
+        auth.onAuthStateChanged(user => {
+            console.log('Estado de autenticação mudou:', user ? user.email : 'não autenticado');
+            currentUser = user;
+
+            if (user) {
+                // Show main content, hide login screen
+                loginScreen.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+
+                userEmail.textContent = user.email;
+                statusArea.className = 'status-card status-connected';
+                statusArea.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    Conectado como <strong>${user.email}</strong>
+                `;
+
+                // Clear login form
+                loginEmail.value = '';
+                loginPassword.value = '';
+                loginMessage.innerHTML = '';
+            } else {
+                // Show login screen, hide main content
+                loginScreen.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+
+                userEmail.textContent = '';
+                statusArea.className = 'status-card status-disconnected';
+                statusArea.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Sistema não conectado
+                `;
+            }
+
+            renderNotes();
+        });
+
+        // ================== NOTES CRUD ==================
+        db.collection('notes').orderBy('createdAt', 'desc').onSnapshot(
+            (snapshot) => {
+                console.log('Notas atualizadas:', snapshot.size, 'documentos');
+                allNotes = [];
+                snapshot.forEach(doc => {
+                    allNotes.push({ id: doc.id, ...doc.data() });
+                });
+                renderNotes();
+            },
+            (error) => {
+                console.error('Erro ao carregar notas:', error);
+                notesContainer.innerHTML = `
+                    <div class="message message-error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Erro ao carregar notas. Verifique as permissões do Firestore.
+                    </div>
+                `;
+            }
+        );
+
+        function renderNotes() {
+            console.log('Renderizando notas. Usuário atual:', currentUser ? currentUser.email : 'não logado');
+            const query = searchInput.value.trim().toLowerCase();
+            notesContainer.innerHTML = '';
+
+            let filtered = allNotes.filter(note => {
+                if (activeFilter === 'all') {
+                    return note.public === true && !note.completed;
+                } else if (activeFilter === 'mine') {
+                    return currentUser && note.ownerUID === currentUser.uid && note.public === false && !note.completed;
+                } else if (activeFilter === 'completed') {
+                    return note.completed === true && (note.public || (currentUser && note.ownerUID === currentUser.uid));
+                }
+                else {
+                    return (note.public === true && !note.completed) || (currentUser && note.ownerUID === currentUser.uid && !note.completed);
+                }
+            });
+
+            if (query) {
+                filtered = filtered.filter(note => {
+                    const searchText = ((note.title || '') + ' ' + (note.content || '')).toLowerCase();
+                    return searchText.includes(query);
+                });
+            }
+
+            console.log('Notas filtradas:', filtered.length);
+
+            if (filtered.length === 0) {
+                let emptyMessage = 'Nenhuma nota encontrada';
+                if (activeFilter === 'completed') {
+                    emptyMessage = 'Nenhuma nota concluída';
+                } else if (activeFilter === 'mine') {
+                    emptyMessage = 'Você não possui notas privadas';
+                }
+
+                notesContainer.innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-sticky-note"></i>
+                        ${emptyMessage}
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(note => {
+                const noteElement = createNoteElement(note);
+                notesContainer.appendChild(noteElement);
+            });
+        }
+
+        function createNoteElement(note) {
+            const item = document.createElement('div');
+            item.className = 'note-item';
+
+            if (isReminderDue(note)) item.classList.add('reminder-due');
+            if (!note.public) item.classList.add('private');
+            if (note.completed) item.classList.add('completed');
+
+            const isOwner = currentUser && note.ownerUID === currentUser.uid;
+            const canInteract = currentUser && (note.public || isOwner); // Can interact if note is public or user is owner
+
+            console.log('Criando nota:', note.title, 'isOwner:', isOwner, 'canInteract:', canInteract, 'completed:', note.completed);
+
+            item.innerHTML = `
+                <div class="note-title">${note.title || '(sem título)'}</div>
+                
+                <div class="note-meta">
+                    <span class="note-badge ${note.public ? 'badge-public' : 'badge-private'}">
+                        <i class="fas fa-${note.public ? 'globe' : 'lock'}"></i>
+                        ${note.public ? 'Pública' : 'Privada'}
+                    </span>
+                    ${note.completed ? `
+                    <span class="note-badge badge-completed">
+                        <i class="fas fa-check-circle"></i>
+                        Concluída
+                    </span>
+                    ` : ''}
+                    <span>
+                        <i class="fas fa-user"></i>
+                        ${note.ownerEmail || '—'}
+                    </span>
+                    ${note.createdAt ? `
+                    <span>
+                        <i class="fas fa-calendar-alt"></i>
+                        ${formatDate(note.createdAt)}
+                    </span>
+                    ` : ''}
+                </div>
+
+                ${note.reminderTimestamp ? `
+                <div class="note-reminder">
+                    <i class="fas fa-bell"></i>
+                    Lembrete: ${formatDate(note.reminderTimestamp)}
+                </div>
+                ` : ''}
+
+                <div class="note-content">${note.content || ''}</div>
+
+                ${note.completed && note.completedData ? `
+                <div class="completion-info">
+                    <div class="completion-header">
+                        <i class="fas fa-check-circle"></i>
+                        <strong>Marcada como feita</strong>
+                    </div>
+                    <div class="completion-details">
+                        <span><i class="fas fa-user"></i> Por: ${note.completedData.userEmail}</span>
+                        <span><i class="fas fa-clock"></i> Em: ${formatDate(note.completedData.timestamp)}</span>
+                    </div>
+                    ${note.completedData.observation ? `
+                    <div class="completion-observation">
+                        <i class="fas fa-comment"></i> <strong>Observação:</strong> ${note.completedData.observation}
+                    </div>
+                    ` : ''}
+                </div>
+                ` : ''}
+
+                <div class="note-actions">
+                    ${isOwner ? `
+                    <button class="btn btn-ghost btn-sm edit-btn" data-id="${note.id}">
+                        <i class="fas fa-edit"></i>
+                        Editar
+                    </button>
+                    ` : ''}
+                    
+                    ${canInteract && !note.completed ? `
+                    <button class="btn btn-info btn-sm complete-btn" data-id="${note.id}">
+                        <i class="fas fa-check"></i>
+                        Marcar como Feita
+                    </button>
+                    ` : ''}
+                    
+                    ${isOwner && note.completed ? `
+                    <button class="btn btn-secondary btn-sm incomplete-btn" data-id="${note.id}">
+                        <i class="fas fa-undo"></i>
+                        Reabrir
+                    </button>
+                    ` : ''}
+                    
+                    ${isOwner ? `
+                    <button class="btn btn-secondary btn-sm toggle-btn" data-id="${note.id}">
+                        <i class="fas fa-${note.public ? 'lock' : 'globe'}"></i>
+                        ${note.public ? 'Tornar Privada' : 'Tornar Pública'}
+                    </button>
+                    <button class="btn btn-danger btn-sm delete-btn" data-id="${note.id}">
+                        <i class="fas fa-trash"></i>
+                        Excluir
+                    </button>
+                    ` : ''}
+                </div>
+            `;
+
+            // Event listeners for buttons
+            const editBtn = item.querySelector('.edit-btn');
+            const toggleBtn = item.querySelector('.toggle-btn');
+            const deleteBtn = item.querySelector('.delete-btn');
+            const completeBtn = item.querySelector('.complete-btn');
+            const incompleteBtn = item.querySelector('.incomplete-btn');
+
+            if (editBtn) {
+                editBtn.addEventListener('click', () => {
+                    console.log('Botão editar clicado');
+                    openEditor(note);
+                });
+            }
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    console.log('Botão toggle clicado');
+                    toggleNoteVisibility(note);
+                });
+            }
+
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', () => {
+                    console.log('Botão excluir clicado');
+                    deleteNote(note);
+                });
+            }
+
+            if (completeBtn) {
+                completeBtn.addEventListener('click', () => {
+                    console.log('Botão marcar como feita clicado para nota:', note.id);
+                    showCompletionModal(note);
+                });
+            }
+
+            if (incompleteBtn) {
+                incompleteBtn.addEventListener('click', () => {
+                    console.log('Botão reabrir clicado');
+                    toggleNoteCompletion(note, false);
+                });
+            }
+
+            return item;
+        }
+
+        async function toggleNoteVisibility(note) {
+            try {
+                await db.collection('notes').doc(note.id).update({
+                    public: !note.public,
+                    updatedAt: Date.now()
+                });
+                console.log('Visibilidade alterada:', note.id);
+            } catch (error) {
+                console.error('Erro ao alterar visibilidade:', error);
+                alert('Erro ao alterar visibilidade da nota');
+            }
+        }
+
+        async function toggleNoteCompletion(note, completed) {
+            try {
+                const updateData = {
+                    completed: completed,
+                    updatedAt: Date.now()
+                };
+
+                // If marking as incomplete, remove completion data
+                if (!completed) {
+                    updateData.completedData = firebase.firestore.FieldValue.delete();
+                }
+
+                await db.collection('notes').doc(note.id).update(updateData);
+                console.log('Status de conclusão alterado:', note.id, completed);
+            } catch (error) {
+                console.error('Erro ao alterar status de conclusão:', error);
+                alert('Erro ao alterar status da nota');
+            }
+        }
+
+        // ================== COMPLETION MODAL FUNCTIONS ==================
+        function showCompletionModal(note) {
+            currentNoteForCompletion = note;
+            completionObservation.value = '';
+            completionModal.classList.remove('hidden');
+            completionObservation.focus();
+        }
+
+        function hideCompletionModal() {
+            currentNoteForCompletion = null;
+            completionObservation.value = '';
+            completionModal.classList.add('hidden');
+        }
+
+        async function completeNoteWithObservation() {
+            if (!currentNoteForCompletion || !currentUser) return;
+
+            const observation = completionObservation.value.trim();
+
+            const completedData = {
+                completed: true,
+                completedData: {
+                    userEmail: currentUser.email,
+                    userUID: currentUser.uid,
+                    timestamp: Date.now(),
+                    observation: observation || null
+                },
+                updatedAt: Date.now()
+            };
+
+            confirmCompletion.disabled = true;
+            confirmCompletion.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Marcando...';
+
+            try {
+                await db.collection('notes').doc(currentNoteForCompletion.id).update(completedData);
+                console.log('Nota marcada como concluída:', currentNoteForCompletion.id);
+                hideCompletionModal();
+            } catch (error) {
+                console.error('Erro ao marcar nota como concluída:', error);
+                alert('Erro ao marcar nota como concluída');
+            } finally {
+                confirmCompletion.disabled = false;
+                confirmCompletion.innerHTML = '<i class="fas fa-check"></i> Marcar como Feita';
+            }
+        }
+
+        // Modal event listeners
+        cancelCompletion.addEventListener('click', hideCompletionModal);
+        confirmCompletion.addEventListener('click', completeNoteWithObservation);
+
+        // Close modal when clicking outside
+        completionModal.addEventListener('click', (e) => {
+            if (e.target === completionModal) {
+                hideCompletionModal();
+            }
+        });
+
+        // Handle Enter key in observation textarea
+        completionObservation.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                completeNoteWithObservation();
+            }
+        });
+
+        async function deleteNote(note) {
+            if (!confirm(`Tem certeza que deseja excluir a nota "${note.title || 'sem título'}"?`)) {
+                return;
+            }
+
+            try {
+                await db.collection('notes').doc(note.id).delete();
+                console.log('Nota excluída:', note.id);
+            } catch (error) {
+                console.error('Erro ao excluir nota:', error);
+                alert('Erro ao excluir a nota');
+            }
+        }
+
+        // ================== EVENT LISTENERS ==================
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                activeFilter = tab.dataset.filter;
+                renderNotes();
+            });
+        });
+
+        searchInput.addEventListener('input', renderNotes);
+
+        btnNew.addEventListener('click', () => {
+            editId = null;
+            noteTitle.value = '';
+            noteContent.value = '';
+            notePublic.value = 'false';
+            noteCompleted.value = 'false';
+            noteReminder.value = '';
+            saveMessage.innerHTML = '';
+            noteTitle.focus();
+        });
+
+        btnCancel.addEventListener('click', () => {
+            editId = null;
+            noteTitle.value = '';
+            noteContent.value = '';
+            noteCompleted.value = 'false';
+            noteReminder.value = '';
+            saveMessage.innerHTML = '';
+        });
+
+        btnSave.addEventListener('click', async () => {
+            if (!currentUser) {
+                showMessage(saveMessage, 'Faça login para salvar notas', 'error');
+                return;
+            }
+
+            const title = noteTitle.value.trim();
+            const content = noteContent.value.trim();
+
+            if (!title && !content) {
+                showMessage(saveMessage, 'Informe pelo menos o título ou conteúdo', 'error');
+                return;
+            }
+
+            const isPublic = notePublic.value === 'true';
+            const isCompleted = noteCompleted.value === 'true';
+            const reminderValue = noteReminder.value ? new Date(noteReminder.value).getTime() : null;
+
+            const noteData = {
+                title,
+                content,
+                public: isPublic,
+                completed: isCompleted,
+                ownerUID: currentUser.uid,
+                ownerEmail: currentUser.email,
+                reminderTimestamp: reminderValue,
+                updatedAt: Date.now()
+            };
+
+            btnSave.disabled = true;
+            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+
+            try {
+                if (editId) {
+                    await db.collection('notes').doc(editId).update(noteData);
+                    console.log('Nota atualizada:', editId);
+                    showMessage(saveMessage, 'Nota atualizada com sucesso!', 'success');
+                    editId = null;
+                } else {
+                    noteData.createdAt = Date.now();
+                    const docRef = await db.collection('notes').add(noteData);
+                    console.log('Nova nota criada:', docRef.id);
+                    showMessage(saveMessage, 'Nota criada com sucesso!', 'success');
+                }
+
+                // Clear form
+                noteTitle.value = '';
+                noteContent.value = '';
+                noteCompleted.value = 'false';
+                noteReminder.value = '';
+            } catch (error) {
+                console.error('Erro ao salvar nota:', error);
+                showMessage(saveMessage, 'Erro ao salvar nota: ' + error.message, 'error');
+            } finally {
+                btnSave.disabled = false;
+                btnSave.innerHTML = '<i class="fas fa-save"></i> Salvar';
+            }
+        });
+
+        function openEditor(note) {
+            editId = note.id;
+            noteTitle.value = note.title || '';
+            noteContent.value = note.content || '';
+            notePublic.value = note.public ? 'true' : 'false';
+            noteCompleted.value = note.completed ? 'true' : 'false';
+            noteReminder.value = note.reminderTimestamp ?
+                new Date(note.reminderTimestamp).toISOString().slice(0, 16) : '';
+            saveMessage.innerHTML = '';
+
+            // Scroll to editor
+            document.querySelector('.card-header h3').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // ================== REMINDERS ==================
+        if ('Notification' in window) {
+            if (Notification.permission === 'default') {
+                Notification.requestPermission().then(permission => {
+                    console.log('Permissão para notificações:', permission);
+                }).catch(() => {
+                    console.log('Erro ao solicitar permissão para notificações');
+                });
+            }
+        }
+
+        function isReminderDue(note) {
+            if (!note.reminderTimestamp) return false;
+            return note.reminderTimestamp <= Date.now();
+        }
+
+        const notifiedReminders = new Set();
+
+        // Check reminders every 30 seconds
+        setInterval(() => {
+            if (!currentUser) return;
+
+            allNotes.forEach(note => {
+                if (!note.reminderTimestamp) return;
+                if (note.ownerUID !== currentUser.uid) return;
+                if (notifiedReminders.has(note.id)) return;
+                if (note.completed) return; // Don't notify for completed notes
+
+                if (note.reminderTimestamp <= Date.now()) {
+                    notifyReminder(note);
+                    notifiedReminders.add(note.id);
+                }
+            });
+        }, 30000);
+
+        function notifyReminder(note) {
+            const title = 'Lembrete: ' + (note.title || 'Sem título');
+            const body = note.content || 'Sem conteúdo';
+
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const notification = new Notification(title, {
+                    body,
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234f46e5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
+                    requireInteraction: true
+                });
+
+                notification.onclick = () => {
+                    window.focus();
+                    notification.close();
+                };
+            } else {
+                // Fallback alert
+                alert(`${title}\n\n${body}`);
+            }
+        }
+
+        // ================== KEYBOARD SHORTCUTS ==================
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + N for new note
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                if (currentUser) {
+                    btnNew.click();
+                }
+            }
+
+            // Ctrl/Cmd + S for save note
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                if (currentUser && (noteTitle.value.trim() || noteContent.value.trim())) {
+                    btnSave.click();
+                }
+            }
+
+            // Escape to cancel editing or close modal
+            if (e.key === 'Escape') {
+                if (!completionModal.classList.contains('hidden')) {
+                    hideCompletionModal();
+                } else if (currentUser) {
+                    btnCancel.click();
+                }
+            }
+        });
+
+        // ================== INITIAL SETUP ==================
+        console.log('Sistema de anotações carregado');
+
+        // Auto-focus email field on page load
+        setTimeout(() => {
+            if (loginEmail) {
+                loginEmail.focus();
+            }
+        }, 500);
+
+        //====app
+        
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(() => console.log("Service Worker registrado com sucesso"))
+      .catch(err => console.error("Erro ao registrar Service Worker:", err));
+  }
+</script>
+
+    </script>
 </body>
+
 </html>
