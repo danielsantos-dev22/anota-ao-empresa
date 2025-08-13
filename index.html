@@ -12,7 +12,7 @@
     <title>Sistema de Anotações - Empresa</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* ====== Variables & Reset ====== */
+        /* ====== Variáveis e Redefinição ====== */
         :root {
             --primary: #4f46e5;
             --primary-dark: #3730a3;
@@ -45,7 +45,7 @@
             line-height: 1.6;
         }
 
-        /* ====== Login Screen ====== */
+      
         .login-screen {
             position: fixed;
             top: 0;
@@ -171,7 +171,7 @@
             font-size: 0.875rem;
         }
 
-        /* ====== Layout ====== */
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -206,7 +206,7 @@
             gap: 2rem;
         }
 
-        /* ====== Auth Section ====== */
+        
         .auth-card {
             background: var(--card);
             border-radius: var(--radius);
@@ -223,7 +223,7 @@
             color: white;
         }
 
-        /* ====== Form Elements ====== */
+       
         input,
         textarea,
         select {
@@ -259,7 +259,7 @@
             resize: vertical;
         }
 
-        /* ====== Buttons ====== */
+       
         .btn {
             padding: 0.75rem 1.25rem;
             border: none;
@@ -324,7 +324,7 @@
             font-size: 0.8125rem;
         }
 
-        /* ====== Cards ====== */
+        
         .card {
             background: var(--card);
             border-radius: var(--radius);
@@ -348,7 +348,7 @@
             padding: 1.5rem;
         }
 
-        /* ====== Tabs ====== */
+     
         .tabs {
             display: flex;
             gap: 0.5rem;
@@ -376,7 +376,7 @@
             box-shadow: var(--shadow);
         }
 
-        /* ====== Search ====== */
+       
         .search-container {
             position: relative;
             margin-bottom: 1.5rem;
@@ -398,7 +398,7 @@
             color: var(--text-muted);
         }
 
-        /* ====== Notes List ====== */
+        
         .notes-container {
             max-height: 600px;
             overflow-y: auto;
@@ -500,7 +500,7 @@
             flex-wrap: wrap;
         }
 
-        /* ====== Status & Messages ====== */
+       
         .status-card {
             padding: 1rem;
             border-radius: var(--radius);
@@ -538,7 +538,7 @@
             border: 1px solid #fca5a5;
         }
 
-        /* ====== Animacao ====== */
+       
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -555,7 +555,7 @@
             animation: slideIn 0.3s ease;
         }
 
-        /* ====== Loading ====== */
+      
         .loading {
             display: flex;
             justify-content: center;
@@ -584,7 +584,7 @@
             }
         }
 
-        /* ====== Completion Info Styles ====== */
+       
         .completion-info {
             background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
             border: 1px solid #a7f3d0;
@@ -628,7 +628,7 @@
             margin-right: 0.25rem;
         }
 
-        /* ====== Modal Styles ====== */
+      
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -753,7 +753,7 @@
             color: var(--text-muted);
         }
 
-        /* ====== Hide main when not logged in ====== */
+     
         .main-content.hidden {
             display: none;
         }
@@ -761,7 +761,7 @@
 </head>
 
 <body>
-    <!-- Login Screen -->
+  
     <div class="login-screen" id="loginScreen">
         <div class="login-card">
             <div class="login-logo">
@@ -798,17 +798,15 @@
         </div>
     </div>
 
-    <!-- Main Content -->
+    
     <div class="main-content hidden" id="mainContent">
         <div class="container">
-            <!-- Header -->
+           
             <header class="header">
                 <div class="logo">
                     <i class="fas fa-sticky-note"></i>
                     <span>Sistema de Anotações</span>
                 </div>
-
-                <!-- User Area -->
                 <div class="auth-card">
                     <div class="user-area" id="userArea">
                         <i class="fas fa-user-circle"></i>
@@ -820,10 +818,9 @@
                     </div>
                 </div>
             </header>
-
-            <!-- Main Grid -->
+         
             <main class="main-grid">
-                <!-- Left Column - Notes List -->
+              
                 <section class="card">
                     <div class="card-header">
                         <div
@@ -840,7 +837,7 @@
                     </div>
 
                     <div class="card-body">
-                        <!-- Tabs -->
+                     
                         <div class="tabs">
                             <button class="tab-btn active" data-filter="all">
                                 <i class="fas fa-globe"></i>
@@ -860,14 +857,12 @@
                             </button>
                         </div>
 
-                        <!-- Search -->
+              
                         <div class="search-container">
                             <i class="fas fa-search search-icon"></i>
                             <input type="text" class="search-input" id="searchInput"
                                 placeholder="Buscar por título ou conteúdo...">
                         </div>
-
-                        <!-- Notes List -->
                         <div class="notes-container" id="notesContainer">
                             <div class="loading">
                                 <div class="spinner"></div>
@@ -877,9 +872,8 @@
                     </div>
                 </section>
 
-                <!-- Right Column - Editor & Status -->
                 <aside>
-                    <!-- Editor Card -->
+               
                     <div class="card" style="margin-bottom: 1.5rem;">
                         <div class="card-header">
                             <h3 class="card-title">
@@ -937,7 +931,6 @@
                         </div>
                     </div>
 
-                    <!-- Status Card -->
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title">
@@ -955,7 +948,7 @@
                 </aside>
             </main>
 
-            <!-- Footer -->
+       
             <footer class="footer">
                 <p class="footer-text">
                     <i class="fas fa-info-circle"></i>
@@ -969,7 +962,6 @@
         </div>
     </div>
 
-    <!-- Completion Modal -->
     <div class="modal-overlay hidden" id="completionModal">
         <div class="modal">
             <div class="modal-header">
@@ -1003,13 +995,12 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // ================== FIREBASE CONFIGURATION ==================
+        // ==== FIREBASE  ==
         const firebaseConfig = {
             apiKey: "AIzaSyAsd9ywXXxibVZseCTZ_P0uejq9Ttk5VUI",
             authDomain: "notas-empresa.firebaseapp.com",
@@ -1026,7 +1017,7 @@
 
         console.log('Firebase inicializado:', firebase.app().name);
 
-        // ================== UI REFERENCES ==================
+        // ==REFERÊNCIAS DE IU ==
         const loginScreen = document.getElementById('loginScreen');
         const mainContent = document.getElementById('mainContent');
         const loginEmail = document.getElementById('loginEmail');
@@ -1056,7 +1047,7 @@
         let activeFilter = 'all';
         let allNotes = [];
 
-        // ================== HELPER FUNCTIONS ==================
+        
         function showMessage(element, message, type = 'info') {
             const messageClass = type === 'error' ? 'message-error' : 'message-success';
             element.innerHTML = `<div class="message ${messageClass}">
@@ -1078,7 +1069,7 @@
             });
         }
 
-        // ================== AUTH HANDLERS ==================
+        
         btnSignupMain.addEventListener('click', async () => {
             const email = loginEmail.value.trim();
             const pwd = loginPassword.value;
@@ -1150,7 +1141,7 @@
             auth.signOut();
         });
 
-        // Handle Enter key on login form
+       
         loginEmail.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 loginPassword.focus();
@@ -1168,7 +1159,7 @@
             currentUser = user;
 
             if (user) {
-                // Show main content, hide login screen
+               
                 loginScreen.classList.add('hidden');
                 mainContent.classList.remove('hidden');
 
@@ -1179,12 +1170,12 @@
                     Conectado como <strong>${user.email}</strong>
                 `;
 
-                // Clear login form
+               
                 loginEmail.value = '';
                 loginPassword.value = '';
                 loginMessage.innerHTML = '';
             } else {
-                // Show login screen, hide main content
+                
                 loginScreen.classList.remove('hidden');
                 mainContent.classList.add('hidden');
 
@@ -1199,7 +1190,7 @@
             renderNotes();
         });
 
-        // ================== NOTES CRUD ==================
+        
         db.collection('notes').orderBy('createdAt', 'desc').onSnapshot(
             (snapshot) => {
                 console.log('Notas atualizadas:', snapshot.size, 'documentos');
@@ -1371,7 +1362,7 @@
                 </div>
             `;
 
-            // Event listeners for buttons
+           
             const editBtn = item.querySelector('.edit-btn');
             const toggleBtn = item.querySelector('.toggle-btn');
             const deleteBtn = item.querySelector('.delete-btn');
@@ -1436,7 +1427,7 @@
                     updatedAt: Date.now()
                 };
 
-                // If marking as incomplete, remove completion data
+            
                 if (!completed) {
                     updateData.completedData = firebase.firestore.FieldValue.delete();
                 }
@@ -1449,7 +1440,7 @@
             }
         }
 
-        // ================== COMPLETION MODAL FUNCTIONS ==================
+      
         function showCompletionModal(note) {
             currentNoteForCompletion = note;
             completionObservation.value = '';
@@ -1495,18 +1486,18 @@
             }
         }
 
-        // Modal event listeners
+     
         cancelCompletion.addEventListener('click', hideCompletionModal);
         confirmCompletion.addEventListener('click', completeNoteWithObservation);
 
-        // Close modal when clicking outside
+        
         completionModal.addEventListener('click', (e) => {
             if (e.target === completionModal) {
                 hideCompletionModal();
             }
         });
 
-        // Handle Enter key in observation textarea
+        
         completionObservation.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                 completeNoteWithObservation();
@@ -1527,7 +1518,7 @@
             }
         }
 
-        // ================== EVENT LISTENERS ==================
+       
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 tabs.forEach(t => t.classList.remove('active'));
@@ -1604,7 +1595,7 @@
                     showMessage(saveMessage, 'Nota criada com sucesso!', 'success');
                 }
 
-                // Clear form
+                
                 noteTitle.value = '';
                 noteContent.value = '';
                 noteCompleted.value = 'false';
@@ -1628,13 +1619,13 @@
                 new Date(note.reminderTimestamp).toISOString().slice(0, 16) : '';
             saveMessage.innerHTML = '';
 
-            // Scroll to editor
+           
             document.querySelector('.card-header h3').scrollIntoView({
                 behavior: 'smooth'
             });
         }
 
-        // ================== REMINDERS ==================
+       
         if ('Notification' in window) {
             if (Notification.permission === 'default') {
                 Notification.requestPermission().then(permission => {
@@ -1652,7 +1643,7 @@
 
         const notifiedReminders = new Set();
 
-        // Check reminders every 30 seconds
+      
         setInterval(() => {
             if (!currentUser) return;
 
@@ -1685,12 +1676,12 @@
                     notification.close();
                 };
             } else {
-                // Fallback alert
+                
                 alert(`${title}\n\n${body}`);
             }
         }
 
-        // ================== KEYBOARD SHORTCUTS ==================
+        
         document.addEventListener('keydown', (e) => {
             // Ctrl/Cmd + N for new note
             if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
@@ -1700,7 +1691,7 @@
                 }
             }
 
-            // Ctrl/Cmd + S for save note
+            
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
                 if (currentUser && (noteTitle.value.trim() || noteContent.value.trim())) {
@@ -1708,7 +1699,7 @@
                 }
             }
 
-            // Escape to cancel editing or close modal
+            
             if (e.key === 'Escape') {
                 if (!completionModal.classList.contains('hidden')) {
                     hideCompletionModal();
@@ -1718,17 +1709,17 @@
             }
         });
 
-        // ================== INITIAL SETUP ==================
+        
         console.log('Sistema de anotações carregado');
 
-        // Auto-focus email field on page load
+      
         setTimeout(() => {
             if (loginEmail) {
                 loginEmail.focus();
             }
         }, 500);
 
-        //====app
+       
         
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js")
@@ -1741,5 +1732,6 @@
 </body>
 
 </html>
+
 
 
