@@ -3,34 +3,63 @@
 
 <head>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#4f46e5">
+    <meta name="theme-color" content="#0a0a0f">
     <link rel="icon" href="icon-192.png" sizes="192x192">
     <link rel="icon" href="icon-512.png" sizes="512x512">
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Anotações - Empresa</title>
+    <title>Anotacao inforwnet</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* ====== Variáveis e Redefinição ====== */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
         :root {
-            --primary: #4f46e5;
-            --primary-dark: #3730a3;
-            --primary-light: #eef2ff;
-            --success: #059669;
-            --danger: #dc2626;
-            --warning: #d97706;
-            --info: #0284c7;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --border: #e2e8f0;
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            /* Paleta Clara */
+            --primary: #224d9b;
+            /* Azul principal */
+            --primary-dark: #16336d;
+            --secondary: #e12226;
+            /* Vermelho destaque */
+            --accent: #ffffff;
+            /* Branco */
+
+            /* Estados */
+            --success: #28a745;
+            --danger: #e12226;
+            --warning: #ffcc00;
+            --info: #224d9b;
+
+            /* Fundo */
+            --bg-primary: #f5f7fa;
+            /* Fundo claro */
+            --bg-secondary: #ffffff;
+            /* Cartões */
+            --bg-tertiary: #eef1f6;
+            /* Seções */
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.8);
+
+            /* Texto */
+            --text-primary: #222;
+            /* Preto suave */
+            --text-secondary: #555;
+            --text-muted: #888;
+            --text-dim: #aaa;
+
+            /* Efeitos */
+            --border-glow: rgba(34, 77, 155, 0.2);
+            --shadow-intense: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --gradient-neural: linear-gradient(135deg, #224d9b 0%, #e12226 100%);
+            --gradient-card: linear-gradient(145deg, #ffffff 0%, #f5f7fa 100%);
+            --gradient-hover: linear-gradient(135deg, rgba(34, 77, 155, 0.1) 0%, rgba(225, 34, 38, 0.1) 100%);
+
             --radius: 12px;
-            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --radius-xl: 20px;
         }
+
+
+
 
         * {
             margin: 0;
@@ -40,19 +69,63 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background: var(--bg-primary);
+            color: var(--text-primary);
             line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
-      
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(51, 102, 255, 0.1) 0%, transparent 50%);
+            animation: backgroundShift 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes backgroundShift {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        /* Glassmorphism Effects */
+        .glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: var(--gradient-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glow);
+            box-shadow: var(--shadow-neural);
+        }
+
+        /* Login Screen */
         .login-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--gradient);
+            background: var(--bg-primary);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -60,521 +133,710 @@
         }
 
         .login-screen.hidden {
-            display: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.320, 1);
         }
 
         .login-card {
-            background: var(--card);
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
+            background: var(--gradient-card);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-intense);
             padding: 3rem;
             width: 100%;
             max-width: 450px;
             margin: 1rem;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: var(--gradient-neural);
+            opacity: 0.05;
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .login-logo {
-            font-size: 3rem;
-            color: var(--primary);
+            font-size: 4rem;
+            background: var(--gradient-neural);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 1rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
+            }
+
+            to {
+                filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.8));
+            }
         }
 
         .login-title {
-            font-size: 1.8rem;
-            font-weight: 700;
+            font-size: 2rem;
+            font-weight: 800;
             margin-bottom: 0.5rem;
-            color: var(--text);
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .login-subtitle {
             color: var(--text-muted);
             margin-bottom: 2rem;
+            font-weight: 300;
         }
 
-        .login-form {
-            text-align: left;
-        }
-
-        .login-form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .login-input {
+        /* Neural Input Fields */
+        .neural-input {
             width: 100%;
-            padding: 1rem;
-            border: 2px solid var(--border);
-            border-radius: 10px;
+            padding: 1.2rem 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius);
+            color: var(--text-primary);
             font-size: 1rem;
-            transition: all 0.2s ease;
+            font-weight: 400;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+            backdrop-filter: blur(10px);
         }
 
-        .login-input:focus {
+        .neural-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            background: rgba(0, 212, 255, 0.05);
+            box-shadow: 0 0 0 4px var(--primary-glow), inset 0 0 20px rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
         }
 
-        .login-btn {
+        .neural-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Neural Buttons */
+        .neural-btn {
             width: 100%;
-            padding: 1rem;
+            padding: 1.2rem;
             border: none;
-            border-radius: 10px;
+            border-radius: var(--radius);
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .login-btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .login-btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-
-        .login-btn-secondary {
-            background: var(--border);
-            color: var(--text);
-        }
-
-        .login-btn-secondary:hover {
-            background: #cbd5e1;
-        }
-
-        .login-divider {
-            display: flex;
-            align-items: center;
-            margin: 1.5rem 0;
-            color: var(--text-muted);
-        }
-
-        .login-divider::before,
-        .login-divider::after {
+        .neural-btn::before {
             content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+            transform: translate(-50%, -50%);
         }
 
-        .login-divider span {
-            padding: 0 1rem;
-            font-size: 0.875rem;
+        .neural-btn:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
-        
+        .neural-btn-primary {
+            background: var(--gradient-neural);
+            color: white;
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3);
+        }
+
+        .neural-btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0, 212, 255, 0.4);
+        }
+
+        .neural-btn-secondary {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .neural-btn-secondary:hover {
+            background: var(--gradient-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-content.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 2rem 1rem;
         }
 
+        /* Header */
         .header {
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 1.5rem;
+            background: var(--glass-card);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
             margin-bottom: 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-neural);
+            animation: scan 3s ease-in-out infinite;
+        }
+
+        @keyframes scan {
+            0% {
+                left: -100%;
+            }
+
+            50% {
+                left: 100%;
+            }
+
+            100% {
+                left: -100%;
+            }
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
+            gap: 1rem;
+            font-size: 1.8rem;
+            font-weight: 800;
         }
 
+        .logo i {
+            background: var(--gradient-neural);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.2rem;
+        }
+
+        .logo-text {
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* User Area */
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: var(--gradient-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-glow);
+            backdrop-filter: blur(20px);
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--gradient-neural);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        /* Main Grid */
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 400px;
             gap: 2rem;
         }
 
-        
-        .auth-card {
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+        /* Cards */
+        .neural-card {
+            background: var(--glass-card);
+            border-radius: var(--radius-xl);
             overflow: hidden;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
         }
 
-        .user-area {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: var(--success);
-            color: white;
-        }
-
-       
-        input,
-        textarea,
-        select {
-            padding: 0.75rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-            width: 100%;
-        }
-
-        input:focus,
-        textarea:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            font-size: 0.875rem;
-        }
-
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-       
-        .btn {
-            padding: 0.75rem 1.25rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow);
-        }
-
-        .btn-secondary {
-            background: var(--border);
-            color: var(--text);
-        }
-
-        .btn-secondary:hover {
-            background: #cbd5e1;
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-info {
-            background: var(--info);
-            color: white;
-        }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--text-muted);
-            border: 2px solid var(--border);
-        }
-
-        .btn-ghost:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-sm {
-            padding: 0.5rem 0.75rem;
-            font-size: 0.8125rem;
-        }
-
-        
-        .card {
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
+        .neural-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-intense);
         }
 
         .card-header {
-            padding: 1.25rem 1.5rem;
-            border-bottom: 2px solid var(--border);
-            background: var(--primary-light);
+            padding: 2rem 2rem 1rem 2rem;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(51, 102, 255, 0.05) 100%);
+            border-bottom: 1px solid var(--border-glow);
+            position: relative;
+        }
+
+        .card-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--gradient-neural);
+            opacity: 0.3;
         }
 
         .card-title {
-            font-size: 1.125rem;
-            font-weight: 600;
+            font-size: 1.3rem;
+            font-weight: 700;
             margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-title i {
+            color: var(--primary);
         }
 
         .card-body {
-            padding: 1.5rem;
+            padding: 2rem;
         }
 
-     
-        .tabs {
-            display: flex;
+        /* Tabs */
+        .neural-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            background: var(--border);
-            padding: 0.25rem;
-            border-radius: 10px;
+            margin-bottom: 2rem;
+            background: var(--bg-tertiary);
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .tab-btn {
-            flex: 1;
-            padding: 0.75rem 1rem;
+            padding: 1rem;
             background: transparent;
             border: none;
-            border-radius: 8px;
+            border-radius: calc(var(--radius) - 4px);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gradient-neural);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .tab-btn.active {
-            background: var(--primary);
+            background: var(--gradient-neural);
             color: white;
-            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
         }
 
-       
+        .tab-btn i {
+            font-size: 1.2rem;
+        }
+
+        /* Search */
         .search-container {
             position: relative;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .search-input {
             width: 100%;
-            padding: 0.75rem 1rem 0.75rem 2.5rem;
-            background: var(--primary-light);
-            border: 2px solid transparent;
-            border-radius: 10px;
+            padding: 1rem 1rem 1rem 3rem;
+            background: var(--bg-tertiary);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(0, 212, 255, 0.05);
+            box-shadow: 0 0 0 4px var(--primary-glow);
         }
 
         .search-icon {
             position: absolute;
-            left: 0.75rem;
+            left: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
+            color: var(--primary);
+            font-size: 1.1rem;
         }
 
-        
+        /* Notes */
         .notes-container {
-            max-height: 600px;
+            max-height: 700px;
             overflow-y: auto;
             padding-right: 0.5rem;
         }
 
         .note-item {
-            background: var(--card);
-            border: 2px solid var(--border);
+            background: var(--glass-card);
             border-radius: var(--radius);
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-            transition: all 0.2s ease;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
             position: relative;
+            overflow: hidden;
+            border-left: 4px solid transparent;
+        }
+
+        .note-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gradient-hover);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .note-item:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-intense);
         }
 
-        .note-item.reminder-due {
-            border-left: 4px solid var(--warning);
-            background: linear-gradient(90deg, #fef3c7 0%, var(--card) 10%);
+        .note-item:hover::before {
+            opacity: 1;
         }
 
         .note-item.private {
-            border-left: 4px solid var(--primary);
+            border-left-color: var(--primary);
         }
 
         .note-item.completed {
-            border-left: 4px solid var(--success);
-            background: linear-gradient(90deg, #ecfdf5 0%, var(--card) 10%);
-            opacity: 0.8;
+            border-left-color: var(--success);
+            opacity: 0.7;
         }
 
-        .note-item.completed .note-title {
-            text-decoration: line-through;
-            color: var(--text-muted);
+        .note-item.reminder-due {
+            border-left-color: var(--warning);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                border-left-color: var(--warning);
+            }
+
+            50% {
+                border-left-color: var(--danger);
+            }
         }
 
         .note-title {
-            font-size: 1.125rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text);
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            position: relative;
+            z-index: 1;
         }
 
         .note-meta {
             display: flex;
             gap: 1rem;
             align-items: center;
-            margin-bottom: 0.75rem;
-            font-size: 0.8125rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
             flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
         }
 
         .note-badge {
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
             font-size: 0.75rem;
-            font-weight: 500;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         .badge-public {
-            background: var(--success);
+            background: linear-gradient(135deg, var(--success) 0%, #00cc66 100%);
             color: white;
         }
 
         .badge-private {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
         }
 
         .badge-completed {
-            background: var(--info);
+            background: linear-gradient(135deg, var(--info) 0%, #2244cc 100%);
             color: white;
         }
 
         .note-content {
-            margin-bottom: 1rem;
-            line-height: 1.6;
-        }
-
-        .note-reminder {
-            background: var(--warning);
-            color: white;
-            padding: 0.5rem;
-            border-radius: 6px;
-            font-size: 0.8125rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
         }
 
         .note-actions {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
             flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
         }
 
-       
-        .status-card {
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .btn:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-neural);
+            color: white;
+            box-shadow: 0 4px 16px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.5);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-ghost:hover {
+            background: var(--gradient-hover);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #00cc66 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #cc1144 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, var(--info) 0%, #2244cc 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        textarea.neural-input {
+            min-height: 140px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        select.neural-input {
+            cursor: pointer;
+        }
+
+        /* Status Messages */
+        .message {
             padding: 1rem;
             border-radius: var(--radius);
-            margin-bottom: 1rem;
-        }
-
-        .status-connected {
-            background: #ecfdf5;
-            color: var(--success);
-            border: 2px solid #a7f3d0;
-        }
-
-        .status-disconnected {
-            background: #fef2f2;
-            color: var(--danger);
-            border: 2px solid #fca5a5;
-        }
-
-        .message {
-            padding: 0.75rem;
-            border-radius: 8px;
-            margin-top: 0.5rem;
-            font-size: 0.875rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
 
         .message-success {
-            background: #ecfdf5;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 204, 102, 0.1) 100%);
             color: var(--success);
-            border: 1px solid #a7f3d0;
+            border: 1px solid rgba(0, 255, 136, 0.3);
         }
 
         .message-error {
-            background: #fef2f2;
+            background: linear-gradient(135deg, rgba(255, 51, 102, 0.1) 0%, rgba(204, 17, 68, 0.1) 100%);
             color: var(--danger);
-            border: 1px solid #fca5a5;
+            border: 1px solid rgba(255, 51, 102, 0.3);
         }
 
-       
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Status Card */
+        .status-card {
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
         }
 
-        .note-item {
-            animation: slideIn 0.3s ease;
+        .status-connected {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 204, 102, 0.1) 100%);
+            color: var(--success);
+            border: 1px solid rgba(0, 255, 136, 0.3);
         }
 
-      
+        .status-disconnected {
+            background: linear-gradient(135deg, rgba(255, 51, 102, 0.1) 0%, rgba(204, 17, 68, 0.1) 100%);
+            color: var(--danger);
+            border: 1px solid rgba(255, 51, 102, 0.3);
+        }
+
+        /* Loading */
         .loading {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 2rem;
+            padding: 3rem;
             color: var(--text-muted);
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .spinner {
-            border: 2px solid var(--border);
-            border-top: 2px solid var(--primary);
+        .neural-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid transparent;
+            border-top: 3px solid var(--primary);
+            border-right: 3px solid var(--secondary);
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            margin-right: 0.5rem;
+            animation: neuralSpin 1s linear infinite;
         }
 
-        @keyframes spin {
+        @keyframes neuralSpin {
             0% {
                 transform: rotate(0deg);
             }
@@ -584,120 +846,105 @@
             }
         }
 
-       
-        .completion-info {
-            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
-            border: 1px solid #a7f3d0;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-
-        .completion-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            color: var(--success);
-            margin-bottom: 0.75rem;
-        }
-
-        .completion-details {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            flex-wrap: wrap;
-        }
-
-        .completion-details span {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .completion-observation {
-            font-size: 0.875rem;
-            color: var(--text);
-            line-height: 1.5;
-        }
-
-        .completion-observation i {
-            color: var(--info);
-            margin-right: 0.25rem;
-        }
-
-      
+        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.8);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(10px);
         }
 
         .modal-overlay.hidden {
-            display: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
 
         .modal {
-            background: var(--card);
-            border-radius: 16px;
-            box-shadow: var(--shadow-lg);
-            padding: 2rem;
+            background: var(--glass-card);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem;
             width: 100%;
-            max-width: 500px;
+            max-width: 550px;
             margin: 1rem;
             max-height: 90vh;
             overflow-y: auto;
+            position: relative;
         }
 
         .modal-header {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
         .modal-title {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--success);
             margin: 0;
         }
 
-        .modal-subtitle {
-            color: var(--text-muted);
-            margin-bottom: 1.5rem;
-            font-size: 0.875rem;
+        /* Scrollbar */
+        .notes-container::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .modal-actions {
+        .notes-container::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        .notes-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        /* Completion Info */
+        .completion-info {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 204, 102, 0.1) 100%);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .completion-header {
             display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            justify-content: flex-end;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            color: var(--success);
+            margin-bottom: 1rem;
         }
 
-        .modal-actions .btn {
-            min-width: 100px;
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            background: var(--glass-card);
+            border-radius: var(--radius-xl);
         }
 
+        /* Responsive Design */
         @media (max-width: 1024px) {
             .main-grid {
                 grid-template-columns: 1fr;
             }
 
-            .header {
-                flex-direction: column;
-                text-align: center;
+            .neural-tabs {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -706,91 +953,445 @@
                 padding: 1rem;
             }
 
-            .tabs {
-                flex-direction: column;
-            }
-
-            .note-actions {
-                justify-content: center;
+            .neural-tabs {
+                grid-template-columns: 1fr;
             }
 
             .login-card {
                 padding: 2rem 1.5rem;
             }
+
+            .header {
+                padding: 1.5rem;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .card-body,
+            .card-header {
+                padding: 1.5rem;
+            }
         }
 
-        /* ====== barra de rolagem personalizada ====== */
-        .notes-container::-webkit-scrollbar {
-            width: 6px;
+        /* Custom Animations */
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
-        .notes-container::-webkit-scrollbar-track {
-            background: var(--border);
-            border-radius: 3px;
+        @keyframes slideInFromBottom {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .notes-container::-webkit-scrollbar-thumb {
-            background: var(--text-muted);
-            border-radius: 3px;
+        .note-item {
+            animation: slideInFromBottom 0.6s cubic-bezier(0.23, 1, 0.320, 1);
         }
 
-        .notes-container::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
+        .neural-card {
+            animation: slideInFromLeft 0.8s cubic-bezier(0.23, 1, 0.320, 1);
         }
 
-        /* ====== Rodapé ====== */
-        .footer {
-            text-align: center;
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-
-        .footer-text {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-        }
-
-     
-        .main-content.hidden {
+        /* Floating Action Elements */
+        .floating-new-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--gradient-neural);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-intense);
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+            z-index: 100;
             display: none;
+        }
+
+        .floating-new-btn:hover {
+            transform: scale(1.1) translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.4);
+        }
+
+        /* Neural Grid Pattern */
+        .neural-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            background-image:
+                linear-gradient(var(--primary) 1px, transparent 1px),
+                linear-gradient(90deg, var(--primary) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* Data Visualization Elements */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--glass-card);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-neural);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient-neural);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Advanced Input Styling */
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group .neural-input:focus+.input-label,
+        .input-group .neural-input:not(:placeholder-shown)+.input-label {
+            transform: translateY(-2.5rem) scale(0.85);
+            color: var(--primary);
+        }
+
+        .input-label {
+            position: absolute;
+            top: 1.2rem;
+            left: 1.5rem;
+            color: var(--text-muted);
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+            pointer-events: none;
+            background: var(--bg-card);
+            padding: 0 0.5rem;
+        }
+
+        /* Holographic Effects */
+        .hologram {
+            position: relative;
+        }
+
+        .hologram::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(0, 212, 255, 0.2),
+                    transparent);
+            animation: hologramScan 3s ease-in-out infinite;
+        }
+
+        @keyframes hologramScan {
+            0% {
+                left: -100%;
+            }
+
+            50% {
+                left: 100%;
+            }
+
+            100% {
+                left: -100%;
+            }
+        }
+
+        /* Particle Effects */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: particleFloat 10s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0px);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.5;
+            }
+
+            90% {
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Cyberpunk Toggle Switch */
+        .cyber-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .cyber-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-glow);
+            transition: 0.3s;
+            border-radius: 30px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background: var(--text-muted);
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked+.toggle-slider {
+            background: var(--gradient-neural);
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(30px);
+            background: white;
+        }
+
+        /* Advanced Notification */
+        .neural-notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--glass-card);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius);
+            padding: 1rem 1.5rem;
+            max-width: 400px;
+            z-index: 3000;
+            transform: translateX(500px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        .neural-notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .neural-notification.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .neural-notification.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .neural-notification.warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        /* Progress Indicators */
+        .neural-progress {
+            width: 100%;
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .neural-progress-bar {
+            height: 100%;
+            background: var(--gradient-neural);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .neural-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: linear-gradient(-45deg,
+                    rgba(255, 255, 255, 0.2) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    rgba(255, 255, 255, 0.2) 50%,
+                    rgba(255, 255, 255, 0.2) 75%,
+                    transparent 75%,
+                    transparent);
+            background-size: 30px 30px;
+            animation: progressStripes 1s linear infinite;
+        }
+
+        @keyframes progressStripes {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 30px 0;
+            }
+        }
+
+        /* Dark Mode Enhancements */
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .login-screen,
+            .header,
+            .btn,
+            .neural-notification,
+            .floating-new-btn {
+                display: none !important;
+            }
+
+            .neural-card {
+                background: white;
+                border: 1px solid #ccc;
+                box-shadow: none;
+            }
         }
     </style>
 </head>
 
 <body>
-  
+    <!-- Particle Background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Neural Grid -->
+    <div class="neural-grid"></div>
+
+    <!-- Login Screen -->
     <div class="login-screen" id="loginScreen">
         <div class="login-card">
             <div class="login-logo">
-                <i class="fas fa-sticky-note"></i>
+                <i class="fas fa-brain"></i>
             </div>
-            <h1 class="login-title">Sistema de Anotações Inforwnet</h1>
-            <p class="login-subtitle">Sejam bem vindos.</p>
+            <h1 class="login-title">Inforwnet anotação</h1>
+            <p class="login-subtitle">Sistema Inteligente de Anotações - Criado por Daniel Santos</p>
 
             <form class="login-form">
-                <div class="login-form-group">
-                    <input type="email" class="login-input" id="loginEmail" placeholder="Seu email" required>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="email" class="neural-input" id="loginEmail" placeholder=" " required>
+                        <label class="input-label">Seu email</label>
+                    </div>
                 </div>
 
-                <div class="login-form-group">
-                    <input type="password" class="login-input" id="loginPassword" placeholder="Sua senha" required>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="password" class="neural-input" id="loginPassword" placeholder=" " required>
+                        <label class="input-label">Sua senha</label>
+                    </div>
                 </div>
 
-                <button type="button" class="login-btn login-btn-primary" id="btnLoginMain">
+                <button type="button" class="neural-btn neural-btn-primary" id="btnLoginMain">
                     <i class="fas fa-sign-in-alt"></i>
-                    Entrar
+                    <span>Entrar no Sistema</span>
                 </button>
 
-                <div class="login-divider">
-                    <span>ou</span>
+                <div style="text-align: center; margin: 1.5rem 0; color: var(--text-muted);">
+                    <span>━━━━━━ ou ━━━━━━</span>
                 </div>
 
-                <button type="button" class="login-btn login-btn-secondary" id="btnSignupMain">
+                <button type="button" class="neural-btn neural-btn-secondary" id="btnSignupMain">
                     <i class="fas fa-user-plus"></i>
-                    Criar nova conta
+                    <span>Criar Nova Conta</span>
                 </button>
             </form>
 
@@ -798,132 +1399,182 @@
         </div>
     </div>
 
-    
+    <!-- Main Content -->
     <div class="main-content hidden" id="mainContent">
         <div class="container">
-           
-            <header class="header">
+            <!-- Header -->
+            <header class="header hologram">
                 <div class="logo">
-                    <i class="fas fa-sticky-note"></i>
-                    <span>Sistema de Anotações</span>
+                    <i class="fas fa-brain"></i>
+                    <span class="logo-text">Inforwnet anotação</span>
                 </div>
-                <div class="auth-card">
-                    <div class="user-area" id="userArea">
-                        <i class="fas fa-user-circle"></i>
-                        <span id="userEmail"></span>
-                        <button class="btn btn-secondary btn-sm" id="btnLogout">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Sair
-                        </button>
+
+                <!-- User Area -->
+                <div class="user-area" id="userArea">
+                    <div class="user-avatar">
+                        <i class="fas fa-user-astronaut"></i>
                     </div>
+                    <div>
+                        <div style="font-weight: 600;" id="userEmail"></div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">conta online</div>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="btnLogout">
+                        <i class="fas fa-power-off"></i>
+                        <span>Desconectar</span>
+                    </button>
                 </div>
             </header>
-         
+
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="statsGrid" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalNotes">0</div>
+                    <div class="stat-label">Total de Notas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="publicNotes">0</div>
+                    <div class="stat-label">Notas Públicas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="privateNotes">0</div>
+                    <div class="stat-label">Notas Privadas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completedNotes">0</div>
+                    <div class="stat-label">Concluídas</div>
+                </div>
+            </div>
+
+            <!-- Main Grid -->
             <main class="main-grid">
-              
-                <section class="card">
+                <!-- Left Column - Notes List -->
+                <section class="neural-card">
                     <div class="card-header">
                         <div
                             style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                             <h2 class="card-title">
-                                <i class="fas fa-list"></i>
-                                Suas Anotações
+                                <i class="fas fa-database"></i>
+                                <span>Anotações</span>
                             </h2>
                             <button class="btn btn-primary" id="btnNew">
-                                <i class="fas fa-plus"></i>
-                                Nova Nota
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Nova nota</span>
                             </button>
                         </div>
                     </div>
 
                     <div class="card-body">
-                     
-                        <div class="tabs">
+                        <!-- Neural Tabs -->
+                        <div class="neural-tabs">
                             <button class="tab-btn active" data-filter="all">
-                                <i class="fas fa-globe"></i>
-                                Todas Públicas
+                                <i class="fas fa-globe-americas"></i>
+                                <span>Públicas</span>
                             </button>
                             <button class="tab-btn" data-filter="mine">
-                                <i class="fas fa-lock"></i>
-                                Minhas Privadas
+                                <i class="fas fa-user-shield"></i>
+                                <span>Privadas</span>
                             </button>
                             <button class="tab-btn" data-filter="both">
                                 <i class="fas fa-layer-group"></i>
-                                Minhas + Públicas
+                                <span>Todas</span>
                             </button>
                             <button class="tab-btn" data-filter="completed">
-                                <i class="fas fa-check-circle"></i>
-                                Concluídas
+                                <i class="fas fa-check-double"></i>
+                                <span>Finalizadas</span>
                             </button>
                         </div>
 
-              
+                        <!-- Advanced Search -->
                         <div class="search-container">
                             <i class="fas fa-search search-icon"></i>
-                            <input type="text" class="search-input" id="searchInput"
-                                placeholder="Buscar por título ou conteúdo...">
+                            <input type="text" class="search-input neural-input" id="searchInput"
+                                placeholder="Buscar anotações">
                         </div>
+
+                        <!-- Notes List -->
                         <div class="notes-container" id="notesContainer">
                             <div class="loading">
-                                <div class="spinner"></div>
-                                Carregando anotações...
+                                <div class="neural-spinner"></div>
+                                <span>Carregando anotações</span>
                             </div>
                         </div>
                     </div>
                 </section>
 
+                <!-- Right Column - Editor & Status -->
                 <aside>
-               
-                    <div class="card" style="margin-bottom: 1.5rem;">
+                    <!-- Neural Editor -->
+                    <div class="neural-card" style="margin-bottom: 1.5rem;">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-edit"></i>
-                                Editor de Notas
+                                <i class="fas fa-terminal"></i>
+                                <span>anota AQUI</span>
                             </h3>
                         </div>
                         <div class="card-body">
                             <div class="form-group">
-                                <label class="form-label">Título</label>
-                                <input type="text" id="noteTitle" placeholder="Digite o título da nota...">
+                                <div class="input-group">
+                                    <input type="text" class="neural-input" id="noteTitle" placeholder=" ">
+                                    <label class="input-label">Título</label>
+                                </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">Conteúdo</label>
-                                <textarea id="noteContent" placeholder="Digite o conteúdo da sua nota..."></textarea>
+                                <div class="input-group">
+                                    <textarea class="neural-input" id="noteContent" placeholder=" "></textarea>
+                                    <label class="input-label">Conteúdo</label>
+                                </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">Visibilidade</label>
-                                <select id="notePublic">
-                                    <option value="true">🌐 Pública (visível a todos)</option>
-                                    <option value="false">🔒 Privada (apenas você)</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Status</label>
-                                <select id="noteCompleted">
-                                    <option value="false">📝 Em andamento</option>
-                                    <option value="true">✅ Concluída</option>
+                                <label class="form-label">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Nível de Acesso
+                                </label>
+                                <select class="neural-input" id="notePublic">
+                                    <option value="true">🌐 Público (Todos)</option>
+                                    <option value="false">🔒 Privado (Apenas Você)</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">
-                                    <i class="fas fa-clock"></i>
-                                    Lembrete (opcional)
+                                    <i class="fas fa-user-tag"></i>
+                                    Destinatário da Anotação
                                 </label>
-                                <input type="datetime-local" id="noteReminder">
+                                <select class="neural-input" id="noteAssignedTo">
+                                    <option value="">em desenvolvimento</option>
+                                </select>
                             </div>
 
-                            <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-tasks"></i>
+                                    Status da anotação
+                                </label>
+                                <select class="neural-input" id="noteCompleted">
+                                    <option value="false">⚡ Em Progresso</option>
+                                    <option value="true">✅ Missão Completa</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-satellite"></i>
+                                    Lembrete (opcional)
+                                </label>
+                                <input type="datetime-local" class="neural-input" id="noteReminder">
+                            </div>
+
+                            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                                 <button class="btn btn-primary" id="btnSave" style="flex: 1;">
                                     <i class="fas fa-save"></i>
-                                    Salvar
+                                    <span>Sincronizar</span>
                                 </button>
                                 <button class="btn btn-secondary" id="btnCancel">
-                                    <i class="fas fa-times"></i>
-                                    Cancelar
+                                    <i class="fas fa-times-circle"></i>
+                                    <span>Cancelar</span>
                                 </button>
                             </div>
 
@@ -931,76 +1582,117 @@
                         </div>
                     </div>
 
-                    <div class="card">
+                    <!-- System Status -->
+                    <div class="neural-card">
                         <div class="card-header">
                             <h4 class="card-title">
-                                <i class="fas fa-info-circle"></i>
-                                Status da Conexão
+                                <i class="fas fa-satellite-dish"></i>
+                                <span>Status</span>
                             </h4>
                         </div>
                         <div class="card-body">
                             <div id="statusArea" class="status-card status-disconnected">
                                 <i class="fas fa-exclamation-triangle"></i>
-                                Sistema não conectado
+                                <span>Sistema Offline</span>
+                            </div>
+
+                            <!-- System Info -->
+                            <div
+                                style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: var(--radius); font-size: 0.85rem; color: var(--text-muted);">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span>Versão:</span>
+                                    <span style="color: var(--primary);">v2.0.0</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span>Protocolo:</span>
+                                    <span style="color: var(--success);">anota ai</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Sincronização:</span>
+                                    <span style="color: var(--info);">Real-time</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </aside>
             </main>
 
-       
+            <!-- Neural Footer -->
             <footer class="footer">
-                <p class="footer-text">
-                    <i class="fas fa-info-circle"></i>
-                    Notas públicas são visíveis a todos os usuários. Notas privadas são visíveis apenas ao proprietário.
-                    <br>
-                    Os lembretes aparecem como notificações do navegador quando permitidas.
-                   <br>
-                   © 2025 Daniel Santos. Criado com dedicação e todos os direitos reservados.
-                </p>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <i class="fas fa-microchip" style="color: var(--primary);"></i>
+                    <span style="color: var(--text-muted);">
+                        Inforwnet anotação - Desenvolvido por Daniel Santos
+                    </span>
+                    <i class="fas fa-brain" style="color: var(--secondary);"></i>
+                </div>
+                <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-dim); text-align: center;">
+                    anotações rapidas •
+                    Sincronização em tempo real •
+                    Criptografia avançada
+                </div>
             </footer>
         </div>
     </div>
 
+    <!-- Floating Action Button -->
+    <button class="floating-new-btn" id="floatingNewBtn">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Neural Notification -->
+    <div class="neural-notification" id="neuralNotification">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <i class="notification-icon"></i>
+            <div>
+                <div class="notification-title" style="font-weight: 600; margin-bottom: 0.25rem;"></div>
+                <div class="notification-message" style="font-size: 0.85rem; color: var(--text-muted);"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Completion Modal -->
     <div class="modal-overlay hidden" id="completionModal">
         <div class="modal">
             <div class="modal-header">
                 <i class="fas fa-check-circle"></i>
-                <h3 class="modal-title">Marcar como Feita</h3>
+                <h3 class="modal-title">Finalizar Missão</h3>
             </div>
-            <p class="modal-subtitle">
-                Você está marcando esta nota como concluída. Adicione uma observação opcional sobre a conclusão.
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6;">
+                Você está marcando esta entrada como concluída. Adicione uma observação opcional sobre o resultado.
             </p>
 
             <div class="form-group">
-                <label class="form-label">
-                    <i class="fas fa-comment"></i>
-                    Observação (opcional)
-                </label>
-                <textarea id="completionObservation"
-                    placeholder="Ex: Tarefa concluída com sucesso, Problema resolvido, etc..."
-                    style="min-height: 100px;"></textarea>
+                <div class="input-group">
+                    <textarea class="neural-input" id="completionObservation" placeholder=" "
+                        style="min-height: 100px;"></textarea>
+                    <label class="input-label">
+                        <i class="fas fa-comment-dots"></i>
+                        Relatório de Conclusão (opcional)
+                    </label>
+                </div>
             </div>
 
-            <div class="modal-actions">
+            <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
                 <button class="btn btn-secondary" id="cancelCompletion">
                     <i class="fas fa-times"></i>
-                    Cancelar
+                    <span>Cancelar</span>
                 </button>
                 <button class="btn btn-success" id="confirmCompletion">
-                    <i class="fas fa-check"></i>
-                    Marcar como Feita
+                    <i class="fas fa-check-circle"></i>
+                    <span>Finalizar Missão</span>
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // ==== FIREBASE  ==
+        // ================== FIREBASE CONFIGURATION ==================
         const firebaseConfig = {
             apiKey: "AIzaSyAsd9ywXXxibVZseCTZ_P0uejq9Ttk5VUI",
             authDomain: "notas-empresa.firebaseapp.com",
@@ -1015,9 +1707,9 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        console.log('Firebase inicializado:', firebase.app().name);
+        console.log('Neural Network inicializado:', firebase.app().name);
 
-        // ==REFERÊNCIAS DE IU ==
+        // ================== UI REFERENCES ==================
         const loginScreen = document.getElementById('loginScreen');
         const mainContent = document.getElementById('mainContent');
         const loginEmail = document.getElementById('loginEmail');
@@ -1041,13 +1733,73 @@
         const btnCancel = document.getElementById('btnCancel');
         const statusArea = document.getElementById('statusArea');
         const saveMessage = document.getElementById('saveMessage');
+        const completionModal = document.getElementById('completionModal');
+        const completionObservation = document.getElementById('completionObservation');
+        const cancelCompletion = document.getElementById('cancelCompletion');
+        const confirmCompletion = document.getElementById('confirmCompletion');
+        const floatingNewBtn = document.getElementById('floatingNewBtn');
+        const neuralNotification = document.getElementById('neuralNotification');
+        const statsGrid = document.getElementById('statsGrid');
 
         let currentUser = null;
         let editId = null;
         let activeFilter = 'all';
         let allNotes = [];
+        let currentNoteForCompletion = null;
 
-        
+        // ================== PARTICLE SYSTEM ==================
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // ================== NEURAL NOTIFICATIONS ==================
+        function showNeuralNotification(title, message, type = 'success') {
+            const notification = neuralNotification;
+            const icon = notification.querySelector('.notification-icon');
+            const titleElement = notification.querySelector('.notification-title');
+            const messageElement = notification.querySelector('.notification-message');
+
+            // Set content
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+
+            // Set icon and type
+            notification.className = `neural-notification ${type}`;
+
+            switch (type) {
+                case 'success':
+                    icon.className = 'fas fa-check-circle notification-icon';
+                    break;
+                case 'error':
+                    icon.className = 'fas fa-exclamation-triangle notification-icon';
+                    break;
+                case 'warning':
+                    icon.className = 'fas fa-exclamation-circle notification-icon';
+                    break;
+                default:
+                    icon.className = 'fas fa-info-circle notification-icon';
+            }
+
+            // Show notification
+            notification.classList.add('show');
+
+            // Auto hide after 4 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // ================== HELPER FUNCTIONS ==================
         function showMessage(element, message, type = 'info') {
             const messageClass = type === 'error' ? 'message-error' : 'message-success';
             element.innerHTML = `<div class="message ${messageClass}">
@@ -1069,38 +1821,56 @@
             });
         }
 
-        
+        function updateStats() {
+            if (!currentUser) return;
+
+            const total = allNotes.length;
+            const publicNotes = allNotes.filter(note => note.public).length;
+            const privateNotes = allNotes.filter(note => !note.public && note.ownerUID === currentUser.uid).length;
+            const completed = allNotes.filter(note => note.completed).length;
+
+            document.getElementById('totalNotes').textContent = total;
+            document.getElementById('publicNotes').textContent = publicNotes;
+            document.getElementById('privateNotes').textContent = privateNotes;
+            document.getElementById('completedNotes').textContent = completed;
+
+            if (total > 0) {
+                statsGrid.style.display = 'grid';
+            }
+        }
+
+        // ================== AUTH HANDLERS ==================
         btnSignupMain.addEventListener('click', async () => {
             const email = loginEmail.value.trim();
             const pwd = loginPassword.value;
 
             if (!email || !pwd) {
-                showMessage(loginMessage, 'Por favor, informe email e senha', 'error');
+                showNeuralNotification('Erro de Entrada', 'Por favor, informe email e senha', 'error');
                 return;
             }
 
             btnSignupMain.disabled = true;
-            btnSignupMain.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando conta...';
+            btnSignupMain.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Criando conta neural...</span>';
 
             try {
-                console.log('Tentando criar conta para:', email);
+                console.log('Iniciando criação de conta para:', email);
                 const userCredential = await auth.createUserWithEmailAndPassword(email, pwd);
                 console.log('Conta criada com sucesso:', userCredential.user.email);
-                showMessage(loginMessage, 'Conta criada com sucesso!', 'success');
+                showNeuralNotification('Sistema Ativo', 'Conta neural criada com sucesso!', 'success');
             } catch (error) {
                 console.error('Erro ao criar conta:', error);
-                let errorMsg = 'Erro ao criar conta';
+                let errorMsg = 'Erro ao criar conta neural';
                 if (error.code === 'auth/email-already-in-use') {
-                    errorMsg = 'Este email já está em uso';
+                    errorMsg = 'Este email já está em uso na rede';
                 } else if (error.code === 'auth/weak-password') {
-                    errorMsg = 'Senha muito fraca (mínimo 6 caracteres)';
+                    errorMsg = 'Senha insegura (mínimo 6 caracteres)';
                 } else if (error.code === 'auth/invalid-email') {
                     errorMsg = 'Email inválido';
                 }
-                showMessage(loginMessage, errorMsg, 'error');
+                showNeuralNotification('Falha no Sistema', errorMsg, 'error');
             } finally {
                 btnSignupMain.disabled = false;
-                btnSignupMain.innerHTML = '<i class="fas fa-user-plus"></i> Criar nova conta';
+                btnSignupMain.innerHTML = '<i class="fas fa-user-plus"></i> <span>Criar Nova Conta</span>';
             }
         });
 
@@ -1109,31 +1879,32 @@
             const pwd = loginPassword.value;
 
             if (!email || !pwd) {
-                showMessage(loginMessage, 'Por favor, informe email e senha', 'error');
+                showNeuralNotification('Erro de Entrada', 'Por favor, informe email e senha', 'error');
                 return;
             }
 
             btnLoginMain.disabled = true;
-            btnLoginMain.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+            btnLoginMain.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Conectando...</span>';
 
             try {
-                console.log('Tentando fazer login para:', email);
+                console.log('Iniciando conexão neural para:', email);
                 await auth.signInWithEmailAndPassword(email, pwd);
-                console.log('Login realizado com sucesso');
+                console.log('Conexão neural estabelecida');
+                showNeuralNotification('Conexão Ativa', 'Interface neural sincronizada', 'success');
             } catch (error) {
-                console.error('Erro ao fazer login:', error);
-                let errorMsg = 'Erro ao fazer login';
+                console.error('Erro ao conectar:', error);
+                let errorMsg = 'Erro ao estabelecer conexão';
                 if (error.code === 'auth/user-not-found') {
-                    errorMsg = 'Usuário não encontrado';
+                    errorMsg = 'Usuário não encontrado na rede';
                 } else if (error.code === 'auth/wrong-password') {
                     errorMsg = 'Senha incorreta';
                 } else if (error.code === 'auth/invalid-email') {
                     errorMsg = 'Email inválido';
                 }
-                showMessage(loginMessage, errorMsg, 'error');
+                showNeuralNotification('Falha na Conexão', errorMsg, 'error');
             } finally {
                 btnLoginMain.disabled = false;
-                btnLoginMain.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+                btnLoginMain.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>Entrar no Sistema</span>';
             }
         });
 
@@ -1141,7 +1912,7 @@
             auth.signOut();
         });
 
-       
+        // Handle Enter key on login form
         loginEmail.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 loginPassword.focus();
@@ -1155,27 +1926,32 @@
         });
 
         auth.onAuthStateChanged(user => {
-            console.log('Estado de autenticação mudou:', user ? user.email : 'não autenticado');
+            console.log('Estado neural alterado:', user ? user.email : 'desconectado');
             currentUser = user;
 
             if (user) {
-               
+                // Show main content, hide login screen
                 loginScreen.classList.add('hidden');
                 mainContent.classList.remove('hidden');
 
                 userEmail.textContent = user.email;
                 statusArea.className = 'status-card status-connected';
                 statusArea.innerHTML = `
-                    <i class="fas fa-check-circle"></i>
-                    Conectado como <strong>${user.email}</strong>
+                    <i class="fas fa-satellite"></i>
+                    <span>Rede Neural Ativa - <strong>${user.email}</strong></span>
                 `;
 
-               
+                // Clear login form
                 loginEmail.value = '';
                 loginPassword.value = '';
                 loginMessage.innerHTML = '';
+
+                // Show floating button on mobile
+                if (window.innerWidth <= 768) {
+                    floatingNewBtn.style.display = 'flex';
+                }
             } else {
-                
+                // Show login screen, hide main content
                 loginScreen.classList.remove('hidden');
                 mainContent.classList.add('hidden');
 
@@ -1183,36 +1959,40 @@
                 statusArea.className = 'status-card status-disconnected';
                 statusArea.innerHTML = `
                     <i class="fas fa-exclamation-triangle"></i>
-                    Sistema não conectado
+                    <span>Sistema Offline</span>
                 `;
+
+                floatingNewBtn.style.display = 'none';
+                statsGrid.style.display = 'none';
             }
 
             renderNotes();
         });
 
-        
+        // ================== NOTES CRUD ==================
         db.collection('notes').orderBy('createdAt', 'desc').onSnapshot(
             (snapshot) => {
-                console.log('Notas atualizadas:', snapshot.size, 'documentos');
+                console.log('Base de dados atualizada:', snapshot.size, 'entradas');
                 allNotes = [];
                 snapshot.forEach(doc => {
                     allNotes.push({ id: doc.id, ...doc.data() });
                 });
                 renderNotes();
+                updateStats();
             },
             (error) => {
-                console.error('Erro ao carregar notas:', error);
+                console.error('Erro ao carregar base de dados:', error);
                 notesContainer.innerHTML = `
                     <div class="message message-error">
                         <i class="fas fa-exclamation-triangle"></i>
-                        Erro ao carregar notas. Verifique as permissões do Firestore.
+                        Erro na sincronização neural. Verifique as permissões do sistema.
                     </div>
                 `;
             }
         );
 
         function renderNotes() {
-            console.log('Renderizando notas. Usuário atual:', currentUser ? currentUser.email : 'não logado');
+            console.log('Renderizando interface neural. Usuário ativo:', currentUser ? currentUser.email : 'offline');
             const query = searchInput.value.trim().toLowerCase();
             notesContainer.innerHTML = '';
 
@@ -1236,20 +2016,20 @@
                 });
             }
 
-            console.log('Notas filtradas:', filtered.length);
+            console.log('Entradas filtradas:', filtered.length);
 
             if (filtered.length === 0) {
-                let emptyMessage = 'Nenhuma nota encontrada';
+                let emptyMessage = 'Nenhuma entrada encontrada na base';
                 if (activeFilter === 'completed') {
-                    emptyMessage = 'Nenhuma nota concluída';
+                    emptyMessage = 'Nenhuma missão finalizada';
                 } else if (activeFilter === 'mine') {
-                    emptyMessage = 'Você não possui notas privadas';
+                    emptyMessage = 'Você não possui entradas privadas';
                 }
 
                 notesContainer.innerHTML = `
                     <div class="loading">
-                        <i class="fas fa-sticky-note"></i>
-                        ${emptyMessage}
+                        <i class="fas fa-database" style="font-size: 2rem; color: var(--primary);"></i>
+                        <span>${emptyMessage}</span>
                     </div>
                 `;
                 return;
@@ -1270,40 +2050,40 @@
             if (note.completed) item.classList.add('completed');
 
             const isOwner = currentUser && note.ownerUID === currentUser.uid;
-            const canInteract = currentUser && (note.public || isOwner); // Can interact if note is public or user is owner
+            const canInteract = currentUser && (note.public || isOwner);
 
-            console.log('Criando nota:', note.title, 'isOwner:', isOwner, 'canInteract:', canInteract, 'completed:', note.completed);
+            console.log('Criando entrada neural:', note.title, 'owner:', isOwner, 'interact:', canInteract);
 
             item.innerHTML = `
                 <div class="note-title">${note.title || '(sem título)'}</div>
                 
                 <div class="note-meta">
                     <span class="note-badge ${note.public ? 'badge-public' : 'badge-private'}">
-                        <i class="fas fa-${note.public ? 'globe' : 'lock'}"></i>
-                        ${note.public ? 'Pública' : 'Privada'}
+                        <i class="fas fa-${note.public ? 'globe-americas' : 'user-shield'}"></i>
+                        ${note.public ? 'Público' : 'Privado'}
                     </span>
                     ${note.completed ? `
                     <span class="note-badge badge-completed">
-                        <i class="fas fa-check-circle"></i>
-                        Concluída
+                        <i class="fas fa-check-double"></i>
+                        Finalizada
                     </span>
                     ` : ''}
                     <span>
-                        <i class="fas fa-user"></i>
+                        <i class="fas fa-user-astronaut"></i>
                         ${note.ownerEmail || '—'}
                     </span>
                     ${note.createdAt ? `
                     <span>
-                        <i class="fas fa-calendar-alt"></i>
+                        <i class="fas fa-clock"></i>
                         ${formatDate(note.createdAt)}
                     </span>
                     ` : ''}
                 </div>
 
                 ${note.reminderTimestamp ? `
-                <div class="note-reminder">
-                    <i class="fas fa-bell"></i>
-                    Lembrete: ${formatDate(note.reminderTimestamp)}
+                <div style="background: linear-gradient(135deg, rgba(255, 170, 0, 0.1) 0%, rgba(255, 136, 0, 0.1) 100%); border: 1px solid rgba(255, 170, 0, 0.3); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; color: var(--warning);">
+                    <i class="fas fa-satellite"></i>
+                    <strong>Alerta Neural:</strong> ${formatDate(note.reminderTimestamp)}
                 </div>
                 ` : ''}
 
@@ -1312,16 +2092,17 @@
                 ${note.completed && note.completedData ? `
                 <div class="completion-info">
                     <div class="completion-header">
-                        <i class="fas fa-check-circle"></i>
-                        <strong>Marcada como feita</strong>
+                        <i class="fas fa-check-double"></i>
+                        <strong>Missão Finalizada</strong>
                     </div>
-                    <div class="completion-details">
-                        <span><i class="fas fa-user"></i> Por: ${note.completedData.userEmail}</span>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 0.75rem; font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap;">
+                        <span><i class="fas fa-user-astronaut"></i> Por: ${note.completedData.userEmail}</span>
                         <span><i class="fas fa-clock"></i> Em: ${formatDate(note.completedData.timestamp)}</span>
                     </div>
                     ${note.completedData.observation ? `
-                    <div class="completion-observation">
-                        <i class="fas fa-comment"></i> <strong>Observação:</strong> ${note.completedData.observation}
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                        <i class="fas fa-comment-dots" style="color: var(--info); margin-right: 0.5rem;"></i>
+                        <strong>Relatório:</strong> ${note.completedData.observation}
                     </div>
                     ` : ''}
                 </div>
@@ -1331,38 +2112,38 @@
                     ${isOwner ? `
                     <button class="btn btn-ghost btn-sm edit-btn" data-id="${note.id}">
                         <i class="fas fa-edit"></i>
-                        Editar
+                        <span>Editar</span>
                     </button>
                     ` : ''}
                     
                     ${canInteract && !note.completed ? `
                     <button class="btn btn-info btn-sm complete-btn" data-id="${note.id}">
-                        <i class="fas fa-check"></i>
-                        Marcar como Feita
+                        <i class="fas fa-check-circle"></i>
+                        <span>Finalizar</span>
                     </button>
                     ` : ''}
                     
                     ${isOwner && note.completed ? `
                     <button class="btn btn-secondary btn-sm incomplete-btn" data-id="${note.id}">
                         <i class="fas fa-undo"></i>
-                        Reabrir
+                        <span>Reabrir</span>
                     </button>
                     ` : ''}
                     
                     ${isOwner ? `
                     <button class="btn btn-secondary btn-sm toggle-btn" data-id="${note.id}">
-                        <i class="fas fa-${note.public ? 'lock' : 'globe'}"></i>
-                        ${note.public ? 'Tornar Privada' : 'Tornar Pública'}
+                        <i class="fas fa-${note.public ? 'user-shield' : 'globe-americas'}"></i>
+                        <span>${note.public ? 'Tornar Privado' : 'Tornar Público'}</span>
                     </button>
                     <button class="btn btn-danger btn-sm delete-btn" data-id="${note.id}">
-                        <i class="fas fa-trash"></i>
-                        Excluir
+                        <i class="fas fa-trash-alt"></i>
+                        <span>Deletar</span>
                     </button>
                     ` : ''}
                 </div>
             `;
 
-           
+            // Event listeners for buttons
             const editBtn = item.querySelector('.edit-btn');
             const toggleBtn = item.querySelector('.toggle-btn');
             const deleteBtn = item.querySelector('.delete-btn');
@@ -1371,35 +2152,35 @@
 
             if (editBtn) {
                 editBtn.addEventListener('click', () => {
-                    console.log('Botão editar clicado');
+                    console.log('Editando entrada neural');
                     openEditor(note);
                 });
             }
 
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', () => {
-                    console.log('Botão toggle clicado');
+                    console.log('Alterando visibilidade');
                     toggleNoteVisibility(note);
                 });
             }
 
             if (deleteBtn) {
                 deleteBtn.addEventListener('click', () => {
-                    console.log('Botão excluir clicado');
+                    console.log('Deletando entrada');
                     deleteNote(note);
                 });
             }
 
             if (completeBtn) {
                 completeBtn.addEventListener('click', () => {
-                    console.log('Botão marcar como feita clicado para nota:', note.id);
+                    console.log('Finalizando missão:', note.id);
                     showCompletionModal(note);
                 });
             }
 
             if (incompleteBtn) {
                 incompleteBtn.addEventListener('click', () => {
-                    console.log('Botão reabrir clicado');
+                    console.log('Reabrindo entrada');
                     toggleNoteCompletion(note, false);
                 });
             }
@@ -1414,9 +2195,10 @@
                     updatedAt: Date.now()
                 });
                 console.log('Visibilidade alterada:', note.id);
+                showNeuralNotification('Sistema Atualizado', 'Nível de acesso alterado', 'success');
             } catch (error) {
                 console.error('Erro ao alterar visibilidade:', error);
-                alert('Erro ao alterar visibilidade da nota');
+                showNeuralNotification('Erro de Sistema', 'Falha ao alterar visibilidade', 'error');
             }
         }
 
@@ -1427,20 +2209,20 @@
                     updatedAt: Date.now()
                 };
 
-            
                 if (!completed) {
                     updateData.completedData = firebase.firestore.FieldValue.delete();
                 }
 
                 await db.collection('notes').doc(note.id).update(updateData);
-                console.log('Status de conclusão alterado:', note.id, completed);
+                console.log('Status alterado:', note.id, completed);
+                showNeuralNotification('Missão Atualizada', completed ? 'Entrada finalizada' : 'Entrada reaberta', 'success');
             } catch (error) {
-                console.error('Erro ao alterar status de conclusão:', error);
-                alert('Erro ao alterar status da nota');
+                console.error('Erro ao alterar status:', error);
+                showNeuralNotification('Erro de Sistema', 'Falha ao alterar status', 'error');
             }
         }
 
-      
+        // ================== COMPLETION MODAL ==================
         function showCompletionModal(note) {
             currentNoteForCompletion = note;
             completionObservation.value = '';
@@ -1471,33 +2253,32 @@
             };
 
             confirmCompletion.disabled = true;
-            confirmCompletion.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Marcando...';
+            confirmCompletion.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Processando...</span>';
 
             try {
                 await db.collection('notes').doc(currentNoteForCompletion.id).update(completedData);
-                console.log('Nota marcada como concluída:', currentNoteForCompletion.id);
+                console.log('Entrada finalizada:', currentNoteForCompletion.id);
+                showNeuralNotification('Missão Completa', 'Entrada marcada como finalizada', 'success');
                 hideCompletionModal();
             } catch (error) {
-                console.error('Erro ao marcar nota como concluída:', error);
-                alert('Erro ao marcar nota como concluída');
+                console.error('Erro ao finalizar:', error);
+                showNeuralNotification('Erro de Sistema', 'Falha ao finalizar entrada', 'error');
             } finally {
                 confirmCompletion.disabled = false;
-                confirmCompletion.innerHTML = '<i class="fas fa-check"></i> Marcar como Feita';
+                confirmCompletion.innerHTML = '<i class="fas fa-check-circle"></i> <span>Finalizar Missão</span>';
             }
         }
 
-     
+        // Modal event listeners
         cancelCompletion.addEventListener('click', hideCompletionModal);
         confirmCompletion.addEventListener('click', completeNoteWithObservation);
 
-        
         completionModal.addEventListener('click', (e) => {
             if (e.target === completionModal) {
                 hideCompletionModal();
             }
         });
 
-        
         completionObservation.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                 completeNoteWithObservation();
@@ -1505,20 +2286,21 @@
         });
 
         async function deleteNote(note) {
-            if (!confirm(`Tem certeza que deseja excluir a nota "${note.title || 'sem título'}"?`)) {
+            if (!confirm(`Tem certeza que deseja deletar "${note.title || 'entrada sem título'}" da base neural?`)) {
                 return;
             }
 
             try {
                 await db.collection('notes').doc(note.id).delete();
-                console.log('Nota excluída:', note.id);
+                console.log('Entrada deletada:', note.id);
+                showNeuralNotification('Sistema Limpo', 'Entrada removida da base', 'success');
             } catch (error) {
-                console.error('Erro ao excluir nota:', error);
-                alert('Erro ao excluir a nota');
+                console.error('Erro ao deletar:', error);
+                showNeuralNotification('Erro de Sistema', 'Falha ao deletar entrada', 'error');
             }
         }
 
-       
+        // ================== EVENT LISTENERS ==================
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 tabs.forEach(t => t.classList.remove('active'));
@@ -1541,6 +2323,10 @@
             noteTitle.focus();
         });
 
+        floatingNewBtn.addEventListener('click', () => {
+            btnNew.click();
+        });
+
         btnCancel.addEventListener('click', () => {
             editId = null;
             noteTitle.value = '';
@@ -1552,7 +2338,7 @@
 
         btnSave.addEventListener('click', async () => {
             if (!currentUser) {
-                showMessage(saveMessage, 'Faça login para salvar notas', 'error');
+                showNeuralNotification('Acesso Negado', 'Conecte-se à rede neural primeiro', 'error');
                 return;
             }
 
@@ -1560,7 +2346,7 @@
             const content = noteContent.value.trim();
 
             if (!title && !content) {
-                showMessage(saveMessage, 'Informe pelo menos o título ou conteúdo', 'error');
+                showNeuralNotification('Dados Insuficientes', 'Informe pelo menos título ou conteúdo', 'warning');
                 return;
             }
 
@@ -1580,32 +2366,32 @@
             };
 
             btnSave.disabled = true;
-            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Sincronizando...</span>';
 
             try {
                 if (editId) {
                     await db.collection('notes').doc(editId).update(noteData);
-                    console.log('Nota atualizada:', editId);
-                    showMessage(saveMessage, 'Nota atualizada com sucesso!', 'success');
+                    console.log('Entrada atualizada:', editId);
+                    showNeuralNotification('Sistema Atualizado', 'Entrada sincronizada com sucesso', 'success');
                     editId = null;
                 } else {
                     noteData.createdAt = Date.now();
                     const docRef = await db.collection('notes').add(noteData);
-                    console.log('Nova nota criada:', docRef.id);
-                    showMessage(saveMessage, 'Nota criada com sucesso!', 'success');
+                    console.log('Nova entrada criada:', docRef.id);
+                    showNeuralNotification('Nova Entrada', 'Dados adicionados à base neural', 'success');
                 }
 
-                
+                // Clear form
                 noteTitle.value = '';
                 noteContent.value = '';
                 noteCompleted.value = 'false';
                 noteReminder.value = '';
             } catch (error) {
-                console.error('Erro ao salvar nota:', error);
-                showMessage(saveMessage, 'Erro ao salvar nota: ' + error.message, 'error');
+                console.error('Erro na sincronização:', error);
+                showNeuralNotification('Erro de Sistema', 'Falha na sincronização: ' + error.message, 'error');
             } finally {
                 btnSave.disabled = false;
-                btnSave.innerHTML = '<i class="fas fa-save"></i> Salvar';
+                btnSave.innerHTML = '<i class="fas fa-save"></i> <span>Sincronizar</span>';
             }
         });
 
@@ -1619,19 +2405,19 @@
                 new Date(note.reminderTimestamp).toISOString().slice(0, 16) : '';
             saveMessage.innerHTML = '';
 
-           
-            document.querySelector('.card-header h3').scrollIntoView({
+            // Smooth scroll to editor
+            document.querySelector('.card-title').scrollIntoView({
                 behavior: 'smooth'
             });
         }
 
-       
+        // ================== REMINDERS ==================
         if ('Notification' in window) {
             if (Notification.permission === 'default') {
                 Notification.requestPermission().then(permission => {
-                    console.log('Permissão para notificações:', permission);
+                    console.log('Permissão para alertas neurais:', permission);
                 }).catch(() => {
-                    console.log('Erro ao solicitar permissão para notificações');
+                    console.log('Erro ao solicitar permissão para alertas');
                 });
             }
         }
@@ -1643,7 +2429,7 @@
 
         const notifiedReminders = new Set();
 
-      
+        // Check reminders every 30 seconds
         setInterval(() => {
             if (!currentUser) return;
 
@@ -1651,7 +2437,7 @@
                 if (!note.reminderTimestamp) return;
                 if (note.ownerUID !== currentUser.uid) return;
                 if (notifiedReminders.has(note.id)) return;
-                if (note.completed) return; // Don't notify for completed notes
+                if (note.completed) return;
 
                 if (note.reminderTimestamp <= Date.now()) {
                     notifyReminder(note);
@@ -1661,13 +2447,13 @@
         }, 30000);
 
         function notifyReminder(note) {
-            const title = 'Lembrete: ' + (note.title || 'Sem título');
+            const title = 'Alerta Neural: ' + (note.title || 'Sem título');
             const body = note.content || 'Sem conteúdo';
 
             if ('Notification' in window && Notification.permission === 'granted') {
                 const notification = new Notification(title, {
                     body,
-                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234f46e5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300d4ff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
                     requireInteraction: true
                 });
 
@@ -1676,12 +2462,11 @@
                     notification.close();
                 };
             } else {
-                
-                alert(`${title}\n\n${body}`);
+                showNeuralNotification('Alerta Neural', note.title || 'Lembrete ativo', 'warning');
             }
         }
 
-        
+        // ================== KEYBOARD SHORTCUTS ==================
         document.addEventListener('keydown', (e) => {
             // Ctrl/Cmd + N for new note
             if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
@@ -1691,7 +2476,7 @@
                 }
             }
 
-            
+            // Ctrl/Cmd + S for save note
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
                 if (currentUser && (noteTitle.value.trim() || noteContent.value.trim())) {
@@ -1699,7 +2484,7 @@
                 }
             }
 
-            
+            // Escape to cancel editing or close modal
             if (e.key === 'Escape') {
                 if (!completionModal.classList.contains('hidden')) {
                     hideCompletionModal();
@@ -1709,29 +2494,47 @@
             }
         });
 
-        
-        console.log('Sistema de anotações carregado');
+        // ================== RESPONSIVE BEHAVIOR ==================
+        window.addEventListener('resize', () => {
+            if (currentUser) {
+                if (window.innerWidth <= 768) {
+                    floatingNewBtn.style.display = 'flex';
+                } else {
+                    floatingNewBtn.style.display = 'none';
+                }
+            }
+        });
 
-      
+        // ================== INITIALIZATION ==================
+        console.log('Neural Notes System inicializado');
+
+        // Create particle effects
+        createParticles();
+
+        // Auto-focus email field on page load
         setTimeout(() => {
-            if (loginEmail) {
+            if (loginEmail && !currentUser) {
                 loginEmail.focus();
             }
-        }, 500);
+        }, 1000);
 
-       
-        
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js")
-      .then(() => console.log("Service Worker registrado com sucesso"))
-      .catch(err => console.error("Erro ao registrar Service Worker:", err));
-  }
-</script>
+        // Service Worker for PWA
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service-worker.js")
+                .then(() => console.log("Service Worker neural ativo"))
+                .catch(err => console.error("Erro no Service Worker:", err));
+        }
 
+        // Add some neural network visualization
+        setInterval(() => {
+            if (currentUser) {
+                const header = document.querySelector('.header');
+                if (header) {
+                    header.style.setProperty('--scan-position', Math.random() * 100 + '%');
+                }
+            }
+        }, 5000);
     </script>
 </body>
 
 </html>
-
-
-
