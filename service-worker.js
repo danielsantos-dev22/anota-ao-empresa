@@ -1,4 +1,4 @@
-const CACHE_NAME = "anotacoes-cache-v1";
+const CACHE_NAME = "anotacoes-cache-" + Date.now();
 const urlsToCache = [
   "./",
   "./index.html",
@@ -39,3 +39,4 @@ self.addEventListener("fetch", event => {
     })
   );
 });
+
