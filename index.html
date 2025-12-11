@@ -1,168 +1,1850 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
+
 <head>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a0f">
+    <link rel="icon" href="icon-192.png" sizes="192x192">
+    <link rel="icon" href="icon-512.png" sizes="512x512">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aviso de Suspensão URGENTE - Inforwnet Telecom</title>
+    <title>Anotacao inforwnet</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <style>
-        /* --- Animações de Piscar --- */
-        @keyframes flashBanner {
-            0%, 100% { background-color: #d9534f; color: white; } /* Vermelho */
-            50% { background-color: #ffc107; color: #333; } /* Amarelo */
-        }
-        
-        @keyframes iconBlink {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(1.1); }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            /* --- Paleta Cyber-Neural --- */
+            --primary: #00f2ff;
+            /* Ciano Neon */
+            --primary-glow: rgba(0, 242, 255, 0.4);
+
+            --secondary: #7000ff;
+            /* Roxo Elétrico */
+            --secondary-glow: rgba(112, 0, 255, 0.4);
+
+            --accent: #ffffff;
+
+            /* Status */
+            --success: #00ff9d;
+            --danger: #ff0055;
+            --warning: #ffcc00;
+            --info: #00f2ff;
+
+            /* Fundos (Dark Mode) */
+            --bg-body: #050507;
+            /* Quase preto */
+            --bg-glass: rgba(10, 10, 15, 0.6);
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --bg-input: rgba(0, 0, 0, 0.3);
+
+            /* Texto */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+
+            /* Efeitos */
+            --border-glass: 1px solid rgba(255, 255, 255, 0.08);
+            --border-active: 1px solid rgba(0, 242, 255, 0.5);
+
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-glow: 0 0 20px rgba(0, 242, 255, 0.15);
+
+            --gradient-neural: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            --gradient-hover: linear-gradient(135deg, rgba(112, 0, 255, 0.2) 0%, rgba(0, 242, 255, 0.2) 100%);
+
+            --radius: 16px;
+            --radius-xl: 24px;
+
+            --font-main: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
         }
 
-        /* --- Estilos Gerais --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #eee;
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(112, 0, 255, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(0, 242, 255, 0.08), transparent 25%);
+        }
+
+        /* --- Scrollbar Customizada --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-body);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* --- Login Screen --- */
+        .login-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-body);
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            color: #333;
-            padding-top: 50px; /* Espaço para o banner fixo */
+            z-index: 1000;
+            background-image:
+                linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
         }
-        
-        /* Faixa Superior Piscante */
-        .alert-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
+
+        .login-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all 0.8s ease;
+        }
+
+        .login-card {
+            background: rgba(10, 10, 15, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: var(--border-glass);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
+            padding: 3.5rem 2.5rem;
             width: 100%;
+            max-width: 420px;
             text-align: center;
-            padding: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            z-index: 9999;
-            animation: flashBanner 1s infinite linear; /* Pisca a cada 1 segundo */
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-logo i {
+            font-size: 3.5rem;
+            background: var(--gradient-neural);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px var(--secondary-glow));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .login-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 1rem 0 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        /* --- Inputs Estilizados --- */
+        .neural-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: var(--bg-input);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .neural-input:focus {
+            outline: none;
+            background: rgba(0, 0, 0, 0.5);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 242, 255, 0.1);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            position: absolute;
+            left: 1rem;
+            top: 1rem;
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            padding: 0 0.5rem;
+            background: transparent;
+            font-size: 0.95rem;
+        }
+
+        .neural-input:focus~.input-label,
+        .neural-input:not(:placeholder-shown)~.input-label {
+            top: -0.6rem;
+            left: 0.8rem;
+            font-size: 0.75rem;
+            color: var(--primary);
+            background: var(--bg-body);
+            border-radius: 4px;
+        }
+
+        /* Ajuste para label dentro de cards */
+        .card-body .neural-input:focus~.input-label,
+        .card-body .neural-input:not(:placeholder-shown)~.input-label {
+            background: #13131a;
+            /* Cor aproximada do card */
+        }
+
+        /* --- Botões --- */
+        .neural-btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .neural-btn-primary,
+        .btn-primary {
+            background: var(--gradient-neural);
+            color: white;
+            box-shadow: 0 4px 15px var(--secondary-glow);
+        }
+
+        .neural-btn-primary:hover,
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--secondary-glow);
+            filter: brightness(1.1);
+        }
+
+        .neural-btn-secondary,
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .neural-btn-secondary:hover,
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--text-primary);
+        }
+
+        /* --- Main Layout --- */
+        .main-content.hidden {
+            display: none;
         }
 
         .container {
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            text-align: center;
-            max-width: 600px;
-            width: 90%;
-            border: 3px solid #d9534f;
-            position: relative;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1.5rem;
         }
 
-        h1 {
-            color: #d9534f;
-            margin-bottom: 25px;
-            font-size: 26px;
-            text-transform: uppercase;
+        /* --- Header --- */
+        .header {
+            background: rgba(20, 20, 25, 0.6);
+            backdrop-filter: blur(12px);
+            border: var(--border-glass);
+            border-radius: var(--radius-xl);
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo-text {
+            background: linear-gradient(90deg, #fff, var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- User Area --- */
+        .user-area {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50px;
+            padding: 0.5rem 0.5rem 0.5rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: var(--border-glass);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-neural);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-        }
-        
-        /* Ícones piscantes no H1 */
-        .blink-icon {
-            font-size: 30px;
-            animation: iconBlink 0.8s infinite ease-in-out;
+            box-shadow: 0 0 10px var(--primary-glow);
         }
 
-        p {
-            font-size: 17px;
-            line-height: 1.6;
-            margin-bottom: 15px;
+        /* --- Cards e Grid --- */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
         }
-        .highlight-debtor {
-            font-weight: 800;
-            color: #d9534f;
-            background-color: #fff3f3;
-            padding: 2px 5px;
-            border-radius: 4px;
+
+        .neural-card {
+            background: #13131a;
+            /* Fallback */
+            background: linear-gradient(180deg, rgba(20, 20, 30, 0.8) 0%, rgba(15, 15, 20, 0.9) 100%);
+            backdrop-filter: blur(10px);
+            border: var(--border-glass);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
         }
-        .highlight-creditor {
-            font-weight: bold;
-            color: #000;
+
+        .card-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        .contact-box {
-            background-color: #fff8e1; /* Fundo levemente amarelado para destaque */
-            border: 2px solid #ffeeba;
-            padding: 20px;
+
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* --- Tabs --- */
+        .neural-tabs {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.8rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.8rem;
+            gap: 5px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+            box-shadow: inset 0 0 0 1px rgba(0, 242, 255, 0.2);
+        }
+
+        /* --- Lista de Notas --- */
+        .note-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .note-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--text-muted);
+            transition: 0.3s;
+        }
+
+        .note-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .note-item.private::before {
+            background: var(--secondary);
+            box-shadow: 0 0 10px var(--secondary-glow);
+        }
+
+        .note-item:not(.private)::before {
+            background: var(--success);
+            box-shadow: 0 0 10px rgba(0, 255, 157, 0.4);
+        }
+
+        .note-item.completed {
+            opacity: 0.6;
+            filter: grayscale(0.8);
+        }
+
+        .note-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .note-content {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .note-meta {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .note-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.7rem;
+        }
+
+        .badge-public {
+            color: var(--success);
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid rgba(0, 255, 157, 0.2);
+        }
+
+        .badge-private {
+            color: var(--secondary);
+            background: rgba(112, 0, 255, 0.1);
+            border: 1px solid rgba(112, 0, 255, 0.2);
+        }
+
+        /* --- Buttons in Note --- */
+        .note-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
             border-radius: 8px;
-            margin-top: 30px;
         }
-        .phone {
-            font-size: 24px;
-            font-weight: 900;
-            color: #28a745;
-            text-decoration: none;
-            display: block;
-            margin: 15px 0;
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
         }
-        .btn-whatsapp {
-            display: inline-block;
-            padding: 12px 25px;
-            background-color: #25d366;
+
+        .btn-ghost:hover {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+        }
+
+        .btn-info {
+            background: rgba(0, 242, 255, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+        }
+
+        .btn-info:hover {
+            background: rgba(0, 242, 255, 0.25);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+        }
+
+        .btn-danger {
+            background: rgba(255, 0, 85, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(255, 0, 85, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 0, 85, 0.25);
+        }
+
+        /* --- Status Card --- */
+        .status-card {
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-connected {
+            background: rgba(0, 255, 157, 0.05);
+            border-color: rgba(0, 255, 157, 0.2);
+            color: var(--success);
+        }
+
+        .status-disconnected {
+            background: rgba(255, 0, 85, 0.05);
+            border-color: rgba(255, 0, 85, 0.2);
+            color: var(--danger);
+        }
+
+        /* --- Stats Grid --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- Floating Btn --- */
+        .floating-new-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-neural);
+            border: none;
             color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 18px;
-            box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3);
-            transition: transform 0.2s;
+            font-size: 1.5rem;
+            box-shadow: 0 0 20px var(--secondary-glow);
+            z-index: 100;
+            cursor: pointer;
+            display: none;
+            justify-content: center;
+            align-items: center;
         }
-        .btn-whatsapp:hover {
-            background-color: #128c7e;
-            transform: scale(1.05);
+
+        /* --- Footer --- */
+        .footer {
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
         }
-        footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #888;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
+
+        /* --- Responsividade --- */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .neural-tabs {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .floating-new-btn {
+                display: flex;
+            }
+        }
+
+        /* Particles Canvas fix */
+        .particles {
+            opacity: 0.4;
+        }
+
+        .particle {
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
         }
     </style>
 </head>
+
 <body>
+    <!-- Particle Background -->
+    <div class="particles" id="particles"></div>
 
-    <div class="alert-banner">
-        ⚠️ Atenção: Bloqueio por falta de pagamento ⚠️
-    </div>
+    <!-- Neural Grid -->
+    <div class="neural-grid"></div>
 
-    <div class="container">
-        <h1>
-            <span class="blink-icon">⚠️</span>
-            Serviço Suspenso
-            <span class="blink-icon">⚠️</span>
-        </h1>
-        
-        <p>O acesso aos serviços da empresa abaixo encontra-se temporariamente bloqueado devido a pendências financeiras:</p>
-        
-        <p class="highlight-debtor">Inforwnet Telecom</p>
-        
-        <div class="contact-box">
-            <p><strong>Evite o cancelamento definitivo.</strong> Para restabelecer o acesso, regularize a pendência imediatamente junto ao desenvolvedor:</p>
-            <p class="highlight-creditor">Daniel Sistema</p>
-            
-            <p style="margin-top: 20px;">Envie o comprovante de pagamento para o WhatsApp:</p>
-            <a href="https://wa.me/5591982461873" class="phone">(91) 98246-1873</a>
-            
-            <a href="https://wa.me/5591982461873" class="btn-whatsapp">
-                Enviar Comprovante Urgente
-            </a>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h1 class="login-title">Inforwnet anotação</h1>
+            <p class="login-subtitle">Sistema Inteligente de Anotações - Criado por Daniel Santos</p>
+
+            <form class="login-form">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="email" class="neural-input" id="loginEmail" placeholder=" " required>
+                        <label class="input-label">Seu email</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="password" class="neural-input" id="loginPassword" placeholder=" " required>
+                        <label class="input-label">Sua senha</label>
+                    </div>
+                </div>
+
+                <button type="button" class="neural-btn neural-btn-primary" id="btnLoginMain">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Entrar no Sistema</span>
+                </button>
+
+                <div style="text-align: center; margin: 1.5rem 0; color: var(--text-muted);">
+                    <span>━━━━━━ ou ━━━━━━</span>
+                </div>
+
+                <button type="button" class="neural-btn neural-btn-secondary" id="btnSignupMain">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Criar Nova Conta</span>
+                </button>
+            </form>
+
+            <div id="loginMessage"></div>
         </div>
-
-        <footer>
-            Sistema de bloqueio automático gerado por Daniel Sistema.
-        </footer>
     </div>
 
+    <!-- Main Content -->
+    <div class="main-content hidden" id="mainContent">
+        <div class="container">
+            <!-- Header -->
+            <header class="header hologram">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span class="logo-text">Inforwnet anotação</span>
+                </div>
+
+                <!-- User Area -->
+                <div class="user-area" id="userArea">
+                    <div class="user-avatar">
+                        <i class="fas fa-user-astronaut"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;" id="userEmail"></div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">conta online</div>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="btnLogout">
+                        <i class="fas fa-power-off"></i>
+                        <span>Desconectar</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="statsGrid" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalNotes">0</div>
+                    <div class="stat-label">Total de Notas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="publicNotes">0</div>
+                    <div class="stat-label">Notas Públicas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="privateNotes">0</div>
+                    <div class="stat-label">Notas Privadas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completedNotes">0</div>
+                    <div class="stat-label">Concluídas</div>
+                </div>
+            </div>
+
+            <!-- Main Grid -->
+            <main class="main-grid">
+                <!-- Left Column - Notes List -->
+                <section class="neural-card">
+                    <div class="card-header">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <h2 class="card-title">
+                                <i class="fas fa-database"></i>
+                                <span>Anotações</span>
+                            </h2>
+                            <button class="btn btn-primary" id="btnNew">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Nova nota</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Neural Tabs -->
+                        <div class="neural-tabs">
+                            <button class="tab-btn active" data-filter="all">
+                                <i class="fas fa-globe-americas"></i>
+                                <span>Públicas</span>
+                            </button>
+                            <button class="tab-btn" data-filter="mine">
+                                <i class="fas fa-user-shield"></i>
+                                <span>Privadas</span>
+                            </button>
+                            <button class="tab-btn" data-filter="both">
+                                <i class="fas fa-layer-group"></i>
+                                <span>Todas</span>
+                            </button>
+                            <button class="tab-btn" data-filter="completed">
+                                <i class="fas fa-check-double"></i>
+                                <span>Finalizadas</span>
+                            </button>
+                        </div>
+
+                        <!-- Advanced Search -->
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input neural-input" id="searchInput"
+                                placeholder="Buscar anotações">
+                        </div>
+
+                        <!-- Notes List -->
+                        <div class="notes-container" id="notesContainer">
+                            <div class="loading">
+                                <div class="neural-spinner"></div>
+                                <span>Carregando anotações</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Right Column - Editor & Status -->
+                <aside>
+                    <!-- Neural Editor -->
+                    <div class="neural-card" style="margin-bottom: 1.5rem;">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-terminal"></i>
+                                <span>ANOTA AQUI</span>
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" class="neural-input" id="noteTitle" placeholder=" ">
+                                    <label class="input-label">Título</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <textarea class="neural-input" id="noteContent" placeholder=" "></textarea>
+                                    <label class="input-label">Conteúdo</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Nível de Acesso
+                                </label>
+                                <select class="neural-input" id="notePublic">
+                                    <option value="true">🌐 Público (Todos)</option>
+                                    <option value="false">🔒 Privado (Apenas Você)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-user-tag"></i>
+                                    Destinatário da Anotação
+                                </label>
+                                <select class="neural-input" id="noteAssignedTo">
+                                    <option value="">em desenvolvimento</option>
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-tasks"></i>
+                                    Status da anotação
+                                </label>
+                                <select class="neural-input" id="noteCompleted">
+                                    <option value="false">⚡ Em Progresso</option>
+                                    <option value="true">✅ Missão Completa</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-satellite"></i>
+                                    Lembrete (opcional)
+                                </label>
+                                <input type="datetime-local" class="neural-input" id="noteReminder">
+                            </div>
+
+                            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                                <button class="btn btn-primary" id="btnSave" style="flex: 1;">
+                                    <i class="fas fa-save"></i>
+                                    <span>Sincronizar</span>
+                                </button>
+                                <button class="btn btn-secondary" id="btnCancel">
+                                    <i class="fas fa-times-circle"></i>
+                                    <span>Cancelar</span>
+                                </button>
+                            </div>
+
+                            <div id="saveMessage"></div>
+                        </div>
+                    </div>
+
+                    <!-- System Status -->
+                    <div class="neural-card">
+                        <div class="card-header">
+                            <h4 class="card-title">
+                                <i class="fas fa-satellite-dish"></i>
+                                <span>Status</span>
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="statusArea" class="status-card status-disconnected">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Sistema Offline</span>
+                            </div>
+
+                            <!-- System Info -->
+                            <div
+                                style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: var(--radius); font-size: 0.85rem; color: var(--text-muted);">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span>Versão:</span>
+                                    <span style="color: var(--primary);">v3.0.0</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span>Protocolo:</span>
+                                    <span style="color: var(--success);">danieltech</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Sincronização:</span>
+                                    <span style="color: var(--info);">time</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </main>
+
+            <!-- Neural Footer -->
+            <footer class="footer">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <i class="fas fa-microchip" style="color: var(--primary);"></i>
+                    <span style="color: var(--text-muted);">
+                        Inforwnet anotação - Desenvolvido por Daniel Santos
+                    </span>
+                    <i class="fas fa-brain" style="color: var(--secondary);"></i>
+                </div>
+                <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-dim); text-align: center;">
+                    anotações rapidas •
+                    Sincronização em tempo real •
+                    Criptografia avançada
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="floating-new-btn" id="floatingNewBtn">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Neural Notification -->
+    <div class="neural-notification" id="neuralNotification">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <i class="notification-icon"></i>
+            <div>
+                <div class="notification-title" style="font-weight: 600; margin-bottom: 0.25rem;"></div>
+                <div class="notification-message" style="font-size: 0.85rem; color: var(--text-muted);"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Completion Modal -->
+    <div class="modal-overlay hidden" id="completionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <i class="fas fa-check-circle"></i>
+                <h3 class="modal-title">Finalizar Missão</h3>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6;">
+                Você está marcando esta entrada como concluída. Adicione uma observação opcional sobre o resultado.
+            </p>
+
+            <div class="form-group">
+                <div class="input-group">
+                    <textarea class="neural-input" id="completionObservation" placeholder=" "
+                        style="min-height: 100px;"></textarea>
+                    <label class="input-label">
+                        <i class="fas fa-comment-dots"></i>
+                        Relatório de Conclusão (opcional)
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+                <button class="btn btn-secondary" id="cancelCompletion">
+                    <i class="fas fa-times"></i>
+                    <span>Cancelar</span>
+                </button>
+                <button class="btn btn-success" id="confirmCompletion">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Finalizar Missão</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ================== FIREBASE CONFIGURATION ==================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsd9ywXXxibVZseCTZ_P0uejq9Ttk5VUI",
+            authDomain: "notas-empresa.firebaseapp.com",
+            projectId: "notas-empresa",
+            storageBucket: "notas-empresa.firebasestorage.app",
+            messagingSenderId: "1036347296997",
+            appId: "1:1036347296997:web:6be1cc59ab70ced9a2580c",
+            measurementId: "G-N0639WT6Y6"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        console.log('Neural Network inicializado:', firebase.app().name);
+
+        // ================== UI REFERENCES ==================
+        const loginScreen = document.getElementById('loginScreen');
+        const mainContent = document.getElementById('mainContent');
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        const btnLoginMain = document.getElementById('btnLoginMain');
+        const btnSignupMain = document.getElementById('btnSignupMain');
+        const loginMessage = document.getElementById('loginMessage');
+        const btnLogout = document.getElementById('btnLogout');
+        const userArea = document.getElementById('userArea');
+        const userEmail = document.getElementById('userEmail');
+        const notesContainer = document.getElementById('notesContainer');
+        const searchInput = document.getElementById('searchInput');
+        const tabs = document.querySelectorAll('.tab-btn');
+        const btnNew = document.getElementById('btnNew');
+        const noteTitle = document.getElementById('noteTitle');
+        const noteContent = document.getElementById('noteContent');
+        const notePublic = document.getElementById('notePublic');
+        const noteCompleted = document.getElementById('noteCompleted');
+        const noteReminder = document.getElementById('noteReminder');
+        const btnSave = document.getElementById('btnSave');
+        const btnCancel = document.getElementById('btnCancel');
+        const statusArea = document.getElementById('statusArea');
+        const saveMessage = document.getElementById('saveMessage');
+        const completionModal = document.getElementById('completionModal');
+        const completionObservation = document.getElementById('completionObservation');
+        const cancelCompletion = document.getElementById('cancelCompletion');
+        const confirmCompletion = document.getElementById('confirmCompletion');
+        const floatingNewBtn = document.getElementById('floatingNewBtn');
+        const neuralNotification = document.getElementById('neuralNotification');
+        const statsGrid = document.getElementById('statsGrid');
+
+        let currentUser = null;
+        let editId = null;
+        let activeFilter = 'all';
+        let allNotes = [];
+        let currentNoteForCompletion = null;
+
+        // ================== PARTICLE SYSTEM ==================
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // ================== NEURAL NOTIFICATIONS ==================
+        function showNeuralNotification(title, message, type = 'success') {
+            const notification = neuralNotification;
+            const icon = notification.querySelector('.notification-icon');
+            const titleElement = notification.querySelector('.notification-title');
+            const messageElement = notification.querySelector('.notification-message');
+
+            // Set content
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+
+            // Set icon and type
+            notification.className = `neural-notification ${type}`;
+
+            switch (type) {
+                case 'success':
+                    icon.className = 'fas fa-check-circle notification-icon';
+                    break;
+                case 'error':
+                    icon.className = 'fas fa-exclamation-triangle notification-icon';
+                    break;
+                case 'warning':
+                    icon.className = 'fas fa-exclamation-circle notification-icon';
+                    break;
+                default:
+                    icon.className = 'fas fa-info-circle notification-icon';
+            }
+
+            // Show notification
+            notification.classList.add('show');
+
+            // Auto hide after 4 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // ================== HELPER FUNCTIONS ==================
+        function showMessage(element, message, type = 'info') {
+            const messageClass = type === 'error' ? 'message-error' : 'message-success';
+            element.innerHTML = `<div class="message ${messageClass}">
+                <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'check-circle'}"></i>
+                ${message}
+            </div>`;
+            setTimeout(() => {
+                element.innerHTML = '';
+            }, 5000);
+        }
+
+        function formatDate(timestamp) {
+            return new Date(timestamp).toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function updateStats() {
+            if (!currentUser) return;
+
+            const total = allNotes.length;
+            const publicNotes = allNotes.filter(note => note.public).length;
+            const privateNotes = allNotes.filter(note => !note.public && note.ownerUID === currentUser.uid).length;
+            const completed = allNotes.filter(note => note.completed).length;
+
+            document.getElementById('totalNotes').textContent = total;
+            document.getElementById('publicNotes').textContent = publicNotes;
+            document.getElementById('privateNotes').textContent = privateNotes;
+            document.getElementById('completedNotes').textContent = completed;
+
+            if (total > 0) {
+                statsGrid.style.display = 'grid';
+            }
+        }
+
+        // ================== AUTH HANDLERS ==================
+        btnSignupMain.addEventListener('click', async () => {
+            const email = loginEmail.value.trim();
+            const pwd = loginPassword.value;
+
+            if (!email || !pwd) {
+                showNeuralNotification('Erro de Entrada', 'Por favor, informe email e senha', 'error');
+                return;
+            }
+
+            btnSignupMain.disabled = true;
+            btnSignupMain.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Criando conta neural...</span>';
+
+            try {
+                console.log('Iniciando criação de conta para:', email);
+                const userCredential = await auth.createUserWithEmailAndPassword(email, pwd);
+                console.log('Conta criada com sucesso:', userCredential.user.email);
+                showNeuralNotification('Sistema Ativo', 'Conta neural criada com sucesso!', 'success');
+            } catch (error) {
+                console.error('Erro ao criar conta:', error);
+                let errorMsg = 'Erro ao criar conta neural';
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMsg = 'Este email já está em uso na rede';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMsg = 'Senha insegura (mínimo 6 caracteres)';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg = 'Email inválido';
+                }
+                showNeuralNotification('Falha no Sistema', errorMsg, 'error');
+            } finally {
+                btnSignupMain.disabled = false;
+                btnSignupMain.innerHTML = '<i class="fas fa-user-plus"></i> <span>Criar Nova Conta</span>';
+            }
+        });
+
+        btnLoginMain.addEventListener('click', async () => {
+            const email = loginEmail.value.trim();
+            const pwd = loginPassword.value;
+
+            if (!email || !pwd) {
+                showNeuralNotification('Erro de Entrada', 'Por favor, informe email e senha', 'error');
+                return;
+            }
+
+            btnLoginMain.disabled = true;
+            btnLoginMain.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Conectando...</span>';
+
+            try {
+                console.log('Iniciando conexão neural para:', email);
+                await auth.signInWithEmailAndPassword(email, pwd);
+                console.log('Conexão neural estabelecida');
+                showNeuralNotification('Conexão Ativa', 'Interface neural sincronizada', 'success');
+            } catch (error) {
+                console.error('Erro ao conectar:', error);
+                let errorMsg = 'Erro ao estabelecer conexão';
+                if (error.code === 'auth/user-not-found') {
+                    errorMsg = 'Usuário não encontrado na rede';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMsg = 'Senha incorreta';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg = 'Email inválido';
+                }
+                showNeuralNotification('Falha na Conexão', errorMsg, 'error');
+            } finally {
+                btnLoginMain.disabled = false;
+                btnLoginMain.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>Entrar no Sistema</span>';
+            }
+        });
+
+        btnLogout.addEventListener('click', () => {
+            auth.signOut();
+        });
+
+        // Handle Enter key on login form
+        loginEmail.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loginPassword.focus();
+            }
+        });
+
+        loginPassword.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                btnLoginMain.click();
+            }
+        });
+
+        auth.onAuthStateChanged(user => {
+            console.log('Estado neural alterado:', user ? user.email : 'desconectado');
+            currentUser = user;
+
+            if (user) {
+                // Show main content, hide login screen
+                loginScreen.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+
+                userEmail.textContent = user.email;
+                statusArea.className = 'status-card status-connected';
+                statusArea.innerHTML = `
+                    <i class="fas fa-satellite"></i>
+                    <span>Rede Neural Ativa - <strong>${user.email}</strong></span>
+                `;
+
+                // Clear login form
+                loginEmail.value = '';
+                loginPassword.value = '';
+                loginMessage.innerHTML = '';
+
+                // Show floating button on mobile
+                if (window.innerWidth <= 768) {
+                    floatingNewBtn.style.display = 'flex';
+                }
+            } else {
+                // Show login screen, hide main content
+                loginScreen.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+
+                userEmail.textContent = '';
+                statusArea.className = 'status-card status-disconnected';
+                statusArea.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Sistema Offline</span>
+                `;
+
+                floatingNewBtn.style.display = 'none';
+                statsGrid.style.display = 'none';
+            }
+
+            renderNotes();
+        });
+
+        // ================== NOTES CRUD ==================
+        db.collection('notes').orderBy('createdAt', 'desc').onSnapshot(
+            (snapshot) => {
+                console.log('Base de dados atualizada:', snapshot.size, 'entradas');
+                allNotes = [];
+                snapshot.forEach(doc => {
+                    allNotes.push({ id: doc.id, ...doc.data() });
+                });
+                renderNotes();
+                updateStats();
+            },
+            (error) => {
+                console.error('Erro ao carregar base de dados:', error);
+                notesContainer.innerHTML = `
+                    <div class="message message-error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Erro na sincronização neural. Verifique as permissões do sistema.
+                    </div>
+                `;
+            }
+        );
+
+        function renderNotes() {
+            console.log('Renderizando interface neural. Usuário ativo:', currentUser ? currentUser.email : 'offline');
+            const query = searchInput.value.trim().toLowerCase();
+            notesContainer.innerHTML = '';
+
+            let filtered = allNotes.filter(note => {
+                if (activeFilter === 'all') {
+                    return note.public === true && !note.completed;
+                } else if (activeFilter === 'mine') {
+                    return currentUser && note.ownerUID === currentUser.uid && note.public === false && !note.completed;
+                } else if (activeFilter === 'completed') {
+                    return note.completed === true && (note.public || (currentUser && note.ownerUID === currentUser.uid));
+                }
+                else {
+                    return (note.public === true && !note.completed) || (currentUser && note.ownerUID === currentUser.uid && !note.completed);
+                }
+            });
+
+            if (query) {
+                filtered = filtered.filter(note => {
+                    const searchText = ((note.title || '') + ' ' + (note.content || '')).toLowerCase();
+                    return searchText.includes(query);
+                });
+            }
+
+            console.log('Entradas filtradas:', filtered.length);
+
+            if (filtered.length === 0) {
+                let emptyMessage = 'Nenhuma entrada encontrada na base';
+                if (activeFilter === 'completed') {
+                    emptyMessage = 'Nenhuma missão finalizada';
+                } else if (activeFilter === 'mine') {
+                    emptyMessage = 'Você não possui entradas privadas';
+                }
+
+                notesContainer.innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-database" style="font-size: 2rem; color: var(--primary);"></i>
+                        <span>${emptyMessage}</span>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(note => {
+                const noteElement = createNoteElement(note);
+                notesContainer.appendChild(noteElement);
+            });
+        }
+
+        function createNoteElement(note) {
+            const item = document.createElement('div');
+            item.className = 'note-item';
+
+            if (isReminderDue(note)) item.classList.add('reminder-due');
+            if (!note.public) item.classList.add('private');
+            if (note.completed) item.classList.add('completed');
+
+            const isOwner = currentUser && note.ownerUID === currentUser.uid;
+            const canInteract = currentUser && (note.public || isOwner);
+
+            console.log('Criando entrada neural:', note.title, 'owner:', isOwner, 'interact:', canInteract);
+
+            item.innerHTML = `
+                <div class="note-title">${note.title || '(sem título)'}</div>
+                
+                <div class="note-meta">
+                    <span class="note-badge ${note.public ? 'badge-public' : 'badge-private'}">
+                        <i class="fas fa-${note.public ? 'globe-americas' : 'user-shield'}"></i>
+                        ${note.public ? 'Público' : 'Privado'}
+                    </span>
+                    ${note.completed ? `
+                    <span class="note-badge badge-completed">
+                        <i class="fas fa-check-double"></i>
+                        Finalizada
+                    </span>
+                    ` : ''}
+                    <span>
+                        <i class="fas fa-user-astronaut"></i>
+                        ${note.ownerEmail || '—'}
+                    </span>
+                    ${note.createdAt ? `
+                    <span>
+                        <i class="fas fa-clock"></i>
+                        ${formatDate(note.createdAt)}
+                    </span>
+                    ` : ''}
+                </div>
+
+                ${note.reminderTimestamp ? `
+                <div style="background: linear-gradient(135deg, rgba(255, 170, 0, 0.1) 0%, rgba(255, 136, 0, 0.1) 100%); border: 1px solid rgba(255, 170, 0, 0.3); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; color: var(--warning);">
+                    <i class="fas fa-satellite"></i>
+                    <strong>Alerta Neural:</strong> ${formatDate(note.reminderTimestamp)}
+                </div>
+                ` : ''}
+
+                <div class="note-content">${note.content || ''}</div>
+
+                ${note.completed && note.completedData ? `
+                <div class="completion-info">
+                    <div class="completion-header">
+                        <i class="fas fa-check-double"></i>
+                        <strong>Missão Finalizada</strong>
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 0.75rem; font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap;">
+                        <span><i class="fas fa-user-astronaut"></i> Por: ${note.completedData.userEmail}</span>
+                        <span><i class="fas fa-clock"></i> Em: ${formatDate(note.completedData.timestamp)}</span>
+                    </div>
+                    ${note.completedData.observation ? `
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                        <i class="fas fa-comment-dots" style="color: var(--info); margin-right: 0.5rem;"></i>
+                        <strong>Relatório:</strong> ${note.completedData.observation}
+                    </div>
+                    ` : ''}
+                </div>
+                ` : ''}
+
+                <div class="note-actions">
+                    ${isOwner ? `
+                    <button class="btn btn-ghost btn-sm edit-btn" data-id="${note.id}">
+                        <i class="fas fa-edit"></i>
+                        <span>Editar</span>
+                    </button>
+                    ` : ''}
+                    
+                    ${canInteract && !note.completed ? `
+                    <button class="btn btn-info btn-sm complete-btn" data-id="${note.id}">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Finalizar</span>
+                    </button>
+                    ` : ''}
+                    
+                    ${isOwner && note.completed ? `
+                    <button class="btn btn-secondary btn-sm incomplete-btn" data-id="${note.id}">
+                        <i class="fas fa-undo"></i>
+                        <span>Reabrir</span>
+                    </button>
+                    ` : ''}
+                    
+                    ${isOwner ? `
+                    <button class="btn btn-secondary btn-sm toggle-btn" data-id="${note.id}">
+                        <i class="fas fa-${note.public ? 'user-shield' : 'globe-americas'}"></i>
+                        <span>${note.public ? 'Tornar Privado' : 'Tornar Público'}</span>
+                    </button>
+                    <button class="btn btn-danger btn-sm delete-btn" data-id="${note.id}">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>Deletar</span>
+                    </button>
+                    ` : ''}
+                </div>
+            `;
+
+            // Event listeners for buttons
+            const editBtn = item.querySelector('.edit-btn');
+            const toggleBtn = item.querySelector('.toggle-btn');
+            const deleteBtn = item.querySelector('.delete-btn');
+            const completeBtn = item.querySelector('.complete-btn');
+            const incompleteBtn = item.querySelector('.incomplete-btn');
+
+            if (editBtn) {
+                editBtn.addEventListener('click', () => {
+                    console.log('Editando entrada neural');
+                    openEditor(note);
+                });
+            }
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    console.log('Alterando visibilidade');
+                    toggleNoteVisibility(note);
+                });
+            }
+
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', () => {
+                    console.log('Deletando entrada');
+                    deleteNote(note);
+                });
+            }
+
+            if (completeBtn) {
+                completeBtn.addEventListener('click', () => {
+                    console.log('Finalizando missão:', note.id);
+                    showCompletionModal(note);
+                });
+            }
+
+            if (incompleteBtn) {
+                incompleteBtn.addEventListener('click', () => {
+                    console.log('Reabrindo entrada');
+                    toggleNoteCompletion(note, false);
+                });
+            }
+
+            return item;
+        }
+
+        async function toggleNoteVisibility(note) {
+            try {
+                await db.collection('notes').doc(note.id).update({
+                    public: !note.public,
+                    updatedAt: Date.now()
+                });
+                console.log('Visibilidade alterada:', note.id);
+                showNeuralNotification('Sistema Atualizado', 'Nível de acesso alterado', 'success');
+            } catch (error) {
+                console.error('Erro ao alterar visibilidade:', error);
+                showNeuralNotification('Erro de Sistema', 'Falha ao alterar visibilidade', 'error');
+            }
+        }
+
+        async function toggleNoteCompletion(note, completed) {
+            try {
+                const updateData = {
+                    completed: completed,
+                    updatedAt: Date.now()
+                };
+
+                if (!completed) {
+                    updateData.completedData = firebase.firestore.FieldValue.delete();
+                }
+
+                await db.collection('notes').doc(note.id).update(updateData);
+                console.log('Status alterado:', note.id, completed);
+                showNeuralNotification('Missão Atualizada', completed ? 'Entrada finalizada' : 'Entrada reaberta', 'success');
+            } catch (error) {
+                console.error('Erro ao alterar status:', error);
+                showNeuralNotification('Erro de Sistema', 'Falha ao alterar status', 'error');
+            }
+        }
+
+        // ================== COMPLETION MODAL ==================
+        function showCompletionModal(note) {
+            currentNoteForCompletion = note;
+            completionObservation.value = '';
+            completionModal.classList.remove('hidden');
+            completionObservation.focus();
+        }
+
+        function hideCompletionModal() {
+            currentNoteForCompletion = null;
+            completionObservation.value = '';
+            completionModal.classList.add('hidden');
+        }
+
+        async function completeNoteWithObservation() {
+            if (!currentNoteForCompletion || !currentUser) return;
+
+            const observation = completionObservation.value.trim();
+
+            const completedData = {
+                completed: true,
+                completedData: {
+                    userEmail: currentUser.email,
+                    userUID: currentUser.uid,
+                    timestamp: Date.now(),
+                    observation: observation || null
+                },
+                updatedAt: Date.now()
+            };
+
+            confirmCompletion.disabled = true;
+            confirmCompletion.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Processando...</span>';
+
+            try {
+                await db.collection('notes').doc(currentNoteForCompletion.id).update(completedData);
+                console.log('Entrada finalizada:', currentNoteForCompletion.id);
+                showNeuralNotification('Missão Completa', 'Entrada marcada como finalizada', 'success');
+                hideCompletionModal();
+            } catch (error) {
+                console.error('Erro ao finalizar:', error);
+                showNeuralNotification('Erro de Sistema', 'Falha ao finalizar entrada', 'error');
+            } finally {
+                confirmCompletion.disabled = false;
+                confirmCompletion.innerHTML = '<i class="fas fa-check-circle"></i> <span>Finalizar Missão</span>';
+            }
+        }
+
+        // Modal event listeners
+        cancelCompletion.addEventListener('click', hideCompletionModal);
+        confirmCompletion.addEventListener('click', completeNoteWithObservation);
+
+        completionModal.addEventListener('click', (e) => {
+            if (e.target === completionModal) {
+                hideCompletionModal();
+            }
+        });
+
+        completionObservation.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                completeNoteWithObservation();
+            }
+        });
+
+        async function deleteNote(note) {
+            if (!confirm(`Tem certeza que deseja deletar "${note.title || 'entrada sem título'}" da base neural?`)) {
+                return;
+            }
+
+            try {
+                await db.collection('notes').doc(note.id).delete();
+                console.log('Entrada deletada:', note.id);
+                showNeuralNotification('Sistema Limpo', 'Entrada removida da base', 'success');
+            } catch (error) {
+                console.error('Erro ao deletar:', error);
+                showNeuralNotification('Erro de Sistema', 'Falha ao deletar entrada', 'error');
+            }
+        }
+
+        // ================== EVENT LISTENERS ==================
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                activeFilter = tab.dataset.filter;
+                renderNotes();
+            });
+        });
+
+        searchInput.addEventListener('input', renderNotes);
+
+        btnNew.addEventListener('click', () => {
+            editId = null;
+            noteTitle.value = '';
+            noteContent.value = '';
+            notePublic.value = 'false';
+            noteCompleted.value = 'false';
+            noteReminder.value = '';
+            saveMessage.innerHTML = '';
+            noteTitle.focus();
+        });
+
+        floatingNewBtn.addEventListener('click', () => {
+            btnNew.click();
+        });
+
+        btnCancel.addEventListener('click', () => {
+            editId = null;
+            noteTitle.value = '';
+            noteContent.value = '';
+            noteCompleted.value = 'false';
+            noteReminder.value = '';
+            saveMessage.innerHTML = '';
+        });
+
+        btnSave.addEventListener('click', async () => {
+            if (!currentUser) {
+                showNeuralNotification('Acesso Negado', 'Conecte-se à rede neural primeiro', 'error');
+                return;
+            }
+
+            const title = noteTitle.value.trim();
+            const content = noteContent.value.trim();
+
+            if (!title && !content) {
+                showNeuralNotification('Dados Insuficientes', 'Informe pelo menos título ou conteúdo', 'warning');
+                return;
+            }
+
+            const isPublic = notePublic.value === 'true';
+            const isCompleted = noteCompleted.value === 'true';
+            const reminderValue = noteReminder.value ? new Date(noteReminder.value).getTime() : null;
+
+            const noteData = {
+                title,
+                content,
+                public: isPublic,
+                completed: isCompleted,
+                ownerUID: currentUser.uid,
+                ownerEmail: currentUser.email,
+                reminderTimestamp: reminderValue,
+                updatedAt: Date.now()
+            };
+
+            btnSave.disabled = true;
+            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Sincronizando...</span>';
+
+            try {
+                if (editId) {
+                    await db.collection('notes').doc(editId).update(noteData);
+                    console.log('Entrada atualizada:', editId);
+                    showNeuralNotification('Sistema Atualizado', 'Entrada sincronizada com sucesso', 'success');
+                    editId = null;
+                } else {
+                    noteData.createdAt = Date.now();
+                    const docRef = await db.collection('notes').add(noteData);
+                    console.log('Nova entrada criada:', docRef.id);
+                    showNeuralNotification('Nova Entrada', 'Dados adicionados à base neural', 'success');
+                }
+
+                // Clear form
+                noteTitle.value = '';
+                noteContent.value = '';
+                noteCompleted.value = 'false';
+                noteReminder.value = '';
+            } catch (error) {
+                console.error('Erro na sincronização:', error);
+                showNeuralNotification('Erro de Sistema', 'Falha na sincronização: ' + error.message, 'error');
+            } finally {
+                btnSave.disabled = false;
+                btnSave.innerHTML = '<i class="fas fa-save"></i> <span>Sincronizar</span>';
+            }
+        });
+
+        function openEditor(note) {
+            editId = note.id;
+            noteTitle.value = note.title || '';
+            noteContent.value = note.content || '';
+            notePublic.value = note.public ? 'true' : 'false';
+            noteCompleted.value = note.completed ? 'true' : 'false';
+            noteReminder.value = note.reminderTimestamp ?
+                new Date(note.reminderTimestamp).toISOString().slice(0, 16) : '';
+            saveMessage.innerHTML = '';
+
+            // Smooth scroll to editor
+            document.querySelector('.card-title').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // ================== REMINDERS ==================
+        if ('Notification' in window) {
+            if (Notification.permission === 'default') {
+                Notification.requestPermission().then(permission => {
+                    console.log('Permissão para alertas neurais:', permission);
+                }).catch(() => {
+                    console.log('Erro ao solicitar permissão para alertas');
+                });
+            }
+        }
+
+        function isReminderDue(note) {
+            if (!note.reminderTimestamp) return false;
+            return note.reminderTimestamp <= Date.now();
+        }
+
+        const notifiedReminders = new Set();
+
+        // Check reminders every 30 seconds
+        setInterval(() => {
+            if (!currentUser) return;
+
+            allNotes.forEach(note => {
+                if (!note.reminderTimestamp) return;
+                if (note.ownerUID !== currentUser.uid) return;
+                if (notifiedReminders.has(note.id)) return;
+                if (note.completed) return;
+
+                if (note.reminderTimestamp <= Date.now()) {
+                    notifyReminder(note);
+                    notifiedReminders.add(note.id);
+                }
+            });
+        }, 30000);
+
+        function notifyReminder(note) {
+            const title = 'Alerta Neural: ' + (note.title || 'Sem título');
+            const body = note.content || 'Sem conteúdo';
+
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const notification = new Notification(title, {
+                    body,
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300d4ff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
+                    requireInteraction: true
+                });
+
+                notification.onclick = () => {
+                    window.focus();
+                    notification.close();
+                };
+            } else {
+                showNeuralNotification('Alerta Neural', note.title || 'Lembrete ativo', 'warning');
+            }
+        }
+
+        // ================== KEYBOARD SHORTCUTS ==================
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + N for new note
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                if (currentUser) {
+                    btnNew.click();
+                }
+            }
+
+            // Ctrl/Cmd + S for save note
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                if (currentUser && (noteTitle.value.trim() || noteContent.value.trim())) {
+                    btnSave.click();
+                }
+            }
+
+            // Escape to cancel editing or close modal
+            if (e.key === 'Escape') {
+                if (!completionModal.classList.contains('hidden')) {
+                    hideCompletionModal();
+                } else if (currentUser) {
+                    btnCancel.click();
+                }
+            }
+        });
+
+        // ================== RESPONSIVE BEHAVIOR ==================
+        window.addEventListener('resize', () => {
+            if (currentUser) {
+                if (window.innerWidth <= 768) {
+                    floatingNewBtn.style.display = 'flex';
+                } else {
+                    floatingNewBtn.style.display = 'none';
+                }
+            }
+        });
+
+        // ================== INITIALIZATION ==================
+        console.log('Neural Notes System inicializado');
+
+        // Create particle effects
+        createParticles();
+
+        // Auto-focus email field on page load
+        setTimeout(() => {
+            if (loginEmail && !currentUser) {
+                loginEmail.focus();
+            }
+        }, 1000);
+
+        // Service Worker for PWA
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service-worker.js")
+                .then(() => console.log("Service Worker neural ativo"))
+                .catch(err => console.error("Erro no Service Worker:", err));
+        }
+
+        // Add some neural network visualization
+        setInterval(() => {
+            if (currentUser) {
+                const header = document.querySelector('.header');
+                if (header) {
+                    header.style.setProperty('--scan-position', Math.random() * 100 + '%');
+                }
+            }
+        }, 5000);
+    </script>
 </body>
+
 </html>
