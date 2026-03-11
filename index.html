@@ -4,21 +4,17 @@
 <head>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#080a0f">
-    <link rel="icon" href="icon-192.png" sizes="192x192">
-    <link rel="icon" href="icon-512.png" sizes="512x512">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inforwnet Anotação - Daniel Santos Dev</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
+    <style>
         :root {
-            --primary: #00d4ff;        
+            --primary: #00d4ff;
             --primary-glow: rgba(0, 212, 255, 0.4);
-            --secondary: #ff004c;      
+            --secondary: #ff004c;
             --secondary-glow: rgba(255, 0, 76, 0.4);
             --success: #00ff9d;
             --bg-body: #080a0f;
@@ -59,22 +55,27 @@
 
         .bg-glow {
             position: fixed; inset: 0; z-index: -1; pointer-events: none;
-            background-image: 
+            background-image:
                 radial-gradient(circle at 0% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
                 radial-gradient(circle at 100% 100%, rgba(255, 0, 76, 0.08) 0%, transparent 40%);
         }
 
+        /* LOGIN */
         .login-screen {
             position: fixed; inset: 0; background: var(--bg-body);
             display: flex; justify-content: center; align-items: center; z-index: 1000;
+            transition: opacity 0.5s, visibility 0.5s;
         }
-        .login-screen.hidden { opacity: 0; visibility: hidden; transition: 0.5s; }
+        .login-screen.hidden { opacity: 0; visibility: hidden; }
         .login-card {
             background: var(--bg-card); backdrop-filter: blur(20px);
             border: 1px solid var(--border-alpha); border-radius: var(--radius-xl);
             padding: 3rem; width: 100%; max-width: 400px; text-align: center;
         }
 
+        .hidden { display: none !important; }
+
+        /* HEADER */
         .header {
             background: var(--bg-header); backdrop-filter: blur(15px);
             border: 1px solid var(--border-alpha); border-radius: var(--radius-xl);
@@ -90,68 +91,316 @@
         }
         .theme-toggle:hover, .view-toggle:hover { background: var(--primary); color: white; }
 
+        /* LAYOUT */
         .main-grid { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; max-width: 1400px; margin: 0 auto; padding: 0 1rem; }
         @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
 
         .neural-card { background: var(--bg-card); border-radius: var(--radius-xl); border: 1px solid var(--border-alpha); overflow: hidden; transition: 0.3s; }
         .card-header { padding: 1.5rem; border-bottom: 1px solid var(--border-alpha); display: flex; justify-content: space-between; align-items: center; }
-        
+
         .neural-input {
             width: 100%; padding: 1rem; background: var(--bg-input); border: 1px solid var(--border-alpha);
             border-radius: var(--radius); color: var(--text-primary); margin-bottom: 1rem; transition: 0.3s;
+            font-family: 'Outfit', sans-serif; font-size: 1rem;
         }
+        .neural-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+
+        /* STATS */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        @media (max-width: 600px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        .stat-card { background: var(--bg-card); padding: 1rem; border-radius: var(--radius); text-align: center; border-top: 3px solid var(--primary); }
+        .stat-card div:first-child { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px; }
+        .stat-card div:last-child { font-size: 1.6rem; font-weight: 800; }
+
+        /* TABS */
+        .neural-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; background: var(--bg-input); padding: 5px; border-radius: 12px; margin-bottom: 1rem; }
+        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 8px; cursor: pointer; border-radius: 8px; font-size: 0.8rem; font-family: 'Outfit', sans-serif; transition: 0.2s; }
+        .tab-btn.active { background: var(--gradient-neural); color: white; }
+
+        /* NOTES */
+        #notesContainer { min-height: 100px; }
 
         #notesContainer.grid-mode {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 15px;
         }
+        #notesContainer.grid-mode .note-item { margin-bottom: 0; }
 
         .note-item {
             background: var(--bg-input); border-radius: var(--radius);
-            padding: 1.5rem; margin-bottom: 1rem; border-left: 4px solid var(--primary); transition: 0.3s;
+            padding: 1.5rem; margin-bottom: 1rem; border-left: 4px solid var(--primary); transition: 0.25s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            position: relative;
+            user-select: none;
         }
         .note-item.private { border-left-color: var(--secondary); }
         .note-item.completed { opacity: 0.6; border-left-color: var(--success); }
-        
+
+        /* DRAG & DROP */
+        .drag-handle {
+            cursor: grab;
+            color: var(--text-muted);
+            padding: 4px 6px;
+            border-radius: 6px;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            font-size: 1rem;
+            margin-right: 6px;
+        }
+        .drag-handle:hover { color: var(--primary); background: rgba(0, 212, 255, 0.1); }
+        .drag-handle:active { cursor: grabbing; }
+
+        .note-item.dragging {
+            opacity: 0.4;
+            transform: scale(0.98);
+            border: 2px dashed var(--primary);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .note-item.drag-over {
+            border-top: 3px solid var(--primary);
+            transform: translateY(3px);
+            box-shadow: 0 -4px 12px var(--primary-glow);
+        }
+
+        .drop-indicator {
+            height: 4px;
+            background: var(--gradient-neural);
+            border-radius: 2px;
+            margin-bottom: 8px;
+            animation: pulse-indicator 0.6s ease-in-out infinite alternate;
+            display: none;
+        }
+        .drop-indicator.visible { display: block; }
+
+        @keyframes pulse-indicator {
+            from { opacity: 0.5; transform: scaleX(0.98); }
+            to { opacity: 1; transform: scaleX(1); }
+        }
+
+        /* DRAG ORDER HINT */
+        .order-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.3);
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            transition: 0.2s;
+        }
+
+        /* BADGES */
         .note-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
         .badge-public { background: rgba(0, 136, 204, 0.15); color: var(--primary); }
         .badge-private { background: rgba(214, 0, 63, 0.15); color: var(--secondary); }
 
-        .btn-primary { background: var(--gradient-neural); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 10px; cursor: pointer; font-weight: 700; transition: 0.3s; }
-        .btn-secondary { background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-alpha); padding: 0.8rem 1.5rem; border-radius: 10px; cursor: pointer; }
-        
+        /* BUTTONS */
+        .btn-primary { background: var(--gradient-neural); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 10px; cursor: pointer; font-weight: 700; transition: 0.3s; font-family: 'Outfit', sans-serif; font-size: 0.9rem; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--primary-glow); }
+        .btn-secondary { background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-alpha); padding: 0.8rem 1.5rem; border-radius: 10px; cursor: pointer; font-family: 'Outfit', sans-serif; font-size: 0.9rem; transition: 0.2s; }
+        .btn-secondary:hover { border-color: var(--primary); }
+
         .action-icon { background: none; border: none; font-size: 1.1rem; cursor: pointer; transition: 0.2s; padding: 5px; color: var(--text-muted); }
+        .action-icon:hover { transform: scale(1.15); }
         .icon-complete.is-done { color: var(--success); }
 
-        .neural-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; background: var(--bg-input); padding: 5px; border-radius: 12px; margin-bottom: 1rem; }
-        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 8px; cursor: pointer; border-radius: 8px; font-size: 0.8rem; }
-        .tab-btn.active { background: var(--gradient-neural); color: white; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
-        .stat-card { background: var(--bg-card); padding: 1rem; border-radius: var(--radius); text-align: center; border-top: 3px solid var(--primary); }
-
+        /* FOOTER */
         .footer-credits {
             text-align: center; padding: 2rem 0; margin-top: 2rem; border-top: 1px solid var(--border-alpha);
             font-size: 0.85rem; color: var(--text-muted);
         }
         .footer-credits a { color: var(--primary); text-decoration: none; font-weight: 600; }
         .footer-credits a:hover { text-decoration: underline; }
+
+        /* DRAG TOOLTIP */
+        .drag-hint {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .drag-hint i { color: var(--primary); }
+
+        /* SAVE ORDER BUTTON */
+        #btnSaveOrder {
+            display: none;
+            margin-top: 10px;
+            width: 100%;
+        }
+        #btnSaveOrder.visible { display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+        /* TOAST */
+        .toast {
+            position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card); border: 1px solid var(--border-alpha); border-radius: 12px;
+            padding: 12px 24px; font-size: 0.85rem; font-weight: 600;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 9999; backdrop-filter: blur(10px);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.success { border-color: var(--success); color: var(--success); }
+        .toast.info { border-color: var(--primary); color: var(--primary); }
+        .toast.error { border-color: var(--secondary); color: var(--secondary); }
+
+        /* AUTH TABS */
+        .auth-tabs {
+            display: grid; grid-template-columns: 1fr 1fr;
+            background: var(--bg-input); border-radius: 12px;
+            padding: 4px; margin-bottom: 2rem; gap: 4px;
+        }
+        .auth-tab {
+            background: none; border: none; color: var(--text-muted);
+            padding: 10px; border-radius: 9px; cursor: pointer;
+            font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 600;
+            transition: 0.25s; letter-spacing: 0.05em;
+        }
+        .auth-tab.active {
+            background: var(--gradient-neural); color: white;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        /* AUTH PANELS */
+        .auth-panel { display: none; animation: fadeSlideIn 0.35s ease; }
+        .auth-panel.active { display: block; }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* PASSWORD STRENGTH */
+        .password-strength {
+            height: 4px; border-radius: 2px; margin-top: -0.5rem;
+            margin-bottom: 1rem; background: var(--border-alpha);
+            overflow: hidden; transition: 0.3s;
+        }
+        .password-strength-bar {
+            height: 100%; width: 0%; border-radius: 2px;
+            transition: width 0.4s, background 0.4s;
+        }
+        .strength-weak   { width: 33%; background: var(--secondary); }
+        .strength-medium { width: 66%; background: #ffaa00; }
+        .strength-strong { width: 100%; background: var(--success); }
+
+        .strength-label {
+            font-size: 0.72rem; margin-bottom: 0.8rem;
+            margin-top: -0.3rem; text-align: right;
+            color: var(--text-muted); transition: color 0.3s;
+        }
+
+        /* LOADING SPINNER on button */
+        .btn-loading { position: relative; pointer-events: none; opacity: 0.8; }
+        .btn-loading::after {
+            content: '';
+            position: absolute; right: 14px; top: 50%;
+            transform: translateY(-50%);
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
+        .auth-divider {
+            text-align: center; font-size: 0.75rem;
+            color: var(--text-muted); margin: 1rem 0;
+            position: relative;
+        }
+        .auth-divider::before, .auth-divider::after {
+            content: ''; position: absolute; top: 50%;
+            width: 38%; height: 1px; background: var(--border-alpha);
+        }
+        .auth-divider::before { left: 0; }
+        .auth-divider::after { right: 0; }
+
+        .input-group { position: relative; margin-bottom: 1rem; }
+        .input-group .neural-input { margin-bottom: 0; padding-right: 3rem; }
+        .input-group .input-icon {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+        }
+        .input-group .input-icon:hover { color: var(--primary); }
     </style>
 </head>
 
 <body>
     <div class="bg-glow"></div>
 
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <!-- LOGIN / REGISTER -->
     <div class="login-screen" id="loginScreen">
-        <div class="login-card">
-            <i class="fas fa-brain" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
-            <h1 class="logo-text" style="font-size: 2rem; margin-bottom: 0.5rem;">INFORWNET</h1>
-            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 2rem;">Desenvolvido por Daniel Santos</p>
-            <input type="email" class="neural-input" id="loginEmail" placeholder="Email">
-            <input type="password" class="neural-input" id="loginPassword" placeholder="Senha">
-            <button class="btn-primary" id="btnLoginMain" style="width: 100%;">ENTRAR</button>
+        <div class="login-card" style="max-width: 420px;">
+            <i class="fas fa-brain" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 0.8rem;"></i>
+            <h1 class="logo-text" style="font-size: 2rem; margin-bottom: 0.3rem;">INFORWNET</h1>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1.8rem;">Desenvolvido por Daniel Santos</p>
+
+            <!-- TABS -->
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">
+                    <i class="fas fa-sign-in-alt"></i> ENTRAR
+                </button>
+                <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">
+                    <i class="fas fa-user-plus"></i> CADASTRAR
+                </button>
+            </div>
+
+            <!-- LOGIN PANEL -->
+            <div class="auth-panel active" id="panelLogin">
+                <div class="input-group">
+                    <input type="email" class="neural-input" id="loginEmail" placeholder="Email" autocomplete="email">
+                    <i class="fas fa-envelope input-icon"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" class="neural-input" id="loginPassword" placeholder="Senha" autocomplete="current-password">
+                    <i class="fas fa-eye input-icon" id="toggleLoginPass" onclick="togglePass('loginPassword','toggleLoginPass')"></i>
+                </div>
+                <button class="btn-primary" id="btnLoginMain" style="width:100%; position:relative;">ENTRAR</button>
+                <div class="auth-divider" style="margin-top:1.2rem;">ou</div>
+                <p style="font-size:0.8rem; color:var(--text-muted);">
+                    Não tem conta?
+                    <a href="#" onclick="switchTab('register');return false;" style="color:var(--primary); font-weight:600; text-decoration:none;">Cadastre-se</a>
+                </p>
+            </div>
+
+            <!-- REGISTER PANEL -->
+            <div class="auth-panel" id="panelRegister">
+                <div class="input-group">
+                    <input type="text" class="neural-input" id="regName" placeholder="Nome completo" autocomplete="name">
+                    <i class="fas fa-user input-icon"></i>
+                </div>
+                <div class="input-group">
+                    <input type="email" class="neural-input" id="regEmail" placeholder="Email" autocomplete="email">
+                    <i class="fas fa-envelope input-icon"></i>
+                </div>
+                <div class="input-group" style="margin-bottom:0;">
+                    <input type="password" class="neural-input" id="regPassword" placeholder="Senha (mín. 6 caracteres)" autocomplete="new-password" oninput="checkStrength(this.value)">
+                    <i class="fas fa-eye input-icon" id="toggleRegPass" onclick="togglePass('regPassword','toggleRegPass')"></i>
+                </div>
+                <div class="password-strength"><div class="password-strength-bar" id="strengthBar"></div></div>
+                <div class="strength-label" id="strengthLabel"></div>
+                <div class="input-group">
+                    <input type="password" class="neural-input" id="regPasswordConfirm" placeholder="Confirmar senha" autocomplete="new-password">
+                    <i class="fas fa-eye input-icon" id="toggleRegPass2" onclick="togglePass('regPasswordConfirm','toggleRegPass2')"></i>
+                </div>
+                <button class="btn-primary" id="btnRegister" style="width:100%; position:relative;">CRIAR CONTA</button>
+                <div class="auth-divider" style="margin-top:1.2rem;">ou</div>
+                <p style="font-size:0.8rem; color:var(--text-muted);">
+                    Já tem conta?
+                    <a href="#" onclick="switchTab('login');return false;" style="color:var(--primary); font-weight:600; text-decoration:none;">Fazer login</a>
+                </p>
+            </div>
+
             <div style="margin-top: 1.5rem; font-size: 0.8rem;">
                 <a href="https://www.instagram.com/daniel.dev_2" target="_blank" style="color: var(--secondary); text-decoration: none;">
                     <i class="fab fa-instagram"></i> @daniel.dev_2
@@ -160,7 +409,8 @@
         </div>
     </div>
 
-    <div class="main-content hidden" id="mainContent">
+    <!-- MAIN -->
+    <div id="mainContent" style="display:none;">
         <div style="max-width: 1400px; margin: 0 auto; padding: 0 1rem;">
             <header class="header">
                 <span class="logo-text">Inforwnet Anotação</span>
@@ -192,7 +442,17 @@
                             <button class="tab-btn" data-filter="completed">Feitas</button>
                         </div>
                         <input type="text" class="neural-input" id="searchInput" placeholder="Buscar...">
+
+                        <div class="drag-hint">
+                            <i class="fas fa-grip-vertical"></i>
+                            Arraste pelo ícone <strong style="color: var(--text-secondary);">⠿</strong> para reordenar as anotações
+                        </div>
+
                         <div id="notesContainer"></div>
+
+                        <button class="btn-primary" id="btnSaveOrder">
+                            <i class="fas fa-save"></i> SALVAR ORDEM
+                        </button>
                     </div>
                 </section>
 
@@ -201,7 +461,7 @@
                         <div class="card-header"><h3>EDITOR</h3></div>
                         <div style="padding: 1.5rem;">
                             <input type="text" id="noteTitle" class="neural-input" placeholder="Título">
-                            <textarea id="noteContent" class="neural-input" placeholder="Conteúdo" style="min-height: 150px;"></textarea>
+                            <textarea id="noteContent" class="neural-input" placeholder="Conteúdo" style="min-height: 150px; resize: vertical;"></textarea>
                             <select id="notePublic" class="neural-input">
                                 <option value="true">🌐 Público</option>
                                 <option value="false">🔒 Privado</option>
@@ -220,8 +480,8 @@
             </main>
 
             <footer class="footer-credits">
-                Projeto Inforwnet Anotação v4.0 - Criado por 
-                <a href="https://www.instagram.com/daniel.dev_2" target="_blank">Daniel Santos</a> 
+                Projeto Inforwnet Anotação v4.1 - Criado por
+                <a href="https://www.instagram.com/daniel.dev_2" target="_blank">Daniel Santos</a>
                 <i class="fab fa-instagram"></i> @daniel.dev_2
             </footer>
         </div>
@@ -245,70 +505,231 @@
         const db = firebase.firestore();
 
         let currentUser = null, allNotes = [], activeFilter = 'all', editId = null;
+        let customOrder = []; // array of note IDs in user-defined order
+        let orderChanged = false;
 
         const themeToggle = document.getElementById('themeToggle');
         const viewToggle = document.getElementById('viewToggle');
         const notesContainer = document.getElementById('notesContainer');
+        const btnSaveOrder = document.getElementById('btnSaveOrder');
 
+        // ─── THEME ──────────────────────────────────────────────────────────────
         themeToggle.onclick = () => {
             const isLight = document.body.getAttribute('data-theme') === 'light';
             document.body.setAttribute('data-theme', isLight ? 'dark' : 'light');
             themeToggle.innerHTML = isLight ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
         };
 
+        // ─── VIEW TOGGLE ─────────────────────────────────────────────────────────
         viewToggle.onclick = () => {
             const isGrid = notesContainer.classList.toggle('grid-mode');
             viewToggle.innerHTML = isGrid ? '<i class="fas fa-list"></i> LISTA' : '<i class="fas fa-th-large"></i> STICKY';
         };
 
+        // ─── TOAST ───────────────────────────────────────────────────────────────
+        function showToast(msg, type = 'info') {
+            const t = document.getElementById('toast');
+            t.className = `toast ${type}`;
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : 'info-circle';
+            t.innerHTML = `<i class="fas fa-${icon}"></i> ${msg}`;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        // ─── AUTH UI HELPERS ─────────────────────────────────────────────────────
+        function switchTab(tab) {
+            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+            document.getElementById('panelLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('panelRegister').classList.toggle('active', tab === 'register');
+        }
+
+        function togglePass(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon  = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        function checkStrength(val) {
+            const bar   = document.getElementById('strengthBar');
+            const label = document.getElementById('strengthLabel');
+            bar.className = 'password-strength-bar';
+            if (!val) { label.textContent = ''; return; }
+            const score = (val.length >= 8 ? 1 : 0)
+                        + (/[A-Z]/.test(val) ? 1 : 0)
+                        + (/[0-9]/.test(val) ? 1 : 0)
+                        + (/[^A-Za-z0-9]/.test(val) ? 1 : 0);
+            if (score <= 1) {
+                bar.classList.add('strength-weak');
+                label.textContent = '🔴 Senha fraca';
+                label.style.color = 'var(--secondary)';
+            } else if (score <= 2) {
+                bar.classList.add('strength-medium');
+                label.textContent = '🟡 Senha média';
+                label.style.color = '#ffaa00';
+            } else {
+                bar.classList.add('strength-strong');
+                label.textContent = '🟢 Senha forte';
+                label.style.color = 'var(--success)';
+            }
+        }
+
+        function setLoading(btnId, loading) {
+            const btn = document.getElementById(btnId);
+            btn.classList.toggle('btn-loading', loading);
+            btn.disabled = loading;
+        }
+
+        function firebaseErrorMsg(code) {
+            const map = {
+                'auth/user-not-found': 'Usuário não encontrado.',
+                'auth/wrong-password': 'Senha incorreta.',
+                'auth/invalid-email': 'Email inválido.',
+                'auth/email-already-in-use': 'Este email já está cadastrado.',
+                'auth/weak-password': 'Senha muito fraca. Use ao menos 6 caracteres.',
+                'auth/too-many-requests': 'Muitas tentativas. Tente mais tarde.',
+                'auth/invalid-credential': 'Email ou senha inválidos.',
+            };
+            return map[code] || 'Erro: ' + code;
+        }
+
+        // ─── AUTH STATE ───────────────────────────────────────────────────────────
         auth.onAuthStateChanged(user => {
             currentUser = user;
             if (user) {
                 document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
+                document.getElementById('mainContent').style.display = 'block';
                 loadNotes();
+                loadCustomOrder();
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
-                document.getElementById('mainContent').classList.add('hidden');
+                document.getElementById('mainContent').style.display = 'none';
             }
         });
 
-        document.getElementById('btnLoginMain').onclick = () => {
-            auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
+        // ─── LOGIN ────────────────────────────────────────────────────────────────
+        document.getElementById('btnLoginMain').onclick = async () => {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass  = document.getElementById('loginPassword').value;
+            if (!email || !pass) { showToast('Preencha email e senha.', 'error'); return; }
+            setLoading('btnLoginMain', true);
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+            } catch (err) {
+                showToast(firebaseErrorMsg(err.code), 'error');
+                setLoading('btnLoginMain', false);
+            }
         };
+
+        // ─── REGISTER ─────────────────────────────────────────────────────────────
+        document.getElementById('btnRegister').onclick = async () => {
+            const name    = document.getElementById('regName').value.trim();
+            const email   = document.getElementById('regEmail').value.trim();
+            const pass    = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regPasswordConfirm').value;
+            if (!name)           { showToast('Informe seu nome.', 'error'); return; }
+            if (!email)          { showToast('Informe um email.', 'error'); return; }
+            if (pass.length < 6) { showToast('Senha deve ter ao menos 6 caracteres.', 'error'); return; }
+            if (pass !== confirm) { showToast('As senhas não coincidem.', 'error'); return; }
+            setLoading('btnRegister', true);
+            try {
+                const cred = await auth.createUserWithEmailAndPassword(email, pass);
+                await cred.user.updateProfile({ displayName: name });
+                await db.collection('users').doc(cred.user.uid).set({ name, email, createdAt: Date.now() });
+                showToast(`Bem-vindo, ${name}! 🎉`, 'success');
+            } catch (err) {
+                showToast(firebaseErrorMsg(err.code), 'error');
+                setLoading('btnRegister', false);
+            }
+        };
+
         document.getElementById('btnLogout').onclick = () => auth.signOut();
 
+        // ─── CUSTOM ORDER ─────────────────────────────────────────────────────────
+        function loadCustomOrder() {
+            if (!currentUser) return;
+            db.collection('userSettings').doc(currentUser.uid).get().then(doc => {
+                if (doc.exists && doc.data().noteOrder) {
+                    customOrder = doc.data().noteOrder;
+                }
+                renderNotes();
+            });
+        }
+
+        async function saveCustomOrder() {
+            if (!currentUser) return;
+            // Build order from current DOM
+            const items = notesContainer.querySelectorAll('.note-item[data-id]');
+            customOrder = Array.from(items).map(el => el.dataset.id);
+            await db.collection('userSettings').doc(currentUser.uid).set({ noteOrder: customOrder }, { merge: true });
+            orderChanged = false;
+            btnSaveOrder.classList.remove('visible');
+            showToast('Ordem salva com sucesso!', 'success');
+        }
+
+        btnSaveOrder.onclick = saveCustomOrder;
+
+        // ─── LOAD NOTES ───────────────────────────────────────────────────────────
         function loadNotes() {
             db.collection('notes').orderBy('createdAt', 'desc').onSnapshot(snap => {
                 allNotes = [];
-                snap.forEach(doc => allNotes.push({id: doc.id, ...doc.data()}));
+                snap.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
                 renderNotes();
                 updateStats();
+            });
+        }
+
+        // ─── RENDER ───────────────────────────────────────────────────────────────
+        function getSortedNotes(filtered) {
+            if (customOrder.length === 0) return filtered;
+            const orderMap = {};
+            customOrder.forEach((id, idx) => orderMap[id] = idx);
+            return filtered.slice().sort((a, b) => {
+                const ai = orderMap[a.id] !== undefined ? orderMap[a.id] : 9999;
+                const bi = orderMap[b.id] !== undefined ? orderMap[b.id] : 9999;
+                return ai - bi;
             });
         }
 
         function renderNotes() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             notesContainer.innerHTML = '';
+
             const filtered = allNotes.filter(n => {
                 const searchMatch = (n.title + n.content).toLowerCase().includes(query);
                 if (activeFilter === 'all') return n.public && !n.completed && searchMatch;
-                if (activeFilter === 'mine') return !n.public && n.ownerUID === currentUser.uid && !n.completed && searchMatch;
+                if (activeFilter === 'mine') return !n.public && n.ownerUID === currentUser?.uid && !n.completed && searchMatch;
                 if (activeFilter === 'completed') return n.completed && searchMatch;
                 return !n.completed && searchMatch;
             });
 
-            filtered.forEach(n => {
+            const sorted = getSortedNotes(filtered);
+
+            sorted.forEach((n, idx) => {
                 const div = document.createElement('div');
                 div.className = `note-item ${!n.public ? 'private' : ''} ${n.completed ? 'completed' : ''}`;
+                div.dataset.id = n.id;
+                div.draggable = true;
+
                 div.innerHTML = `
-                    <div style="display:flex; justify-content:space-between;">
-                        <strong>${n.title}</strong>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div style="display:flex; align-items:center; gap:4px; flex:1; min-width:0;">
+                            <span class="drag-handle" title="Arraste para reordenar">
+                                <i class="fas fa-grip-vertical"></i>
+                            </span>
+                            <strong style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${n.title}</strong>
+                        </div>
                         <button onclick="quickToggle('${n.id}')" class="action-icon icon-complete ${n.completed ? 'is-done' : ''}">
                             <i class="fas ${n.completed ? 'fa-check-circle' : 'fa-bolt'}"></i>
                         </button>
                     </div>
-                    <p style="margin:10px 0; font-size:0.9rem;">${n.content}</p>
+                    <p style="margin:10px 0; font-size:0.9rem; color:var(--text-secondary); padding-left:28px; white-space:pre-wrap; word-break:break-word;">${n.content}</p>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; border-top:1px solid var(--border-alpha); padding-top:8px">
                         <span class="note-badge ${n.public ? 'badge-public' : 'badge-private'}">${n.public ? 'PÚBLICA' : 'PRIVADA'}</span>
                         <div>
@@ -317,56 +738,164 @@
                         </div>
                     </div>
                 `;
+
                 notesContainer.appendChild(div);
+            });
+
+            initDragAndDrop();
+        }
+
+        // ─── DRAG AND DROP ────────────────────────────────────────────────────────
+        let dragSrc = null;
+
+        function initDragAndDrop() {
+            const items = notesContainer.querySelectorAll('.note-item[data-id]');
+
+            items.forEach(item => {
+                const handle = item.querySelector('.drag-handle');
+
+                // Only start drag when grabbing the handle
+                handle.addEventListener('mousedown', () => { item.draggable = true; });
+                item.addEventListener('mouseup', () => { });
+
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+                item.addEventListener('dragover', handleDragOver);
+                item.addEventListener('dragenter', handleDragEnter);
+                item.addEventListener('dragleave', handleDragLeave);
+                item.addEventListener('drop', handleDrop);
             });
         }
 
+        function handleDragStart(e) {
+            dragSrc = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', this.dataset.id);
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.note-item').forEach(el => {
+                el.classList.remove('drag-over');
+            });
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDragEnter(e) {
+            if (this !== dragSrc) {
+                this.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            if (dragSrc === this) return;
+
+            this.classList.remove('drag-over');
+
+            // Swap positions in DOM
+            const container = notesContainer;
+            const allItems = [...container.querySelectorAll('.note-item[data-id]')];
+            const srcIdx = allItems.indexOf(dragSrc);
+            const tgtIdx = allItems.indexOf(this);
+
+            if (srcIdx < tgtIdx) {
+                container.insertBefore(dragSrc, this.nextSibling);
+            } else {
+                container.insertBefore(dragSrc, this);
+            }
+
+            // Flash animation
+            dragSrc.style.transition = 'box-shadow 0.3s';
+            dragSrc.style.boxShadow = '0 0 0 2px var(--primary), 0 8px 24px var(--primary-glow)';
+            setTimeout(() => { dragSrc.style.boxShadow = ''; }, 600);
+
+            orderChanged = true;
+            btnSaveOrder.classList.add('visible');
+
+            return false;
+        }
+
+        // ─── QUICK TOGGLE ─────────────────────────────────────────────────────────
         window.quickToggle = async (id) => {
             const n = allNotes.find(x => x.id === id);
             await db.collection('notes').doc(id).update({ completed: !n.completed });
         };
 
+        // ─── SAVE NOTE ────────────────────────────────────────────────────────────
         document.getElementById('btnSave').onclick = async () => {
+            const title = document.getElementById('noteTitle').value.trim();
+            if (!title) { showToast('Título obrigatório!', 'info'); return; }
+
             const data = {
-                title: document.getElementById('noteTitle').value,
+                title,
                 content: document.getElementById('noteContent').value,
                 public: document.getElementById('notePublic').value === 'true',
                 completed: document.getElementById('noteCompleted').value === 'true',
-                ownerUID: currentUser.uid, ownerEmail: currentUser.email,
+                ownerUID: currentUser.uid,
+                ownerEmail: currentUser.email,
                 createdAt: editId ? allNotes.find(x => x.id === editId).createdAt : Date.now()
             };
-            if(editId) { await db.collection('notes').doc(editId).update(data); editId = null; }
-            else { await db.collection('notes').add(data); }
+
+            if (editId) {
+                await db.collection('notes').doc(editId).update(data);
+                editId = null;
+                showToast('Anotação atualizada!', 'success');
+            } else {
+                await db.collection('notes').add(data);
+                showToast('Anotação criada!', 'success');
+            }
             clearEditor();
         };
 
+        // ─── EDIT / DELETE ────────────────────────────────────────────────────────
         window.editNote = (id) => {
             const n = allNotes.find(x => x.id === id);
             document.getElementById('noteTitle').value = n.title;
             document.getElementById('noteContent').value = n.content;
             document.getElementById('notePublic').value = n.public.toString();
             document.getElementById('noteCompleted').value = n.completed.toString();
-            editId = id; window.scrollTo({top: 0, behavior: 'smooth'});
+            editId = id;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        window.deleteNote = (id) => { if(confirm("Deletar?")) db.collection('notes').doc(id).delete(); };
+        window.deleteNote = (id) => {
+            if (confirm("Deletar esta anotação?")) {
+                db.collection('notes').doc(id).delete();
+                customOrder = customOrder.filter(x => x !== id);
+                showToast('Anotação deletada.', 'info');
+            }
+        };
 
-        function clearEditor() { 
-            document.getElementById('noteTitle').value = ''; 
-            document.getElementById('noteContent').value = ''; 
+        function clearEditor() {
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteContent').value = '';
             document.getElementById('notePublic').value = 'true';
             document.getElementById('noteCompleted').value = 'false';
-            editId = null; 
+            editId = null;
         }
 
         document.getElementById('btnCancel').onclick = clearEditor;
 
-        document.getElementById('btnNew').onclick = () => { 
-            clearEditor(); 
-            document.getElementById('noteTitle').focus(); 
-            window.scrollTo({top: 0, behavior: 'smooth'});
+        document.getElementById('btnNew').onclick = () => {
+            clearEditor();
+            document.getElementById('noteTitle').focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
+        // ─── STATS ────────────────────────────────────────────────────────────────
         function updateStats() {
             document.getElementById('totalNotes').textContent = allNotes.length;
             document.getElementById('publicNotes').textContent = allNotes.filter(n => n.public && !n.completed).length;
@@ -374,10 +903,13 @@
             document.getElementById('completedNotes').textContent = allNotes.filter(n => n.completed).length;
         }
 
+        // ─── TABS / SEARCH ────────────────────────────────────────────────────────
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.onclick = () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active'); activeFilter = btn.dataset.filter; renderNotes();
+                btn.classList.add('active');
+                activeFilter = btn.dataset.filter;
+                renderNotes();
             };
         });
         document.getElementById('searchInput').oninput = renderNotes;
