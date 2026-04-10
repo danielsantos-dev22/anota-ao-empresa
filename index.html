@@ -324,11 +324,11 @@
             background: var(--bg-card);
             border: 1px solid var(--border-alpha);
             border-radius: var(--radius-xl);
-            width: 100%; max-width: 500px;
+            width: 100%; max-width: 720px;
             padding: 2rem;
             transform: translateY(30px) scale(0.97);
             transition: transform 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
-            max-height: 90vh;
+            max-height: 92vh;
             overflow-y: auto;
         }
         .edit-modal-overlay.open .edit-modal {
@@ -439,7 +439,7 @@
                 <button class="modal-close" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
             </div>
             <input type="text" id="modalNoteTitle" class="neural-input" placeholder="Título">
-            <textarea id="modalNoteContent" class="neural-input" placeholder="Conteúdo" style="min-height: 150px; resize: vertical;"></textarea>
+            <textarea id="modalNoteContent" class="neural-input" placeholder="Conteúdo" style="min-height: 260px; resize: vertical;"></textarea>
             <select id="modalNotePublic" class="neural-input">
                 <option value="true">🌐 Público</option>
                 <option value="false">🔒 Privado</option>
@@ -940,20 +940,9 @@
         };
 
         // ─── EDITAR NOTA ──────────────────────────────────────────────────────────
-        // FIX: em tela pequena abre modal, em tela grande preenche o editor lateral
+        // Sempre abre o modal centralizado para editar (melhor experiência em qualquer tela)
         window.editNote = (id) => {
-            if (isSmallScreen()) {
-                openEditModal(id);
-            } else {
-                const n = allNotes.find(x => x.id === id);
-                document.getElementById('noteTitle').value = n.title;
-                document.getElementById('noteContent').value = n.content;
-                document.getElementById('notePublic').value = n.public.toString();
-                document.getElementById('noteCompleted').value = n.completed.toString();
-                editId = id;
-                // Rola até o editor lateral
-                document.getElementById('sideEditor').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            openEditModal(id);
         };
 
         // ─── SALVAR (editor lateral) ──────────────────────────────────────────────
