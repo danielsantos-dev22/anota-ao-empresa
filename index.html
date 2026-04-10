@@ -132,7 +132,7 @@
             padding: 1.5rem; margin-bottom: 1rem; border-left: 4px solid var(--primary); transition: 0.25s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             position: relative;
-            user-select: none;
+            /* FIX: removido user-select: none — permitir seleção de texto normal */
         }
         .note-item.private { border-left-color: var(--secondary); }
         .note-item.completed { opacity: 0.6; border-left-color: var(--success); }
@@ -148,6 +148,10 @@
             align-items: center;
             font-size: 1rem;
             margin-right: 6px;
+            /* FIX: seleção desativada APENAS no handle, não no card todo */
+            user-select: none;
+            -webkit-user-select: none;
+            flex-shrink: 0;
         }
         .drag-handle:hover { color: var(--primary); background: rgba(0, 212, 255, 0.1); }
         .drag-handle:active { cursor: grabbing; }
@@ -163,35 +167,6 @@
             border-top: 3px solid var(--primary);
             transform: translateY(3px);
             box-shadow: 0 -4px 12px var(--primary-glow);
-        }
-
-        .drop-indicator {
-            height: 4px;
-            background: var(--gradient-neural);
-            border-radius: 2px;
-            margin-bottom: 8px;
-            animation: pulse-indicator 0.6s ease-in-out infinite alternate;
-            display: none;
-        }
-        .drop-indicator.visible { display: block; }
-
-        @keyframes pulse-indicator {
-            from { opacity: 0.5; transform: scaleX(0.98); }
-            to { opacity: 1; transform: scaleX(1); }
-        }
-
-        /* DRAG ORDER HINT */
-        .order-badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(0,0,0,0.3);
-            color: var(--text-muted);
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-family: 'JetBrains Mono', monospace;
-            transition: 0.2s;
         }
 
         /* BADGES */
@@ -217,7 +192,7 @@
         .footer-credits a { color: var(--primary); text-decoration: none; font-weight: 600; }
         .footer-credits a:hover { text-decoration: underline; }
 
-        /* DRAG TOOLTIP */
+        /* DRAG HINT */
         .drag-hint {
             font-size: 0.72rem;
             color: var(--text-muted);
@@ -329,6 +304,54 @@
             color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 0.9rem;
         }
         .input-group .input-icon:hover { color: var(--primary); }
+
+        /* ═══════════════════════════════════════════════════════════
+           MODAL DE EDIÇÃO — abre direto ao clicar em editar
+        ═══════════════════════════════════════════════════════════ */
+        .edit-modal-overlay {
+            position: fixed; inset: 0; z-index: 2000;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .edit-modal-overlay.open {
+            opacity: 1; visibility: visible;
+        }
+        .edit-modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-alpha);
+            border-radius: var(--radius-xl);
+            width: 100%; max-width: 500px;
+            padding: 2rem;
+            transform: translateY(30px) scale(0.97);
+            transition: transform 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .edit-modal-overlay.open .edit-modal {
+            transform: translateY(0) scale(1);
+        }
+        .edit-modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .edit-modal-header h3 {
+            background: var(--gradient-neural);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800; font-size: 1.2rem;
+        }
+        .modal-close {
+            background: var(--bg-input); border: 1px solid var(--border-alpha);
+            color: var(--text-muted); width: 36px; height: 36px;
+            border-radius: 10px; cursor: pointer; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .modal-close:hover { background: var(--secondary); color: white; border-color: var(--secondary); }
     </style>
 </head>
 
@@ -345,7 +368,6 @@
             <h1 class="logo-text" style="font-size: 2rem; margin-bottom: 0.3rem;">INFORWNET</h1>
             <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1.8rem;">Desenvolvido por Daniel Santos</p>
 
-            <!-- TABS -->
             <div class="auth-tabs">
                 <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">
                     <i class="fas fa-sign-in-alt"></i> ENTRAR
@@ -409,6 +431,30 @@
         </div>
     </div>
 
+    <!-- ═══ MODAL DE EDIÇÃO ═══ -->
+    <div class="edit-modal-overlay" id="editModalOverlay">
+        <div class="edit-modal">
+            <div class="edit-modal-header">
+                <h3><i class="fas fa-edit"></i> EDITAR ANOTAÇÃO</h3>
+                <button class="modal-close" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="text" id="modalNoteTitle" class="neural-input" placeholder="Título">
+            <textarea id="modalNoteContent" class="neural-input" placeholder="Conteúdo" style="min-height: 150px; resize: vertical;"></textarea>
+            <select id="modalNotePublic" class="neural-input">
+                <option value="true">🌐 Público</option>
+                <option value="false">🔒 Privado</option>
+            </select>
+            <select id="modalNoteCompleted" class="neural-input">
+                <option value="false">Em Aberto</option>
+                <option value="true">Finalizada ✅</option>
+            </select>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="btn-primary" id="btnModalSave">SALVAR</button>
+                <button class="btn-secondary" onclick="closeEditModal()">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MAIN -->
     <div id="mainContent" style="display:none;">
         <div style="max-width: 1400px; margin: 0 auto; padding: 0 1rem;">
@@ -456,7 +502,8 @@
                     </div>
                 </section>
 
-                <aside>
+                <!-- EDITOR LATERAL (visível só em tela grande) -->
+                <aside id="sideEditor">
                     <div class="neural-card">
                         <div class="card-header"><h3>EDITOR</h3></div>
                         <div style="padding: 1.5rem;">
@@ -480,7 +527,7 @@
             </main>
 
             <footer class="footer-credits">
-                Projeto Inforwnet Anotação v4.1 - Criado por
+                Projeto Inforwnet Anotação v4.2 - Criado por
                 <a href="https://www.instagram.com/daniel.dev_2" target="_blank">Daniel Santos</a>
                 <i class="fab fa-instagram"></i> @daniel.dev_2
             </footer>
@@ -505,7 +552,7 @@
         const db = firebase.firestore();
 
         let currentUser = null, allNotes = [], activeFilter = 'all', editId = null;
-        let customOrder = []; // array of note IDs in user-defined order
+        let customOrder = [];
         let orderChanged = false;
 
         const themeToggle = document.getElementById('themeToggle');
@@ -513,7 +560,12 @@
         const notesContainer = document.getElementById('notesContainer');
         const btnSaveOrder = document.getElementById('btnSaveOrder');
 
-        // ─── THEME ──────────────────────────────────────────────────────────────
+        // ─── DETECTAR TELA PEQUENA ────────────────────────────────────────────────
+        function isSmallScreen() {
+            return window.innerWidth <= 1024;
+        }
+
+        // ─── THEME ───────────────────────────────────────────────────────────────
         themeToggle.onclick = () => {
             const isLight = document.body.getAttribute('data-theme') === 'light';
             document.body.setAttribute('data-theme', isLight ? 'dark' : 'light');
@@ -651,6 +703,56 @@
 
         document.getElementById('btnLogout').onclick = () => auth.signOut();
 
+        // ─── MODAL DE EDIÇÃO ──────────────────────────────────────────────────────
+        function openEditModal(id) {
+            const n = allNotes.find(x => x.id === id);
+            if (!n) return;
+            editId = id;
+            document.getElementById('modalNoteTitle').value = n.title;
+            document.getElementById('modalNoteContent').value = n.content;
+            document.getElementById('modalNotePublic').value = n.public.toString();
+            document.getElementById('modalNoteCompleted').value = n.completed.toString();
+            document.getElementById('editModalOverlay').classList.add('open');
+            setTimeout(() => document.getElementById('modalNoteTitle').focus(), 300);
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModalOverlay').classList.remove('open');
+            editId = null;
+        }
+
+        // Fechar modal ao clicar fora
+        document.getElementById('editModalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeEditModal();
+        });
+
+        // Fechar modal com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeEditModal();
+        });
+
+        // Salvar pelo modal
+        document.getElementById('btnModalSave').onclick = async () => {
+            const title = document.getElementById('modalNoteTitle').value.trim();
+            if (!title) { showToast('Título obrigatório!', 'info'); return; }
+
+            const data = {
+                title,
+                content: document.getElementById('modalNoteContent').value,
+                public: document.getElementById('modalNotePublic').value === 'true',
+                completed: document.getElementById('modalNoteCompleted').value === 'true',
+                ownerUID: currentUser.uid,
+                ownerEmail: currentUser.email,
+                createdAt: editId ? allNotes.find(x => x.id === editId)?.createdAt || Date.now() : Date.now()
+            };
+
+            if (editId) {
+                await db.collection('notes').doc(editId).update(data);
+                showToast('Anotação atualizada!', 'success');
+                closeEditModal();
+            }
+        };
+
         // ─── CUSTOM ORDER ─────────────────────────────────────────────────────────
         function loadCustomOrder() {
             if (!currentUser) return;
@@ -664,7 +766,6 @@
 
         async function saveCustomOrder() {
             if (!currentUser) return;
-            // Build order from current DOM
             const items = notesContainer.querySelectorAll('.note-item[data-id]');
             customOrder = Array.from(items).map(el => el.dataset.id);
             await db.collection('userSettings').doc(currentUser.uid).set({ noteOrder: customOrder }, { merge: true });
@@ -711,11 +812,11 @@
 
             const sorted = getSortedNotes(filtered);
 
-            sorted.forEach((n, idx) => {
+            sorted.forEach((n) => {
                 const div = document.createElement('div');
                 div.className = `note-item ${!n.public ? 'private' : ''} ${n.completed ? 'completed' : ''}`;
                 div.dataset.id = n.id;
-                div.draggable = true;
+                // draggable controlado pelo handle
 
                 div.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -733,8 +834,8 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; border-top:1px solid var(--border-alpha); padding-top:8px">
                         <span class="note-badge ${n.public ? 'badge-public' : 'badge-private'}">${n.public ? 'PÚBLICA' : 'PRIVADA'}</span>
                         <div>
-                            <button onclick="editNote('${n.id}')" class="action-icon" style="color:var(--primary)"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteNote('${n.id}')" class="action-icon" style="color:var(--secondary)"><i class="fas fa-trash"></i></button>
+                            <button onclick="editNote('${n.id}')" class="action-icon" style="color:var(--primary)" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteNote('${n.id}')" class="action-icon" style="color:var(--secondary)" title="Deletar"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
                 `;
@@ -754,9 +855,14 @@
             items.forEach(item => {
                 const handle = item.querySelector('.drag-handle');
 
-                // Only start drag when grabbing the handle
+                // Drag só começa pelo handle
                 handle.addEventListener('mousedown', () => { item.draggable = true; });
-                item.addEventListener('mouseup', () => { });
+                handle.addEventListener('touchstart', () => { item.draggable = true; });
+
+                // Ao soltar em qualquer lugar, desativa draggable para não bloquear seleção de texto
+                item.addEventListener('dragend', () => {
+                    setTimeout(() => { item.draggable = false; }, 0);
+                });
 
                 item.addEventListener('dragstart', handleDragStart);
                 item.addEventListener('dragend', handleDragEnd);
@@ -776,6 +882,7 @@
 
         function handleDragEnd(e) {
             this.classList.remove('dragging');
+            this.draggable = false;
             document.querySelectorAll('.note-item').forEach(el => {
                 el.classList.remove('drag-over');
             });
@@ -805,7 +912,6 @@
 
             this.classList.remove('drag-over');
 
-            // Swap positions in DOM
             const container = notesContainer;
             const allItems = [...container.querySelectorAll('.note-item[data-id]')];
             const srcIdx = allItems.indexOf(dragSrc);
@@ -817,7 +923,6 @@
                 container.insertBefore(dragSrc, this);
             }
 
-            // Flash animation
             dragSrc.style.transition = 'box-shadow 0.3s';
             dragSrc.style.boxShadow = '0 0 0 2px var(--primary), 0 8px 24px var(--primary-glow)';
             setTimeout(() => { dragSrc.style.boxShadow = ''; }, 600);
@@ -834,7 +939,24 @@
             await db.collection('notes').doc(id).update({ completed: !n.completed });
         };
 
-        // ─── SAVE NOTE ────────────────────────────────────────────────────────────
+        // ─── EDITAR NOTA ──────────────────────────────────────────────────────────
+        // FIX: em tela pequena abre modal, em tela grande preenche o editor lateral
+        window.editNote = (id) => {
+            if (isSmallScreen()) {
+                openEditModal(id);
+            } else {
+                const n = allNotes.find(x => x.id === id);
+                document.getElementById('noteTitle').value = n.title;
+                document.getElementById('noteContent').value = n.content;
+                document.getElementById('notePublic').value = n.public.toString();
+                document.getElementById('noteCompleted').value = n.completed.toString();
+                editId = id;
+                // Rola até o editor lateral
+                document.getElementById('sideEditor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        };
+
+        // ─── SALVAR (editor lateral) ──────────────────────────────────────────────
         document.getElementById('btnSave').onclick = async () => {
             const title = document.getElementById('noteTitle').value.trim();
             if (!title) { showToast('Título obrigatório!', 'info'); return; }
@@ -846,7 +968,7 @@
                 completed: document.getElementById('noteCompleted').value === 'true',
                 ownerUID: currentUser.uid,
                 ownerEmail: currentUser.email,
-                createdAt: editId ? allNotes.find(x => x.id === editId).createdAt : Date.now()
+                createdAt: editId ? allNotes.find(x => x.id === editId)?.createdAt || Date.now() : Date.now()
             };
 
             if (editId) {
@@ -860,17 +982,7 @@
             clearEditor();
         };
 
-        // ─── EDIT / DELETE ────────────────────────────────────────────────────────
-        window.editNote = (id) => {
-            const n = allNotes.find(x => x.id === id);
-            document.getElementById('noteTitle').value = n.title;
-            document.getElementById('noteContent').value = n.content;
-            document.getElementById('notePublic').value = n.public.toString();
-            document.getElementById('noteCompleted').value = n.completed.toString();
-            editId = id;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
+        // ─── DELETE ───────────────────────────────────────────────────────────────
         window.deleteNote = (id) => {
             if (confirm("Deletar esta anotação?")) {
                 db.collection('notes').doc(id).delete();
@@ -890,9 +1002,60 @@
         document.getElementById('btnCancel').onclick = clearEditor;
 
         document.getElementById('btnNew').onclick = () => {
-            clearEditor();
-            document.getElementById('noteTitle').focus();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (isSmallScreen()) {
+                // Em tela pequena, abre modal vazio para nova nota
+                editId = null;
+                document.getElementById('modalNoteTitle').value = '';
+                document.getElementById('modalNoteContent').value = '';
+                document.getElementById('modalNotePublic').value = 'true';
+                document.getElementById('modalNoteCompleted').value = 'false';
+                // Redireciona o botão salvar do modal para criar
+                document.getElementById('btnModalSave').onclick = saveNewFromModal;
+                document.getElementById('editModalOverlay').classList.add('open');
+                setTimeout(() => document.getElementById('modalNoteTitle').focus(), 300);
+            } else {
+                clearEditor();
+                document.getElementById('noteTitle').focus();
+                document.getElementById('sideEditor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        };
+
+        async function saveNewFromModal() {
+            const title = document.getElementById('modalNoteTitle').value.trim();
+            if (!title) { showToast('Título obrigatório!', 'info'); return; }
+            const data = {
+                title,
+                content: document.getElementById('modalNoteContent').value,
+                public: document.getElementById('modalNotePublic').value === 'true',
+                completed: document.getElementById('modalNoteCompleted').value === 'true',
+                ownerUID: currentUser.uid,
+                ownerEmail: currentUser.email,
+                createdAt: Date.now()
+            };
+            await db.collection('notes').add(data);
+            showToast('Anotação criada!', 'success');
+            closeEditModal();
+            // Restaura o botão para editar
+            document.getElementById('btnModalSave').onclick = null;
+        }
+
+        // Garantir que btnModalSave padrão salva edição
+        document.getElementById('btnModalSave').onclick = async () => {
+            const title = document.getElementById('modalNoteTitle').value.trim();
+            if (!title) { showToast('Título obrigatório!', 'info'); return; }
+            if (!editId) return;
+            const data = {
+                title,
+                content: document.getElementById('modalNoteContent').value,
+                public: document.getElementById('modalNotePublic').value === 'true',
+                completed: document.getElementById('modalNoteCompleted').value === 'true',
+                ownerUID: currentUser.uid,
+                ownerEmail: currentUser.email,
+                createdAt: allNotes.find(x => x.id === editId)?.createdAt || Date.now()
+            };
+            await db.collection('notes').doc(editId).update(data);
+            showToast('Anotação atualizada!', 'success');
+            closeEditModal();
         };
 
         // ─── STATS ────────────────────────────────────────────────────────────────
