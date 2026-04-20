@@ -819,6 +819,99 @@
             border-radius: 20px; background: rgba(0,212,255,0.12); color: var(--primary);
             white-space: nowrap;
         }
+
+        /* ═══════════════════════════════════════════════════════════
+           FOTOS — CLOUDINARY UPLOAD
+        ═══════════════════════════════════════════════════════════ */
+        .photo-section {
+            background: var(--bg-input);
+            border: 1px solid var(--border-alpha);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .photo-section-label {
+            font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--text-muted);
+            display: flex; align-items: center; gap: 6px;
+            margin-bottom: 0.75rem;
+        }
+        .photo-section-label i { color: var(--primary); }
+
+        .photo-upload-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--bg-card); border: 2px dashed var(--border-alpha);
+            color: var(--text-muted); padding: 10px 18px; border-radius: 10px;
+            cursor: pointer; font-size: 0.82rem; font-weight: 600;
+            transition: 0.2s; margin-bottom: 0.75rem;
+        }
+        .photo-upload-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+        .photo-uploading {
+            font-size: 0.8rem; color: var(--primary);
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 0.75rem;
+        }
+
+        .photo-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.6rem;
+        }
+
+        .photo-thumb {
+            position: relative; border-radius: 10px; overflow: hidden;
+            aspect-ratio: 1; background: var(--bg-card);
+            border: 1px solid var(--border-alpha);
+        }
+        .photo-thumb img {
+            width: 100%; height: 100%; object-fit: cover;
+            display: block; cursor: pointer; transition: 0.2s;
+        }
+        .photo-thumb img:hover { opacity: 0.85; }
+        .photo-thumb-del {
+            position: absolute; top: 4px; right: 4px;
+            background: rgba(0,0,0,0.7); color: white;
+            border: none; border-radius: 50%; width: 22px; height: 22px;
+            font-size: 0.65rem; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .photo-thumb-del:hover { background: var(--secondary); }
+
+        /* Lightbox */
+        .photo-lightbox {
+            position: fixed; inset: 0; z-index: 9000;
+            background: rgba(0,0,0,0.92); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: 0.3s;
+            padding: 1rem;
+        }
+        .photo-lightbox.open { opacity: 1; visibility: visible; }
+        .photo-lightbox img {
+            max-width: 100%; max-height: 90vh;
+            border-radius: 12px; object-fit: contain;
+            box-shadow: 0 0 60px rgba(0,0,0,0.8);
+        }
+        .photo-lightbox-close {
+            position: absolute; top: 1rem; right: 1rem;
+            background: rgba(255,255,255,0.15); border: none; color: white;
+            width: 42px; height: 42px; border-radius: 50%; font-size: 1.2rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .photo-lightbox-close:hover { background: var(--secondary); }
+
+        /* inline photo strip in OS cards */
+        .os-card-photos {
+            display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;
+        }
+        .os-card-photo {
+            width: 54px; height: 54px; border-radius: 8px; object-fit: cover;
+            border: 1px solid var(--border-alpha); cursor: pointer;
+            transition: 0.2s;
+        }
+        .os-card-photo:hover { opacity: 0.8; transform: scale(1.05); }
     </style>
 </head>
 
@@ -943,6 +1036,20 @@
                 <option value="andamento">🔧 Em Andamento</option>
                 <option value="concluido">✅ Concluído</option>
             </select>
+
+            <!-- FOTOS DA O.S. -->
+            <div class="photo-section">
+                <div class="photo-section-label"><i class="fas fa-camera"></i> Fotos da O.S.</div>
+                <label class="photo-upload-btn" id="osPhotoLabel">
+                    <input type="file" id="osPhotoInput" accept="image/*" multiple style="display:none;" onchange="handleOsPhotos(this)">
+                    <i class="fas fa-plus"></i> Adicionar Foto
+                </label>
+                <div class="photo-uploading" id="osPhotoUploading" style="display:none;">
+                    <i class="fas fa-spinner fa-spin"></i> Enviando...
+                </div>
+                <div class="photo-preview-grid" id="osPhotoPreview"></div>
+            </div>
+
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                 <button class="btn-primary" id="btnOsSave">SALVAR O.S.</button>
                 <button class="btn-secondary" onclick="closeOsForm()">CANCELAR</button>
@@ -1199,6 +1306,19 @@
                     <div class="check-section-title" style="margin-top:1.25rem;"><i class="fas fa-comment-alt"></i> Observações</div>
                     <textarea class="neural-input" id="checkObs" placeholder="Observações gerais..." style="min-height:80px; resize:vertical;"></textarea>
 
+                    <!-- Fotos do Checklist -->
+                    <div class="check-section-title" style="margin-top:1.25rem;"><i class="fas fa-camera"></i> Fotos</div>
+                    <div class="photo-section" style="margin-bottom:1rem;">
+                        <label class="photo-upload-btn" id="checkPhotoLabel">
+                            <input type="file" id="checkPhotoInput" accept="image/*" multiple style="display:none;" onchange="handleCheckPhotos(this)">
+                            <i class="fas fa-plus"></i> Adicionar Foto
+                        </label>
+                        <div class="photo-uploading" id="checkPhotoUploading" style="display:none;">
+                            <i class="fas fa-spinner fa-spin"></i> Enviando...
+                        </div>
+                        <div class="photo-preview-grid" id="checkPhotoPreview"></div>
+                    </div>
+
                     <!-- Botão Salvar após observações -->
                     <button class="btn-primary" id="btnCheckSave2" style="width:100%; margin-bottom:0.5rem; font-size:1rem; padding:0.9rem; display:flex; align-items:center; justify-content:center; gap:10px;">
                         <i class="fas fa-save"></i> SALVAR CHECKLIST
@@ -1211,6 +1331,12 @@
             </section>
 
             <div id="checkPrintTarget" style="display:none;"></div>
+
+    <!-- LIGHTBOX DE FOTOS -->
+    <div class="photo-lightbox" id="photoLightbox" onclick="closeLightbox()">
+        <button class="photo-lightbox-close" onclick="closeLightbox()"><i class="fas fa-times"></i></button>
+        <img id="lightboxImg" src="" alt="Foto">
+    </div>
 
 
                 Projeto Inforwnet Anotação v4.5 - Criado por
@@ -1822,35 +1948,7 @@
             if (e.target === this) closeOsForm();
         });
 
-        // ── SALVAR OS ──────────────────────────────────────────────
-        document.getElementById('btnOsSave').onclick = async () => {
-            const client = document.getElementById('osClient').value.trim();
-            const desc   = document.getElementById('osDesc').value.trim();
-            if (!client) { showToast('Informe o cliente!', 'error'); return; }
-            if (!desc)   { showToast('Descreva o serviço!', 'error'); return; }
-
-            const data = {
-                client,
-                device:   document.getElementById('osDevice').value.trim(),
-                desc,
-                priority: document.getElementById('osPriority').value,
-                tech:     document.getElementById('osTech').value.trim(),
-                status:   document.getElementById('osStatus').value,
-                ownerUID: currentUser.uid,
-                updatedAt: Date.now()
-            };
-
-            if (editOsId) {
-                await db.collection('ordens').doc(editOsId).update(data);
-                showToast('O.S. atualizada!', 'success');
-            } else {
-                data.numero    = await getNextOsNumber();
-                data.createdAt = Date.now();
-                await db.collection('ordens').add(data);
-                showToast(`O.S. #${String(data.numero).padStart(4,'0')} criada!`, 'success');
-            }
-            closeOsForm();
-        };
+        // ── SALVAR OS — movido para o módulo Cloudinary abaixo ────
 
         // ── DELETE OS ──────────────────────────────────────────────
         window.deleteOs = (id) => {
@@ -1960,6 +2058,9 @@
                     const prioClass = { normal:'priority-normal', urgente:'priority-urgente', critico:'priority-critico' }[os.priority] || 'priority-normal';
                     const prioIcon  = { normal:'📋', urgente:'⚡', critico:'🔥' }[os.priority] || '';
                     const statusNext = { aguardando:'▶ Iniciar', andamento:'✅ Concluir', concluido:'↩ Reabrir' }[os.status];
+                    const photoStrip = (os.photos?.length)
+                        ? `<div class="os-card-photos">${os.photos.map(u=>`<img class="os-card-photo" src="${u}" onclick="openLightbox('${u}')" alt="foto">`).join('')}</div>`
+                        : '';
                     return `
                     <div class="os-card status-${os.status}">
                         <div class="os-card-num">O.S. #${num} · ${dt}</div>
@@ -1967,6 +2068,7 @@
                         ${os.device ? `<div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;"><i class="fas fa-laptop" style="margin-right:4px;"></i>${os.device}</div>` : ''}
                         <div class="os-card-desc">${os.desc}</div>
                         ${os.tech ? `<div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;"><i class="fas fa-user-cog" style="margin-right:4px;"></i>${os.tech}</div>` : ''}
+                        ${photoStrip}
                         <div class="os-card-meta">
                             <span class="os-priority-badge ${prioClass}">${prioIcon} ${os.priority}</span>
                             <div class="os-card-actions">
@@ -2558,6 +2660,187 @@
         auth.onAuthStateChanged(user => {
             if (user && checkPanelOpen) loadCheckHistory();
         });
+
+        // ═══════════════════════════════════════════════════════════
+        //  CLOUDINARY — UPLOAD DE FOTOS
+        // ═══════════════════════════════════════════════════════════
+        const CL_CLOUD  = 'doku11ul8';
+        const CL_PRESET = 'ml_default';
+        const CL_URL    = `https://api.cloudinary.com/v1_1/${CL_CLOUD}/image/upload`;
+
+        // Arrays temporários de URLs enquanto o form está aberto
+        let osPhotos    = [];   // URLs das fotos da O.S. atual
+        let checkPhotos = [];   // URLs das fotos do checklist atual
+
+        // ── UPLOAD genérico ────────────────────────────────────────
+        async function uploadToCloudinary(file, folder) {
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('upload_preset', CL_PRESET);
+            fd.append('folder', `inforwnet/${folder}`);
+            const res  = await fetch(CL_URL, { method: 'POST', body: fd });
+            const data = await res.json();
+            if (data.secure_url) return data.secure_url;
+            throw new Error(data.error?.message || 'Erro no upload');
+        }
+
+        // ── HANDLER — fotos da O.S. ────────────────────────────────
+        window.handleOsPhotos = async (input) => {
+            const files = [...input.files];
+            if (!files.length) return;
+            const upEl = document.getElementById('osPhotoUploading');
+            upEl.style.display = 'flex';
+            for (const file of files) {
+                try {
+                    const url = await uploadToCloudinary(file, 'ordens');
+                    osPhotos.push(url);
+                    addPhotoThumb(url, 'osPhotoPreview', () => {
+                        osPhotos = osPhotos.filter(u => u !== url);
+                    });
+                } catch(e) { showToast('Erro ao enviar foto: ' + e.message, 'error'); }
+            }
+            upEl.style.display = 'none';
+            input.value = '';
+        };
+
+        // ── HANDLER — fotos do checklist ───────────────────────────
+        window.handleCheckPhotos = async (input) => {
+            const files = [...input.files];
+            if (!files.length) return;
+            const upEl = document.getElementById('checkPhotoUploading');
+            upEl.style.display = 'flex';
+            for (const file of files) {
+                try {
+                    const url = await uploadToCloudinary(file, 'checklists');
+                    checkPhotos.push(url);
+                    addPhotoThumb(url, 'checkPhotoPreview', () => {
+                        checkPhotos = checkPhotos.filter(u => u !== url);
+                    });
+                } catch(e) { showToast('Erro ao enviar foto: ' + e.message, 'error'); }
+            }
+            upEl.style.display = 'none';
+            input.value = '';
+        };
+
+        // ── ADICIONAR THUMB ────────────────────────────────────────
+        function addPhotoThumb(url, containerId, onDelete) {
+            const grid = document.getElementById(containerId);
+            const wrap = document.createElement('div');
+            wrap.className = 'photo-thumb';
+            wrap.innerHTML = `
+                <img src="${url}" alt="foto" onclick="openLightbox('${url}')">
+                <button class="photo-thumb-del" title="Remover"><i class="fas fa-times"></i></button>`;
+            wrap.querySelector('.photo-thumb-del').onclick = () => {
+                wrap.remove();
+                onDelete();
+            };
+            grid.appendChild(wrap);
+        }
+
+        // ── LIGHTBOX ───────────────────────────────────────────────
+        window.openLightbox = (url) => {
+            document.getElementById('lightboxImg').src = url;
+            document.getElementById('photoLightbox').classList.add('open');
+        };
+        window.closeLightbox = () => {
+            document.getElementById('photoLightbox').classList.remove('open');
+        };
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+        // ── LIMPAR fotos ao fechar form OS ─────────────────────────
+        const _origCloseOsForm = window.closeOsForm;
+        window.closeOsForm = () => {
+            _origCloseOsForm();
+            osPhotos = [];
+            document.getElementById('osPhotoPreview').innerHTML = '';
+        };
+
+        // ── INJETAR fotos ao abrir OS para editar ─────────────────
+        const _origOpenOsForm = window.openOsForm;
+        window.openOsForm = (id = null) => {
+            osPhotos = [];
+            document.getElementById('osPhotoPreview').innerHTML = '';
+            _origOpenOsForm(id);
+            if (id) {
+                const os = allOS.find(x => x.id === id);
+                if (os?.photos?.length) {
+                    osPhotos = [...os.photos];
+                    os.photos.forEach(url => addPhotoThumb(url, 'osPhotoPreview', () => {
+                        osPhotos = osPhotos.filter(u => u !== url);
+                    }));
+                }
+            }
+        };
+
+        // ── SALVAR fotos junto com O.S. ───────────────────────────
+        const _origBtnOsSave = document.getElementById('btnOsSave').onclick;
+        document.getElementById('btnOsSave').onclick = async () => {
+            // Intercept: add photos array then call original save
+            const client = document.getElementById('osClient').value.trim();
+            const desc   = document.getElementById('osDesc').value.trim();
+            if (!client) { showToast('Informe o cliente!', 'error'); return; }
+            if (!desc)   { showToast('Descreva o serviço!', 'error'); return; }
+
+            const data = {
+                client,
+                device:   document.getElementById('osDevice').value.trim(),
+                desc,
+                priority: document.getElementById('osPriority').value,
+                tech:     document.getElementById('osTech').value.trim(),
+                status:   document.getElementById('osStatus').value,
+                photos:   [...osPhotos],
+                ownerUID: currentUser.uid,
+                updatedAt: Date.now()
+            };
+
+            if (editOsId) {
+                await db.collection('ordens').doc(editOsId).update(data);
+                showToast('O.S. atualizada!', 'success');
+            } else {
+                data.numero    = await getNextOsNumber();
+                data.createdAt = Date.now();
+                await db.collection('ordens').add(data);
+                showToast(`O.S. #${String(data.numero).padStart(4,'0')} criada!`, 'success');
+            }
+            window.closeOsForm();
+        };
+
+        // ── MOSTRAR FOTOS NOS CARDS DA O.S. ───────────────────────
+        // Patch renderOS to show photo strip — injected after main renderOS runs
+        const _origRenderOS = renderOS;
+        // Override via monkey-patch on os card html — done inside renderOS itself below
+        // We'll override the os card photo rendering at the renderOS level:
+        const _baseRenderOS = renderOS;
+        // The photo strip is already included in renderOS card template below via patch:
+
+        // ── FOTOS NO CHECKLIST ────────────────────────────────────
+        // Extend getCheckState
+        const _origGetCheckState = getCheckState;
+        getCheckState = () => {
+            const state = _origGetCheckState();
+            state.photos = [...checkPhotos];
+            return state;
+        };
+
+        // Extend applyCheckState
+        const _origApplyCheckState = applyCheckState;
+        applyCheckState = (state) => {
+            _origApplyCheckState(state);
+            checkPhotos = state.photos || [];
+            const grid = document.getElementById('checkPhotoPreview');
+            grid.innerHTML = '';
+            checkPhotos.forEach(url => addPhotoThumb(url, 'checkPhotoPreview', () => {
+                checkPhotos = checkPhotos.filter(u => u !== url);
+            }));
+        };
+
+        // Limpar fotos ao limpar checklist
+        const _origBtnCheckClear = document.getElementById('btnCheckClear').onclick;
+        document.getElementById('btnCheckClear').onclick = () => {
+            _origBtnCheckClear();
+            checkPhotos = [];
+            document.getElementById('checkPhotoPreview').innerHTML = '';
+        };
 
     </script>
 </body>
