@@ -79,21 +79,35 @@
         .header {
             background: var(--bg-header); backdrop-filter: blur(15px);
             border: 1px solid var(--border-alpha); border-radius: var(--radius-xl);
-            padding: 1rem 2rem; margin: 1.5rem 0; display: flex; justify-content: space-between; align-items: center;
+            padding: 0.85rem 1.25rem; margin: 1rem 0; display: flex; justify-content: space-between; align-items: center;
+            gap: 0.75rem; flex-wrap: wrap;
         }
-        .logo-text { background: var(--gradient-neural); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; font-size: 1.5rem; }
+        .logo-text { background: var(--gradient-neural); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; font-size: 1.3rem; white-space: nowrap; }
+
+        .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
         .theme-toggle, .view-toggle {
             background: var(--bg-input); border: 1px solid var(--border-alpha);
-            color: var(--text-primary); padding: 10px; border-radius: 12px;
-            cursor: pointer; transition: 0.3s; height: 40px;
-            display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem;
+            color: var(--text-primary); padding: 8px 10px; border-radius: 12px;
+            cursor: pointer; transition: 0.3s; height: 38px;
+            display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.78rem;
         }
         .theme-toggle:hover, .view-toggle:hover { background: var(--primary); color: white; }
+
+        /* hide text labels on small screens, keep icons */
+        @media (max-width: 500px) {
+            .view-toggle .btn-label,
+            .os-nav-btn .btn-label { display: none; }
+            .logo-text { font-size: 1.1rem; }
+            .header { padding: 0.75rem 1rem; }
+        }
 
         /* LAYOUT */
         .main-grid { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; max-width: 1400px; margin: 0 auto; padding: 0 1rem; }
         @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
+
+        .page-wrap { max-width: 1400px; margin: 0 auto; padding: 0 0.75rem; }
+        @media (max-width: 600px) { .page-wrap { padding: 0 0.5rem; } }
 
         .neural-card { background: var(--bg-card); border-radius: var(--radius-xl); border: 1px solid var(--border-alpha); overflow: hidden; transition: 0.3s; }
         .card-header { padding: 1.5rem; border-bottom: 1px solid var(--border-alpha); display: flex; justify-content: space-between; align-items: center; }
@@ -106,15 +120,16 @@
         .neural-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
 
         /* STATS */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
-        @media (max-width: 600px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-        .stat-card { background: var(--bg-card); padding: 1rem; border-radius: var(--radius); text-align: center; border-top: 3px solid var(--primary); }
-        .stat-card div:first-child { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px; }
-        .stat-card div:last-child { font-size: 1.6rem; font-weight: 800; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1.25rem; }
+        @media (max-width: 600px) { .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; } }
+        .stat-card { background: var(--bg-card); padding: 0.85rem 0.5rem; border-radius: var(--radius); text-align: center; border-top: 3px solid var(--primary); }
+        .stat-card div:first-child { font-size: 0.65rem; color: var(--text-muted); margin-bottom: 4px; }
+        .stat-card div:last-child { font-size: 1.4rem; font-weight: 800; }
+        @media (max-width: 400px) { .stat-card div:last-child { font-size: 1.2rem; } }
 
         /* TABS */
-        .neural-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; background: var(--bg-input); padding: 5px; border-radius: 12px; margin-bottom: 1rem; }
-        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 8px; cursor: pointer; border-radius: 8px; font-size: 0.8rem; font-family: 'Outfit', sans-serif; transition: 0.2s; }
+        .neural-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: var(--bg-input); padding: 4px; border-radius: 12px; margin-bottom: 1rem; }
+        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 7px 4px; cursor: pointer; border-radius: 8px; font-size: 0.75rem; font-family: 'Outfit', sans-serif; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .tab-btn.active { background: var(--gradient-neural); color: white; }
 
         /* NOTES */
@@ -129,10 +144,9 @@
 
         .note-item {
             background: var(--bg-input); border-radius: var(--radius);
-            padding: 1.5rem; margin-bottom: 1rem; border-left: 4px solid var(--primary); transition: 0.25s;
+            padding: 1.1rem; margin-bottom: 0.85rem; border-left: 4px solid var(--primary); transition: 0.25s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             position: relative;
-            /* FIX: removido user-select: none — permitir seleção de texto normal */
         }
         .note-item.private { border-left-color: var(--secondary); }
         .note-item.completed { opacity: 0.6; border-left-color: var(--success); }
@@ -312,10 +326,13 @@
             position: fixed; inset: 0; z-index: 2000;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(6px);
-            display: flex; align-items: center; justify-content: center;
-            padding: 1rem;
+            display: flex; align-items: flex-end; justify-content: center;
+            padding: 0;
             opacity: 0; visibility: hidden;
             transition: opacity 0.3s, visibility 0.3s;
+        }
+        @media (min-width: 600px) {
+            .edit-modal-overlay { align-items: center; padding: 1rem; }
         }
         .edit-modal-overlay.open {
             opacity: 1; visibility: visible;
@@ -323,20 +340,36 @@
         .edit-modal {
             background: var(--bg-card);
             border: 1px solid var(--border-alpha);
-            border-radius: var(--radius-xl);
-            width: 100%; max-width: 720px;
-            padding: 2rem;
-            transform: translateY(30px) scale(0.97);
-            transition: transform 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
-            max-height: 92vh;
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            width: 100%; max-width: 100%;
+            padding: 1.5rem 1.25rem;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.34, 1.1, 0.64, 1);
+            max-height: 95vh;
             overflow-y: auto;
         }
-        .edit-modal-overlay.open .edit-modal {
-            transform: translateY(0) scale(1);
+        @media (min-width: 600px) {
+            .edit-modal {
+                border-radius: var(--radius-xl);
+                max-width: 720px;
+                transform: translateY(30px) scale(0.97);
+            }
+            .edit-modal-overlay.open .edit-modal { transform: translateY(0) scale(1); }
         }
+        .edit-modal-overlay.open .edit-modal { transform: translateY(0); }
+        /* drag handle bar on mobile */
+        .edit-modal::before {
+            content: '';
+            display: block;
+            width: 40px; height: 4px;
+            background: var(--border-alpha);
+            border-radius: 2px;
+            margin: 0 auto 1.25rem;
+        }
+        @media (min-width: 600px) { .edit-modal::before { display: none; } }
         .edit-modal-header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
         .edit-modal-header h3 {
             background: var(--gradient-neural);
@@ -352,6 +385,206 @@
             transition: 0.2s;
         }
         .modal-close:hover { background: var(--secondary); color: white; border-color: var(--secondary); }
+
+        /* ═══════════════════════════════════════════════════════════
+           ORDEM DE SERVIÇO
+        ═══════════════════════════════════════════════════════════ */
+        .os-nav-btn {
+            background: var(--bg-input); border: 1px solid var(--border-alpha);
+            color: var(--text-primary); padding: 8px 12px; border-radius: 12px;
+            cursor: pointer; transition: 0.3s; height: 38px;
+            display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.78rem;
+            font-family: 'Outfit', sans-serif; font-weight: 600; white-space: nowrap;
+        }
+        .os-nav-btn:hover, .os-nav-btn.active { background: var(--gradient-neural); color: white; border-color: transparent; }
+
+        /* OS MODAL OVERLAY */
+        .os-modal-overlay {
+            position: fixed; inset: 0; z-index: 2100;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+            display: flex; align-items: flex-end; justify-content: center;
+            padding: 0; opacity: 0; visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        @media (min-width: 600px) {
+            .os-modal-overlay { align-items: center; padding: 1rem; }
+        }
+        .os-modal-overlay.open { opacity: 1; visibility: visible; }
+        .os-modal {
+            background: var(--bg-card); border: 1px solid var(--border-alpha);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            width: 100%; max-width: 100%;
+            padding: 1.5rem 1.25rem;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.34,1.1,0.64,1);
+            max-height: 95vh; overflow-y: auto;
+        }
+        @media (min-width: 600px) {
+            .os-modal {
+                border-radius: var(--radius-xl);
+                max-width: 560px;
+                transform: translateY(30px) scale(0.97);
+            }
+            .os-modal-overlay.open .os-modal { transform: translateY(0) scale(1); }
+        }
+        .os-modal-overlay.open .os-modal { transform: translateY(0); }
+
+        /* modal handle bar on mobile */
+        .os-modal::before {
+            content: '';
+            display: block;
+            width: 40px; height: 4px;
+            background: var(--border-alpha);
+            border-radius: 2px;
+            margin: 0 auto 1.25rem;
+        }
+        @media (min-width: 600px) { .os-modal::before { display: none; } }
+
+        /* OS PAINEL PRINCIPAL */
+        #osPanel { display: none; }
+        #osPanel.visible { display: block; }
+
+        /* KANBAN */
+        .os-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        @media (max-width: 860px) {
+            .os-board {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            /* on mobile show columns as accordion-style with colored top border */
+            .os-column { border-top: 3px solid; }
+            .col-aguardando { border-top-color: #ffaa00; }
+            .col-andamento  { border-top-color: var(--primary); }
+            .col-concluido  { border-top-color: var(--success); }
+        }
+
+        .os-column {
+            background: var(--bg-input); border-radius: var(--radius);
+            border: 1px solid var(--border-alpha); padding: 0.85rem;
+        }
+        .os-column-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 0.85rem; padding-bottom: 0.6rem;
+            border-bottom: 2px solid;
+        }
+        .os-column-header h4 { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.05em; }
+        .os-col-count {
+            font-size: 0.72rem; font-weight: 800;
+            padding: 2px 10px; border-radius: 20px;
+        }
+
+        .col-aguardando .os-column-header { border-color: #ffaa00; }
+        .col-aguardando .os-column-header h4 { color: #ffaa00; }
+        .col-aguardando .os-col-count { background: rgba(255,170,0,0.15); color: #ffaa00; }
+
+        .col-andamento .os-column-header { border-color: var(--primary); }
+        .col-andamento .os-column-header h4 { color: var(--primary); }
+        .col-andamento .os-col-count { background: rgba(0,212,255,0.15); color: var(--primary); }
+
+        .col-concluido .os-column-header { border-color: var(--success); }
+        .col-concluido .os-column-header h4 { color: var(--success); }
+        .col-concluido .os-col-count { background: rgba(0,255,157,0.15); color: var(--success); }
+
+        /* OS CARD (comanda) */
+        .os-card {
+            background: var(--bg-card); border-radius: 10px;
+            border: 1px solid var(--border-alpha);
+            padding: 0.9rem; margin-bottom: 0.65rem;
+            position: relative; transition: 0.25s;
+            border-left: 4px solid #ffaa00;
+        }
+        .os-card.status-andamento { border-left-color: var(--primary); }
+        .os-card.status-concluido { border-left-color: var(--success); opacity: 0.7; }
+
+        .os-card-num {
+            font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em;
+            color: var(--text-muted); margin-bottom: 4px;
+        }
+        .os-card-client {
+            font-size: 0.95rem; font-weight: 700; margin-bottom: 4px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .os-card-desc {
+            font-size: 0.8rem; color: var(--text-secondary);
+            margin-bottom: 8px; white-space: pre-wrap; word-break: break-word;
+        }
+        .os-card-meta {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 6px;
+            font-size: 0.72rem; color: var(--text-muted);
+            border-top: 1px solid var(--border-alpha); padding-top: 8px; margin-top: 4px;
+        }
+        .os-card-actions { display: flex; gap: 4px; flex-wrap: wrap; }
+        .os-card-actions button {
+            background: none; border: none; cursor: pointer;
+            font-size: 0.85rem; padding: 5px 7px; border-radius: 6px;
+            transition: 0.2s; color: var(--text-muted);
+            min-width: 32px; min-height: 32px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .os-card-actions button:hover { background: rgba(255,255,255,0.08); }
+
+        .os-priority-badge {
+            font-size: 0.62rem; font-weight: 700; padding: 2px 8px;
+            border-radius: 20px; text-transform: uppercase; white-space: nowrap;
+        }
+        .priority-normal  { background: rgba(100,116,139,0.2); color: var(--text-muted); }
+        .priority-urgente { background: rgba(255,170,0,0.2); color: #ffaa00; }
+        .priority-critico { background: rgba(255,0,76,0.2); color: var(--secondary); }
+
+        /* OS EMPTY */
+        .os-empty {
+            text-align: center; padding: 1.5rem 1rem;
+            color: var(--text-muted); font-size: 0.82rem;
+        }
+        .os-empty i { font-size: 1.6rem; margin-bottom: 0.4rem; display: block; opacity: 0.4; }
+
+        /* OS STATS */
+        .os-stats-row {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 0.6rem; margin-bottom: 1.25rem;
+        }
+        @media (max-width: 600px) { .os-stats-row { grid-template-columns: repeat(2,1fr); gap: 0.5rem; } }
+        .os-stat {
+            background: var(--bg-input); border-radius: var(--radius);
+            padding: 0.65rem 0.5rem; text-align: center;
+            border: 1px solid var(--border-alpha);
+        }
+        .os-stat-label { font-size: 0.6rem; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .os-stat-val { font-size: 1.4rem; font-weight: 800; }
+        @media (max-width: 400px) { .os-stat-val { font-size: 1.2rem; } }
+
+        /* OS SEARCH/FILTER BAR */
+        .os-topbar {
+            display: flex; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center;
+        }
+        .os-topbar input { flex: 1; min-width: 120px; margin-bottom: 0 !important; }
+        .os-topbar select { margin-bottom: 0 !important; width: auto; min-width: 0; flex: 1; }
+        @media (max-width: 500px) {
+            .os-topbar { flex-direction: column; }
+            .os-topbar input, .os-topbar select { width: 100%; }
+        }
+
+        /* card-header responsive */
+        .card-header { padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--border-alpha); display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+        .card-header h2, .card-header h3 { font-size: clamp(0.9rem, 3vw, 1.1rem); }
+
+        /* neural-input touch friendly */
+        .neural-input { touch-action: manipulation; }
+
+        /* action buttons touch area */
+        .action-icon { min-width: 36px; min-height: 36px; display: inline-flex; align-items: center; justify-content: center; }
+
+        /* PRINT comanda */
+        @media print {
+            body * { visibility: hidden; }
+            #osPrintTarget, #osPrintTarget * { visibility: visible; }
+            #osPrintTarget { position: absolute; left: 0; top: 0; width: 100%; }
+        }
     </style>
 </head>
 
@@ -455,15 +688,46 @@
         </div>
     </div>
 
-    <!-- MAIN -->
+    <!-- ═══ MODAL OS: NOVA / EDITAR ═══ -->
+    <div class="os-modal-overlay" id="osFormOverlay">
+        <div class="os-modal">
+            <div class="edit-modal-header">
+                <h3><i class="fas fa-clipboard-list"></i> <span id="osFormTitle">NOVA ORDEM DE SERVIÇO</span></h3>
+                <button class="modal-close" onclick="closeOsForm()"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="text" id="osClient" class="neural-input" placeholder="Cliente *">
+            <input type="text" id="osDevice" class="neural-input" placeholder="Equipamento / Produto">
+            <textarea id="osDesc" class="neural-input" placeholder="Descrição do serviço / problema *" style="min-height:120px; resize:vertical;"></textarea>
+            <select id="osPriority" class="neural-input">
+                <option value="normal">📋 Normal</option>
+                <option value="urgente">⚡ Urgente</option>
+                <option value="critico">🔥 Crítico</option>
+            </select>
+            <input type="text" id="osTech" class="neural-input" placeholder="Técnico responsável">
+            <select id="osStatus" class="neural-input">
+                <option value="aguardando">⏳ Aguardando</option>
+                <option value="andamento">🔧 Em Andamento</option>
+                <option value="concluido">✅ Concluído</option>
+            </select>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <button class="btn-primary" id="btnOsSave">SALVAR O.S.</button>
+                <button class="btn-secondary" onclick="closeOsForm()">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRINT TARGET -->
+    <div id="osPrintTarget" style="display:none;"></div>
+
     <div id="mainContent" style="display:none;">
-        <div style="max-width: 1400px; margin: 0 auto; padding: 0 1rem;">
+        <div class="page-wrap">
             <header class="header">
                 <span class="logo-text">Inforwnet Anotação</span>
-                <div style="display: flex; gap: 10px;">
-                    <button class="view-toggle" id="viewToggle"><i class="fas fa-th-large"></i> STICKY</button>
+                <div class="header-actions">
+                    <button class="os-nav-btn" id="btnOsToggle"><i class="fas fa-clipboard-list"></i> <span class="btn-label">O.S.</span></button>
+                    <button class="view-toggle" id="viewToggle"><i class="fas fa-th-large"></i> <span class="btn-label">STICKY</span></button>
                     <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
-                    <button class="btn-secondary" id="btnLogout"><i class="fas fa-power-off"></i></button>
+                    <button class="btn-secondary" id="btnLogout" style="height:38px; padding: 0 12px;"><i class="fas fa-power-off"></i></button>
                 </div>
             </header>
 
@@ -478,9 +742,9 @@
                 <section class="neural-card">
                     <div class="card-header">
                         <h2>ANOTAÇÕES</h2>
-                        <button class="btn-primary" id="btnNew">+ NOVA</button>
+                        <button class="btn-primary" id="btnNew" style="font-size:0.82rem; padding:0.65rem 1rem;">+ NOVA</button>
                     </div>
-                    <div style="padding: 1.5rem;">
+                    <div style="padding: clamp(0.75rem, 3vw, 1.5rem);">
                         <div class="neural-tabs">
                             <button class="tab-btn active" data-filter="all">Públicas</button>
                             <button class="tab-btn" data-filter="mine">Privadas</button>
@@ -506,7 +770,7 @@
                 <aside id="sideEditor">
                     <div class="neural-card">
                         <div class="card-header"><h3>EDITOR</h3></div>
-                        <div style="padding: 1.5rem;">
+                        <div style="padding: clamp(0.75rem, 3vw, 1.5rem);">
                             <input type="text" id="noteTitle" class="neural-input" placeholder="Título">
                             <textarea id="noteContent" class="neural-input" placeholder="Conteúdo" style="min-height: 150px; resize: vertical;"></textarea>
                             <select id="notePublic" class="neural-input">
@@ -526,7 +790,64 @@
                 </aside>
             </main>
 
-            <footer class="footer-credits">
+            <!-- ═══ PAINEL ORDEM DE SERVIÇO ═══ -->
+            <section id="osPanel" class="neural-card" style="margin-top:1.5rem;">
+                <div class="card-header">
+                    <h2><i class="fas fa-clipboard-list" style="color:var(--primary); margin-right:8px;"></i>ORDENS DE SERVIÇO</h2>
+                    <button class="btn-primary" onclick="openOsForm()" style="white-space:nowrap; font-size:0.82rem; padding:0.65rem 1rem;">+ NOVA O.S.</button>
+                </div>
+                <div style="padding: clamp(0.75rem, 3vw, 1.5rem);">
+                    <!-- stats -->
+                    <div class="os-stats-row">
+                        <div class="os-stat"><div class="os-stat-label">TOTAL</div><div class="os-stat-val" id="osStatTotal">0</div></div>
+                        <div class="os-stat"><div class="os-stat-label">AGUARDANDO</div><div class="os-stat-val" id="osStatAguardando" style="color:#ffaa00;">0</div></div>
+                        <div class="os-stat"><div class="os-stat-label">EM ANDAMENTO</div><div class="os-stat-val" id="osStatAndamento" style="color:var(--primary);">0</div></div>
+                        <div class="os-stat"><div class="os-stat-label">CONCLUÍDAS</div><div class="os-stat-val" id="osStatConcluido" style="color:var(--success);">0</div></div>
+                    </div>
+                    <!-- topbar -->
+                    <div class="os-topbar">
+                        <input type="text" class="neural-input" id="osSearch" placeholder="Buscar cliente, serviço...">
+                        <select class="neural-input" id="osFilterStatus">
+                            <option value="all">Todos os status</option>
+                            <option value="aguardando">⏳ Aguardando</option>
+                            <option value="andamento">🔧 Em Andamento</option>
+                            <option value="concluido">✅ Concluído</option>
+                        </select>
+                        <select class="neural-input" id="osFilterPriority">
+                            <option value="all">Todas prioridades</option>
+                            <option value="critico">🔥 Crítico</option>
+                            <option value="urgente">⚡ Urgente</option>
+                            <option value="normal">📋 Normal</option>
+                        </select>
+                    </div>
+                    <!-- board -->
+                    <div class="os-board">
+                        <div class="os-column col-aguardando">
+                            <div class="os-column-header">
+                                <h4>⏳ AGUARDANDO</h4>
+                                <span class="os-col-count" id="colCountAguardando">0</span>
+                            </div>
+                            <div id="colAguardando"></div>
+                        </div>
+                        <div class="os-column col-andamento">
+                            <div class="os-column-header">
+                                <h4>🔧 EM ANDAMENTO</h4>
+                                <span class="os-col-count" id="colCountAndamento">0</span>
+                            </div>
+                            <div id="colAndamento"></div>
+                        </div>
+                        <div class="os-column col-concluido">
+                            <div class="os-column-header">
+                                <h4>✅ CONCLUÍDO</h4>
+                                <span class="os-col-count" id="colCountConcluido">0</span>
+                            </div>
+                            <div id="colConcluido"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+ class="footer-credits">
                 Projeto Inforwnet Anotação v4.2 - Criado por
                 <a href="https://www.instagram.com/daniel.dev_2" target="_blank">Daniel Santos</a>
                 <i class="fab fa-instagram"></i> @daniel.dev_2
@@ -575,7 +896,9 @@
         // ─── VIEW TOGGLE ─────────────────────────────────────────────────────────
         viewToggle.onclick = () => {
             const isGrid = notesContainer.classList.toggle('grid-mode');
-            viewToggle.innerHTML = isGrid ? '<i class="fas fa-list"></i> LISTA' : '<i class="fas fa-th-large"></i> STICKY';
+            viewToggle.innerHTML = isGrid
+                ? '<i class="fas fa-list"></i> <span class="btn-label">LISTA</span>'
+                : '<i class="fas fa-th-large"></i> <span class="btn-label">STICKY</span>';
         };
 
         // ─── TOAST ───────────────────────────────────────────────────────────────
@@ -1065,6 +1388,230 @@
             };
         });
         document.getElementById('searchInput').oninput = renderNotes;
+
+        // ═══════════════════════════════════════════════════════════
+        //  MÓDULO: ORDEM DE SERVIÇO
+        // ═══════════════════════════════════════════════════════════
+        let allOS = [];
+        let editOsId = null;
+        let osPanelOpen = false;
+
+        // Toggle painel OS
+        document.getElementById('btnOsToggle').onclick = () => {
+            osPanelOpen = !osPanelOpen;
+            const panel = document.getElementById('osPanel');
+            const btn = document.getElementById('btnOsToggle');
+            panel.classList.toggle('visible', osPanelOpen);
+            btn.classList.toggle('active', osPanelOpen);
+            if (osPanelOpen) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        // ── LOAD OS ────────────────────────────────────────────────
+        function loadOS() {
+            db.collection('ordens').orderBy('numero', 'asc').onSnapshot(snap => {
+                allOS = [];
+                snap.forEach(doc => allOS.push({ id: doc.id, ...doc.data() }));
+                renderOS();
+                updateOsStats();
+            });
+        }
+
+        // ── PRÓXIMO NÚMERO ─────────────────────────────────────────
+        async function getNextOsNumber() {
+            const snap = await db.collection('ordens').orderBy('numero', 'desc').limit(1).get();
+            if (snap.empty) return 1;
+            return (snap.docs[0].data().numero || 0) + 1;
+        }
+
+        // ── ABRIR FORM ─────────────────────────────────────────────
+        window.openOsForm = (id = null) => {
+            editOsId = id;
+            document.getElementById('osFormTitle').textContent = id ? 'EDITAR O.S.' : 'NOVA ORDEM DE SERVIÇO';
+            if (id) {
+                const os = allOS.find(x => x.id === id);
+                if (!os) return;
+                document.getElementById('osClient').value   = os.client || '';
+                document.getElementById('osDevice').value   = os.device || '';
+                document.getElementById('osDesc').value     = os.desc || '';
+                document.getElementById('osPriority').value = os.priority || 'normal';
+                document.getElementById('osTech').value     = os.tech || '';
+                document.getElementById('osStatus').value   = os.status || 'aguardando';
+            } else {
+                document.getElementById('osClient').value   = '';
+                document.getElementById('osDevice').value   = '';
+                document.getElementById('osDesc').value     = '';
+                document.getElementById('osPriority').value = 'normal';
+                document.getElementById('osTech').value     = '';
+                document.getElementById('osStatus').value   = 'aguardando';
+            }
+            document.getElementById('osFormOverlay').classList.add('open');
+            setTimeout(() => document.getElementById('osClient').focus(), 300);
+        };
+
+        window.closeOsForm = () => {
+            document.getElementById('osFormOverlay').classList.remove('open');
+            editOsId = null;
+        };
+
+        document.getElementById('osFormOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeOsForm();
+        });
+
+        // ── SALVAR OS ──────────────────────────────────────────────
+        document.getElementById('btnOsSave').onclick = async () => {
+            const client = document.getElementById('osClient').value.trim();
+            const desc   = document.getElementById('osDesc').value.trim();
+            if (!client) { showToast('Informe o cliente!', 'error'); return; }
+            if (!desc)   { showToast('Descreva o serviço!', 'error'); return; }
+
+            const data = {
+                client,
+                device:   document.getElementById('osDevice').value.trim(),
+                desc,
+                priority: document.getElementById('osPriority').value,
+                tech:     document.getElementById('osTech').value.trim(),
+                status:   document.getElementById('osStatus').value,
+                ownerUID: currentUser.uid,
+                updatedAt: Date.now()
+            };
+
+            if (editOsId) {
+                await db.collection('ordens').doc(editOsId).update(data);
+                showToast('O.S. atualizada!', 'success');
+            } else {
+                data.numero    = await getNextOsNumber();
+                data.createdAt = Date.now();
+                await db.collection('ordens').add(data);
+                showToast(`O.S. #${String(data.numero).padStart(4,'0')} criada!`, 'success');
+            }
+            closeOsForm();
+        };
+
+        // ── DELETE OS ──────────────────────────────────────────────
+        window.deleteOs = (id) => {
+            if (confirm('Excluir esta Ordem de Serviço?')) {
+                db.collection('ordens').doc(id).delete();
+                showToast('O.S. excluída.', 'info');
+            }
+        };
+
+        // ── MUDAR STATUS RÁPIDO ────────────────────────────────────
+        window.osNextStatus = async (id) => {
+            const os = allOS.find(x => x.id === id);
+            if (!os) return;
+            const cycle = { aguardando: 'andamento', andamento: 'concluido', concluido: 'aguardando' };
+            await db.collection('ordens').doc(id).update({ status: cycle[os.status], updatedAt: Date.now() });
+        };
+
+        // ── IMPRIMIR COMANDA ───────────────────────────────────────
+        window.printOs = (id) => {
+            const os = allOS.find(x => x.id === id);
+            if (!os) return;
+            const num = String(os.numero).padStart(4, '0');
+            const dt  = new Date(os.createdAt).toLocaleString('pt-BR');
+            const upd = new Date(os.updatedAt).toLocaleString('pt-BR');
+            const statusLabel = { aguardando:'Aguardando', andamento:'Em Andamento', concluido:'Concluído' };
+            const prioLabel   = { normal:'Normal', urgente:'Urgente', critico:'Crítico' };
+            document.getElementById('osPrintTarget').innerHTML = `
+                <div style="font-family:monospace; max-width:400px; padding:20px; border:2px solid #000;">
+                    <div style="text-align:center; border-bottom:2px dashed #000; padding-bottom:10px; margin-bottom:10px;">
+                        <strong style="font-size:1.4rem;">INFORWNET</strong><br>
+                        <span style="font-size:0.8rem;">Ordem de Serviço</span>
+                    </div>
+                    <div style="font-size:1.3rem; font-weight:bold; text-align:center; margin-bottom:10px;">O.S. #${num}</div>
+                    <table style="width:100%; font-size:0.85rem; border-collapse:collapse;">
+                        <tr><td style="padding:4px 0; color:#555;">Cliente:</td><td style="font-weight:bold;">${os.client}</td></tr>
+                        <tr><td style="padding:4px 0; color:#555;">Equipamento:</td><td>${os.device || '—'}</td></tr>
+                        <tr><td style="padding:4px 0; color:#555;">Técnico:</td><td>${os.tech || '—'}</td></tr>
+                        <tr><td style="padding:4px 0; color:#555;">Prioridade:</td><td>${prioLabel[os.priority]}</td></tr>
+                        <tr><td style="padding:4px 0; color:#555;">Status:</td><td>${statusLabel[os.status]}</td></tr>
+                        <tr><td style="padding:4px 0; color:#555;">Abertura:</td><td>${dt}</td></tr>
+                        <tr><td style="padding:4px 0; color:#555;">Atualização:</td><td>${upd}</td></tr>
+                    </table>
+                    <div style="margin-top:10px; border-top:1px dashed #000; padding-top:10px; font-size:0.85rem;">
+                        <strong>Descrição:</strong><br>${os.desc}
+                    </div>
+                    <div style="margin-top:16px; border-top:2px dashed #000; padding-top:10px; text-align:center; font-size:0.75rem; color:#555;">
+                        Assinatura: ________________________
+                    </div>
+                </div>`;
+            document.getElementById('osPrintTarget').style.display = 'block';
+            window.print();
+            document.getElementById('osPrintTarget').style.display = 'none';
+        };
+
+        // ── RENDER OS ──────────────────────────────────────────────
+        function renderOS() {
+            const query   = (document.getElementById('osSearch')?.value || '').toLowerCase();
+            const stFil   = document.getElementById('osFilterStatus')?.value || 'all';
+            const prFil   = document.getElementById('osFilterPriority')?.value || 'all';
+
+            const filtered = allOS.filter(os => {
+                const txt = (os.client + os.desc + os.device + os.tech).toLowerCase();
+                return txt.includes(query)
+                    && (stFil === 'all' || os.status === stFil)
+                    && (prFil === 'all' || os.priority === prFil);
+            });
+
+            const cols = { aguardando: [], andamento: [], concluido: [] };
+            filtered.forEach(os => { if (cols[os.status]) cols[os.status].push(os); });
+
+            ['aguardando', 'andamento', 'concluido'].forEach(status => {
+                const colId = { aguardando:'colAguardando', andamento:'colAndamento', concluido:'colConcluido' }[status];
+                const countId = { aguardando:'colCountAguardando', andamento:'colCountAndamento', concluido:'colCountConcluido' }[status];
+                const col = document.getElementById(colId);
+                const list = cols[status];
+
+                document.getElementById(countId).textContent = list.length;
+
+                if (list.length === 0) {
+                    col.innerHTML = `<div class="os-empty"><i class="fas fa-inbox"></i>Nenhuma O.S.</div>`;
+                    return;
+                }
+                col.innerHTML = list.map(os => {
+                    const num = String(os.numero).padStart(4, '0');
+                    const dt  = new Date(os.createdAt).toLocaleDateString('pt-BR') + ' ' + new Date(os.createdAt).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+                    const prioClass = { normal:'priority-normal', urgente:'priority-urgente', critico:'priority-critico' }[os.priority] || 'priority-normal';
+                    const prioIcon  = { normal:'📋', urgente:'⚡', critico:'🔥' }[os.priority] || '';
+                    const statusNext = { aguardando:'▶ Iniciar', andamento:'✅ Concluir', concluido:'↩ Reabrir' }[os.status];
+                    return `
+                    <div class="os-card status-${os.status}">
+                        <div class="os-card-num">O.S. #${num} · ${dt}</div>
+                        <div class="os-card-client">${os.client}</div>
+                        ${os.device ? `<div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;"><i class="fas fa-laptop" style="margin-right:4px;"></i>${os.device}</div>` : ''}
+                        <div class="os-card-desc">${os.desc}</div>
+                        ${os.tech ? `<div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;"><i class="fas fa-user-cog" style="margin-right:4px;"></i>${os.tech}</div>` : ''}
+                        <div class="os-card-meta">
+                            <span class="os-priority-badge ${prioClass}">${prioIcon} ${os.priority}</span>
+                            <div class="os-card-actions">
+                                <button onclick="osNextStatus('${os.id}')" title="${statusNext}" style="color:var(--primary); font-size:0.75rem; padding:3px 8px; border:1px solid var(--border-alpha); border-radius:6px;">${statusNext}</button>
+                                <button onclick="openOsForm('${os.id}')" title="Editar" style="color:var(--primary);"><i class="fas fa-edit"></i></button>
+                                <button onclick="printOs('${os.id}')" title="Imprimir" style="color:var(--text-muted);"><i class="fas fa-print"></i></button>
+                                <button onclick="deleteOs('${os.id}')" title="Excluir" style="color:var(--secondary);"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        function updateOsStats() {
+            document.getElementById('osStatTotal').textContent       = allOS.length;
+            document.getElementById('osStatAguardando').textContent  = allOS.filter(o => o.status === 'aguardando').length;
+            document.getElementById('osStatAndamento').textContent   = allOS.filter(o => o.status === 'andamento').length;
+            document.getElementById('osStatConcluido').textContent   = allOS.filter(o => o.status === 'concluido').length;
+        }
+
+        // filtros de busca OS
+        document.getElementById('osSearch').oninput = renderOS;
+        document.getElementById('osFilterStatus').onchange = renderOS;
+        document.getElementById('osFilterPriority').onchange = renderOS;
+
+        // ── INICIALIZAR OS quando logado ───────────────────────────
+        auth.onAuthStateChanged(user => {
+            if (user) loadOS();
+        });
+
     </script>
 </body>
 </html>
