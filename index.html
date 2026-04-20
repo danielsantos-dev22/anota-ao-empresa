@@ -579,11 +579,245 @@
         /* action buttons touch area */
         .action-icon { min-width: 36px; min-height: 36px; display: inline-flex; align-items: center; justify-content: center; }
 
-        /* PRINT comanda */
+        /* PRINT */
         @media print {
             body * { visibility: hidden; }
             #osPrintTarget, #osPrintTarget * { visibility: visible; }
+            #checkPrintTarget, #checkPrintTarget * { visibility: visible; }
             #osPrintTarget { position: absolute; left: 0; top: 0; width: 100%; }
+            #checkPrintTarget { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           DASHBOARD
+        ═══════════════════════════════════════════════════════════ */
+        .dash-kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        @media (max-width: 700px) { .dash-kpi-row { grid-template-columns: repeat(2,1fr); } }
+        @media (max-width: 400px) { .dash-kpi-row { grid-template-columns: 1fr 1fr; gap: 0.5rem; } }
+
+        .dash-kpi {
+            background: var(--bg-input);
+            border: 1px solid var(--border-alpha);
+            border-radius: var(--radius);
+            padding: 1rem 0.75rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .dash-kpi::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--gradient-neural);
+        }
+        .dash-kpi-icon { font-size: 1.3rem; margin-bottom: 6px; }
+        .dash-kpi-val { font-size: 1.8rem; font-weight: 800; line-height: 1; }
+        .dash-kpi-label { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+        .dash-kpi-sub { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+        @media (max-width: 400px) { .dash-kpi-val { font-size: 1.4rem; } }
+
+        .dash-charts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        @media (max-width: 900px) { .dash-charts-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 550px) { .dash-charts-grid { grid-template-columns: 1fr; } }
+
+        .dash-chart-card {
+            background: var(--bg-input);
+            border: 1px solid var(--border-alpha);
+            border-radius: var(--radius);
+            padding: 1rem;
+        }
+        .dash-chart-title {
+            font-size: 0.78rem; font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.05em;
+            margin-bottom: 0.85rem;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .dash-chart-title i { color: var(--primary); }
+
+        .dash-canvas { width: 100% !important; height: 160px !important; }
+
+        .dash-legend {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            justify-content: center; margin-top: 0.75rem;
+        }
+        .dash-legend-item {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 0.72rem; color: var(--text-secondary);
+        }
+        .dash-legend-dot {
+            width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+        }
+
+        /* Techs ranking bar */
+        .tech-row {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 8px; font-size: 0.8rem;
+        }
+        .tech-name { min-width: 80px; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-secondary); }
+        .tech-bar-wrap { flex: 1; background: var(--border-alpha); border-radius: 4px; height: 8px; overflow: hidden; }
+        .tech-bar { height: 100%; border-radius: 4px; background: var(--gradient-neural); transition: width 0.6s ease; }
+        .tech-count { font-size: 0.72rem; color: var(--text-muted); min-width: 24px; text-align: right; }
+
+        /* Dash table */
+        .dash-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .dash-table th { padding: 8px 10px; text-align: left; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-alpha); white-space: nowrap; }
+        .dash-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-alpha); color: var(--text-secondary); }
+        .dash-table tr:last-child td { border-bottom: none; }
+        .dash-table tr:hover td { background: rgba(255,255,255,0.03); }
+        .dash-status-badge { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+
+        /* ═══════════════════════════════════════════════════════════
+           CHECKLIST DE MATERIAL
+        ═══════════════════════════════════════════════════════════ */
+        .check-id-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        @media (max-width: 700px) { .check-id-row { grid-template-columns: 1fr; gap: 0.5rem; } }
+
+        .check-id-field { display: flex; flex-direction: column; gap: 6px; }
+        .check-label {
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--text-muted);
+            display: flex; align-items: center; gap: 5px;
+        }
+        .check-label i { color: var(--primary); }
+
+        .check-section-title {
+            font-size: 0.78rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.07em; color: var(--text-secondary);
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 0.85rem; padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-alpha);
+        }
+        .check-section-title i { color: var(--primary); font-size: 0.9rem; }
+
+        /* Material grid: 3 cols desktop, 2 tablet, 1 mobile */
+        .check-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.6rem;
+        }
+        @media (max-width: 860px) { .check-grid { grid-template-columns: repeat(2,1fr); } }
+        @media (max-width: 500px) { .check-grid { grid-template-columns: 1fr; } }
+
+        .check-item {
+            background: var(--bg-input);
+            border: 1px solid var(--border-alpha);
+            border-radius: var(--radius);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            transition: 0.2s;
+        }
+        .check-item:has(.check-qty:not([value="0"])):has(.check-qty[value]) {
+            border-color: var(--primary);
+            background: rgba(0,212,255,0.04);
+        }
+        .check-item-name {
+            font-size: 0.82rem; font-weight: 600;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+        .check-qty-wrap {
+            display: flex; align-items: center; gap: 4px;
+        }
+        .check-qty-btn {
+            background: var(--bg-card); border: 1px solid var(--border-alpha);
+            color: var(--text-primary); width: 28px; height: 28px;
+            border-radius: 7px; cursor: pointer; font-size: 1rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.15s; line-height: 1;
+        }
+        .check-qty-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .check-qty {
+            width: 44px; height: 28px; text-align: center;
+            background: var(--bg-card); border: 1px solid var(--border-alpha);
+            color: var(--text-primary); border-radius: 7px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 700;
+            -moz-appearance: textfield;
+        }
+        .check-qty::-webkit-outer-spin-button,
+        .check-qty::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .check-qty:focus { outline: none; border-color: var(--primary); }
+
+        /* highlight active qty */
+        .check-item.has-qty { border-color: rgba(0,212,255,0.4); background: rgba(0,212,255,0.04); }
+
+        /* Tools grid */
+        .check-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 0.6rem;
+        }
+        @media (max-width: 860px) { .check-tools-grid { grid-template-columns: repeat(2,1fr); } }
+        @media (max-width: 500px) { .check-tools-grid { grid-template-columns: 1fr; } }
+
+        .check-tool {
+            background: var(--bg-input);
+            border: 1px solid var(--border-alpha);
+            border-radius: var(--radius);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: 0.2s;
+            user-select: none;
+        }
+        .check-tool.checked {
+            border-color: var(--success);
+            background: rgba(0,255,157,0.05);
+        }
+        .check-tool-name { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); flex: 1; }
+        .check-tool.checked .check-tool-name { color: var(--success); }
+
+        .check-toggle {
+            width: 40px; height: 22px; border-radius: 11px;
+            background: var(--border-alpha); position: relative;
+            transition: 0.25s; flex-shrink: 0;
+        }
+        .check-tool.checked .check-toggle { background: var(--success); }
+        .check-toggle::after {
+            content: '';
+            position: absolute; top: 3px; left: 3px;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: white; transition: 0.25s;
+        }
+        .check-tool.checked .check-toggle::after { left: 21px; }
+
+        /* History */
+        .check-hist-item {
+            background: var(--bg-input);
+            border: 1px solid var(--border-alpha);
+            border-radius: var(--radius);
+            padding: 0.85rem 1rem;
+            margin-bottom: 0.6rem;
+            display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+        }
+        .check-hist-meta { flex: 1; min-width: 180px; }
+        .check-hist-name { font-size: 0.9rem; font-weight: 700; }
+        .check-hist-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+        .check-hist-actions { display: flex; gap: 6px; }
+        .check-hist-badge {
+            font-size: 0.65rem; font-weight: 700; padding: 2px 8px;
+            border-radius: 20px; background: rgba(0,212,255,0.12); color: var(--primary);
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -724,7 +958,9 @@
             <header class="header">
                 <span class="logo-text">Inforwnet Anotação</span>
                 <div class="header-actions">
+                    <button class="os-nav-btn" id="btnDashToggle"><i class="fas fa-chart-bar"></i> <span class="btn-label">DASH</span></button>
                     <button class="os-nav-btn" id="btnOsToggle"><i class="fas fa-clipboard-list"></i> <span class="btn-label">O.S.</span></button>
+                    <button class="os-nav-btn" id="btnCheckToggle"><i class="fas fa-toolbox"></i> <span class="btn-label">MATERIAL</span></button>
                     <button class="view-toggle" id="viewToggle"><i class="fas fa-th-large"></i> <span class="btn-label">STICKY</span></button>
                     <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
                     <button class="btn-secondary" id="btnLogout" style="height:38px; padding: 0 12px;"><i class="fas fa-power-off"></i></button>
@@ -819,6 +1055,14 @@
                             <option value="urgente">⚡ Urgente</option>
                             <option value="normal">📋 Normal</option>
                         </select>
+                        <select class="neural-input" id="osFilterDate">
+                            <option value="all">Qualquer data</option>
+                            <option value="today">📅 Hoje</option>
+                            <option value="week">📅 Esta semana</option>
+                            <option value="month">📅 Este mês</option>
+                        </select>
+                        <input type="date" class="neural-input" id="osFilterDateFrom" title="De:" style="min-width:0; flex:1;">
+                        <input type="date" class="neural-input" id="osFilterDateTo" title="Até:" style="min-width:0; flex:1;">
                     </div>
                     <!-- board -->
                     <div class="os-board">
@@ -847,8 +1091,124 @@
                 </div>
             </section>
 
- class="footer-credits">
-                Projeto Inforwnet Anotação v4.2 - Criado por
+            <!-- ═══ DASHBOARD ═══ -->
+            <section id="dashPanel" class="neural-card" style="margin-top:1.5rem; display:none;">
+                <div class="card-header">
+                    <h2><i class="fas fa-chart-bar" style="color:var(--primary); margin-right:8px;"></i>DASHBOARD</h2>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <select class="neural-input" id="dashPeriod" style="margin:0; width:auto; font-size:0.8rem; padding:6px 10px; height:36px;">
+                            <option value="7">Últimos 7 dias</option>
+                            <option value="30" selected>Últimos 30 dias</option>
+                            <option value="90">Últimos 90 dias</option>
+                            <option value="365">Este ano</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="padding: clamp(0.75rem, 3vw, 1.5rem);">
+
+                    <!-- KPI Row -->
+                    <div class="dash-kpi-row" id="dashKpis"></div>
+
+                    <!-- Charts Grid -->
+                    <div class="dash-charts-grid">
+                        <!-- OS por dia (barras) -->
+                        <div class="dash-chart-card">
+                            <div class="dash-chart-title"><i class="fas fa-calendar-alt"></i> O.S. por Dia</div>
+                            <canvas id="chartOsDay" class="dash-canvas"></canvas>
+                        </div>
+                        <!-- Status pizza -->
+                        <div class="dash-chart-card">
+                            <div class="dash-chart-title"><i class="fas fa-chart-pie"></i> Status das O.S.</div>
+                            <canvas id="chartStatus" class="dash-canvas" style="max-width:220px; margin:0 auto; display:block;"></canvas>
+                            <div id="chartStatusLegend" class="dash-legend"></div>
+                        </div>
+                        <!-- Prioridade pizza -->
+                        <div class="dash-chart-card">
+                            <div class="dash-chart-title"><i class="fas fa-exclamation-triangle"></i> Prioridade</div>
+                            <canvas id="chartPrio" class="dash-canvas" style="max-width:220px; margin:0 auto; display:block;"></canvas>
+                            <div id="chartPrioLegend" class="dash-legend"></div>
+                        </div>
+                        <!-- Técnicos ranking -->
+                        <div class="dash-chart-card">
+                            <div class="dash-chart-title"><i class="fas fa-users"></i> Técnicos</div>
+                            <div id="chartTechs"></div>
+                        </div>
+                        <!-- Anotações por dia -->
+                        <div class="dash-chart-card">
+                            <div class="dash-chart-title"><i class="fas fa-sticky-note"></i> Anotações por Dia</div>
+                            <canvas id="chartNotesDay" class="dash-canvas"></canvas>
+                        </div>
+                        <!-- Tempo médio resolução -->
+                        <div class="dash-chart-card">
+                            <div class="dash-chart-title"><i class="fas fa-clock"></i> Tempo Médio (horas)</div>
+                            <div id="chartAvgTime" style="display:flex; align-items:center; justify-content:center; height:140px; flex-direction:column; gap:8px;">
+                                <div id="dashAvgTimeVal" style="font-size:3rem; font-weight:800; background:var(--gradient-neural); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">—</div>
+                                <div style="font-size:0.75rem; color:var(--text-muted);">da abertura até conclusão</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Últimas OS tabela -->
+                    <div class="dash-chart-card" style="margin-top:1rem;">
+                        <div class="dash-chart-title"><i class="fas fa-list-alt"></i> Últimas Ordens de Serviço</div>
+                        <div style="overflow-x:auto;">
+                            <table class="dash-table" id="dashRecentOs"></table>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ═══ CHECKLIST DE MATERIAL ═══ -->
+            <section id="checkPanel" class="neural-card" style="margin-top:1.5rem; display:none;">
+                <div class="card-header">
+                    <h2><i class="fas fa-toolbox" style="color:var(--primary); margin-right:8px;"></i>CHECKLIST DE MATERIAL</h2>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                        <button class="btn-secondary" id="btnCheckClear" style="font-size:0.78rem; padding:6px 12px; height:36px;"><i class="fas fa-undo"></i> <span class="btn-label">Limpar</span></button>
+                        <button class="btn-primary" id="btnCheckSave" style="font-size:0.78rem; padding:6px 14px; height:36px;"><i class="fas fa-save"></i> <span class="btn-label">Salvar</span></button>
+                        <button class="btn-secondary" id="btnCheckPrint" style="font-size:0.78rem; padding:6px 12px; height:36px;"><i class="fas fa-print"></i></button>
+                    </div>
+                </div>
+                <div style="padding: clamp(0.75rem, 3vw, 1.5rem);">
+
+                    <!-- Identificação -->
+                    <div class="check-id-row">
+                        <div class="check-id-field">
+                            <label class="check-label"><i class="fas fa-user-cog"></i> Técnico</label>
+                            <input type="text" class="neural-input" id="checkTech" placeholder="Nome do técnico" style="margin:0;">
+                        </div>
+                        <div class="check-id-field">
+                            <label class="check-label"><i class="fas fa-calendar"></i> Data</label>
+                            <input type="date" class="neural-input" id="checkDate" style="margin:0;">
+                        </div>
+                        <div class="check-id-field">
+                            <label class="check-label"><i class="fas fa-hashtag"></i> O.S. / Referência</label>
+                            <input type="text" class="neural-input" id="checkRef" placeholder="Ex: #0023" style="margin:0;">
+                        </div>
+                    </div>
+
+                    <!-- Materiais com quantidade -->
+                    <div class="check-section-title"><i class="fas fa-boxes"></i> Materiais</div>
+                    <div class="check-grid" id="checkMaterials"></div>
+
+                    <!-- Ferramentas sim/não -->
+                    <div class="check-section-title" style="margin-top:1.25rem;"><i class="fas fa-tools"></i> Ferramentas</div>
+                    <div class="check-tools-grid" id="checkTools"></div>
+
+                    <!-- Observações -->
+                    <div class="check-section-title" style="margin-top:1.25rem;"><i class="fas fa-comment-alt"></i> Observações</div>
+                    <textarea class="neural-input" id="checkObs" placeholder="Observações gerais..." style="min-height:80px; resize:vertical;"></textarea>
+
+                    <!-- Histórico -->
+                    <div class="check-section-title" style="margin-top:1.25rem;"><i class="fas fa-history"></i> Histórico Salvo</div>
+                    <div id="checkHistory"></div>
+                </div>
+            </section>
+
+            <div id="checkPrintTarget" style="display:none;"></div>
+
+
+                Projeto Inforwnet Anotação v4.5 - Criado por
                 <a href="https://www.instagram.com/daniel.dev_2" target="_blank">Daniel Santos</a>
                 <i class="fab fa-instagram"></i> @daniel.dev_2
             </footer>
@@ -1545,12 +1905,33 @@
             const query   = (document.getElementById('osSearch')?.value || '').toLowerCase();
             const stFil   = document.getElementById('osFilterStatus')?.value || 'all';
             const prFil   = document.getElementById('osFilterPriority')?.value || 'all';
+            const dateFil = document.getElementById('osFilterDate')?.value || 'all';
+            const dateFrom = document.getElementById('osFilterDateFrom')?.value;
+            const dateTo   = document.getElementById('osFilterDateTo')?.value;
+
+            const now = Date.now();
+            const todayStart = startOfDay(now);
+            const weekStart  = todayStart - 6 * 86400000;
+            const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
 
             const filtered = allOS.filter(os => {
-                const txt = (os.client + os.desc + os.device + os.tech).toLowerCase();
-                return txt.includes(query)
-                    && (stFil === 'all' || os.status === stFil)
-                    && (prFil === 'all' || os.priority === prFil);
+                const txt = (os.client + os.desc + (os.device||'') + (os.tech||'')).toLowerCase();
+                if (!txt.includes(query)) return false;
+                if (stFil !== 'all' && os.status !== stFil) return false;
+                if (prFil !== 'all' && os.priority !== prFil) return false;
+                const ts = os.createdAt || 0;
+                if (dateFil === 'today' && ts < todayStart) return false;
+                if (dateFil === 'week'  && ts < weekStart)  return false;
+                if (dateFil === 'month' && ts < monthStart.getTime()) return false;
+                if (dateFrom) {
+                    const from = new Date(dateFrom + 'T00:00:00').getTime();
+                    if (ts < from) return false;
+                }
+                if (dateTo) {
+                    const to = new Date(dateTo + 'T23:59:59').getTime();
+                    if (ts > to) return false;
+                }
+                return true;
             });
 
             const cols = { aguardando: [], andamento: [], concluido: [] };
@@ -1606,10 +1987,569 @@
         document.getElementById('osSearch').oninput = renderOS;
         document.getElementById('osFilterStatus').onchange = renderOS;
         document.getElementById('osFilterPriority').onchange = renderOS;
+        document.getElementById('osFilterDate').onchange = renderOS;
+        document.getElementById('osFilterDateFrom').onchange = renderOS;
+        document.getElementById('osFilterDateTo').onchange = renderOS;
 
         // ── INICIALIZAR OS quando logado ───────────────────────────
         auth.onAuthStateChanged(user => {
             if (user) loadOS();
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        //  DASHBOARD
+        // ═══════════════════════════════════════════════════════════
+        let dashOpen = false;
+
+        document.getElementById('btnDashToggle').onclick = () => {
+            dashOpen = !dashOpen;
+            const panel = document.getElementById('dashPanel');
+            const btn   = document.getElementById('btnDashToggle');
+            panel.style.display = dashOpen ? 'block' : 'none';
+            btn.classList.toggle('active', dashOpen);
+            if (dashOpen) {
+                renderDashboard();
+                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        };
+
+        document.getElementById('dashPeriod').onchange = () => { if (dashOpen) renderDashboard(); };
+
+        function getDashDays() { return parseInt(document.getElementById('dashPeriod').value) || 30; }
+
+        function startOfDay(ts) {
+            const d = new Date(ts); d.setHours(0,0,0,0); return d.getTime();
+        }
+
+        function renderDashboard() {
+            const days = getDashDays();
+            const now  = Date.now();
+            const cutoff = now - days * 86400000;
+
+            const osInPeriod = allOS.filter(o => o.createdAt >= cutoff);
+            const notesInPeriod = allNotes.filter(n => n.createdAt >= cutoff);
+
+            // ── KPIs ──────────────────────────────────────────────
+            const concluded = osInPeriod.filter(o => o.status === 'concluido');
+            const avgMs = concluded.length
+                ? concluded.reduce((s, o) => s + ((o.updatedAt || o.createdAt) - o.createdAt), 0) / concluded.length
+                : null;
+            const avgH = avgMs !== null ? (avgMs / 3600000).toFixed(1) : '—';
+
+            const taxa = osInPeriod.length ? Math.round(concluded.length / osInPeriod.length * 100) : 0;
+
+            document.getElementById('dashKpis').innerHTML = `
+                <div class="dash-kpi">
+                    <div class="dash-kpi-icon">📋</div>
+                    <div class="dash-kpi-val" style="color:var(--primary);">${osInPeriod.length}</div>
+                    <div class="dash-kpi-label">O.S. abertas</div>
+                    <div class="dash-kpi-sub">últimos ${days} dias</div>
+                </div>
+                <div class="dash-kpi">
+                    <div class="dash-kpi-icon">✅</div>
+                    <div class="dash-kpi-val" style="color:var(--success);">${concluded.length}</div>
+                    <div class="dash-kpi-label">Concluídas</div>
+                    <div class="dash-kpi-sub">taxa: ${taxa}%</div>
+                </div>
+                <div class="dash-kpi">
+                    <div class="dash-kpi-icon">⏳</div>
+                    <div class="dash-kpi-val" style="color:#ffaa00;">${osInPeriod.filter(o=>o.status==='aguardando').length}</div>
+                    <div class="dash-kpi-label">Aguardando</div>
+                    <div class="dash-kpi-sub">${osInPeriod.filter(o=>o.status==='andamento').length} em andamento</div>
+                </div>
+                <div class="dash-kpi">
+                    <div class="dash-kpi-icon">📝</div>
+                    <div class="dash-kpi-val">${notesInPeriod.length}</div>
+                    <div class="dash-kpi-label">Anotações</div>
+                    <div class="dash-kpi-sub">${notesInPeriod.filter(n=>n.completed).length} finalizadas</div>
+                </div>
+            `;
+
+            document.getElementById('dashAvgTimeVal').textContent = avgH;
+
+            // ── O.S. POR DIA (barras) ─────────────────────────────
+            drawBarChart('chartOsDay', osInPeriod, days);
+
+            // ── STATUS PIZZA ──────────────────────────────────────
+            const statusData = [
+                { label:'Aguardando', val: osInPeriod.filter(o=>o.status==='aguardando').length, color:'#ffaa00' },
+                { label:'Andamento',  val: osInPeriod.filter(o=>o.status==='andamento').length,  color:'var(--primary-raw,#00d4ff)' },
+                { label:'Concluído',  val: osInPeriod.filter(o=>o.status==='concluido').length,  color:'#00ff9d' },
+            ];
+            drawDonut('chartStatus', statusData, 'chartStatusLegend');
+
+            // ── PRIORIDADE PIZZA ──────────────────────────────────
+            const prioData = [
+                { label:'Normal',   val: osInPeriod.filter(o=>o.priority==='normal').length,   color:'#64748b' },
+                { label:'Urgente',  val: osInPeriod.filter(o=>o.priority==='urgente').length,  color:'#ffaa00' },
+                { label:'Crítico',  val: osInPeriod.filter(o=>o.priority==='critico').length,  color:'#ff004c' },
+            ];
+            drawDonut('chartPrio', prioData, 'chartPrioLegend');
+
+            // ── TÉCNICOS ──────────────────────────────────────────
+            const techMap = {};
+            osInPeriod.forEach(o => {
+                const t = o.tech || 'Sem técnico';
+                techMap[t] = (techMap[t] || 0) + 1;
+            });
+            const techArr = Object.entries(techMap).sort((a,b)=>b[1]-a[1]).slice(0, 6);
+            const maxTech = techArr[0]?.[1] || 1;
+            document.getElementById('chartTechs').innerHTML = techArr.length
+                ? techArr.map(([name, cnt]) => `
+                    <div class="tech-row">
+                        <span class="tech-name" title="${name}">${name}</span>
+                        <div class="tech-bar-wrap"><div class="tech-bar" style="width:${Math.round(cnt/maxTech*100)}%"></div></div>
+                        <span class="tech-count">${cnt}</span>
+                    </div>`).join('')
+                : '<div class="os-empty"><i class="fas fa-users"></i>Sem dados</div>';
+
+            // ── ANOTAÇÕES POR DIA ─────────────────────────────────
+            drawBarChart('chartNotesDay', notesInPeriod, days, '#a78bfa');
+
+            // ── TABELA RECENTES ───────────────────────────────────
+            const recentes = [...allOS].sort((a,b)=>b.createdAt-a.createdAt).slice(0,10);
+            const statusStyle = {
+                aguardando: 'background:rgba(255,170,0,0.15);color:#ffaa00;',
+                andamento:  'background:rgba(0,212,255,0.15);color:#00d4ff;',
+                concluido:  'background:rgba(0,255,157,0.15);color:#00ff9d;',
+            };
+            const statusLbl = { aguardando:'Aguardando', andamento:'Em Andamento', concluido:'Concluído' };
+            const prioLbl   = { normal:'Normal', urgente:'⚡ Urgente', critico:'🔥 Crítico' };
+            document.getElementById('dashRecentOs').innerHTML = `
+                <thead><tr>
+                    <th>#</th><th>Cliente</th><th>Serviço</th><th>Técnico</th><th>Prioridade</th><th>Status</th><th>Data</th>
+                </tr></thead>
+                <tbody>${recentes.map(o => `<tr>
+                    <td style="font-family:monospace; color:var(--primary);">#${String(o.numero).padStart(4,'0')}</td>
+                    <td style="font-weight:600;">${o.client}</td>
+                    <td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${o.desc}</td>
+                    <td>${o.tech || '—'}</td>
+                    <td>${prioLbl[o.priority] || o.priority}</td>
+                    <td><span class="dash-status-badge" style="${statusStyle[o.status]}">${statusLbl[o.status]}</span></td>
+                    <td style="white-space:nowrap;">${new Date(o.createdAt).toLocaleDateString('pt-BR')}</td>
+                </tr>`).join('')}</tbody>`;
+        }
+
+        // ── CANVAS HELPERS ─────────────────────────────────────────
+        function drawBarChart(canvasId, items, days, color) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const W = canvas.offsetWidth || 300;
+            const H = 160;
+            canvas.width = W; canvas.height = H;
+            ctx.clearRect(0, 0, W, H);
+
+            const isDark = document.body.getAttribute('data-theme') !== 'light';
+            const barColor = color || (isDark ? '#00d4ff' : '#0088cc');
+            const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
+            const textColor = isDark ? '#64748b' : '#718096';
+
+            // bucket per day
+            const now = Date.now();
+            const buckets = Array.from({ length: days }, (_, i) => {
+                const dayStart = startOfDay(now - (days - 1 - i) * 86400000);
+                const dayEnd   = dayStart + 86400000;
+                return items.filter(x => x.createdAt >= dayStart && x.createdAt < dayEnd).length;
+            });
+            const maxVal = Math.max(...buckets, 1);
+
+            const padL = 28, padR = 8, padT = 8, padB = 28;
+            const chartW = W - padL - padR;
+            const chartH = H - padT - padB;
+            const barW   = Math.max(2, Math.floor(chartW / days) - 2);
+
+            // grid lines
+            for (let i = 0; i <= 4; i++) {
+                const y = padT + chartH - (i / 4) * chartH;
+                ctx.strokeStyle = gridColor;
+                ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+                if (i === 0 || i === 2 || i === 4) {
+                    ctx.fillStyle = textColor;
+                    ctx.font = '10px Outfit, sans-serif';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(Math.round(maxVal * i / 4), padL - 3, y + 3);
+                }
+            }
+
+            // bars
+            buckets.forEach((val, i) => {
+                const x = padL + i * (chartW / days);
+                const bH = Math.max(0, (val / maxVal) * chartH);
+                const y  = padT + chartH - bH;
+                ctx.fillStyle = barColor;
+                ctx.globalAlpha = val === 0 ? 0.15 : 0.85;
+                const r = Math.min(3, barW / 2);
+                ctx.beginPath();
+                ctx.roundRect ? ctx.roundRect(x, y, barW, bH, [r, r, 0, 0]) : ctx.rect(x, y, barW, bH);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+
+            // x-axis labels - only show first, middle, last
+            ctx.fillStyle = textColor;
+            ctx.font = '10px Outfit, sans-serif';
+            ctx.textAlign = 'center';
+            [[0, days], [Math.floor(days/2), days], [days-1, days]].forEach(([i]) => {
+                const d = new Date(now - (days - 1 - i) * 86400000);
+                const lbl = `${d.getDate()}/${d.getMonth()+1}`;
+                const x = padL + i * (chartW / days) + barW / 2;
+                ctx.fillText(lbl, x, H - 6);
+            });
+        }
+
+        function drawDonut(canvasId, data, legendId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const size = Math.min(canvas.offsetWidth || 200, 200);
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, size, size);
+
+            const total = data.reduce((s, d) => s + d.val, 0);
+            const cx = size / 2, cy = size / 2, r = size * 0.38, inner = r * 0.55;
+            const isDark = document.body.getAttribute('data-theme') !== 'light';
+
+            // resolve CSS vars manually
+            const resolveColor = c => {
+                if (c.startsWith('var(')) {
+                    const map = { 'var(--primary-raw,#00d4ff)': isDark ? '#00d4ff' : '#0088cc' };
+                    return map[c] || '#00d4ff';
+                }
+                return c;
+            };
+
+            if (total === 0) {
+                ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+                ctx.lineWidth = r - inner;
+                ctx.beginPath(); ctx.arc(cx, cy, (r + inner) / 2, 0, Math.PI * 2); ctx.stroke();
+                ctx.fillStyle = isDark ? '#64748b' : '#718096';
+                ctx.font = `bold 13px Outfit, sans-serif`;
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('Sem dados', cx, cy);
+                if (legendId) document.getElementById(legendId).innerHTML = '';
+                return;
+            }
+
+            let angle = -Math.PI / 2;
+            data.forEach(d => {
+                const slice = (d.val / total) * Math.PI * 2;
+                if (slice === 0) return;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, r, angle, angle + slice);
+                ctx.closePath();
+                ctx.fillStyle = resolveColor(d.color);
+                ctx.fill();
+                angle += slice;
+            });
+
+            // donut hole
+            ctx.beginPath();
+            ctx.arc(cx, cy, inner, 0, Math.PI * 2);
+            ctx.fillStyle = isDark ? 'rgba(20,24,33,0.95)' : '#ffffff';
+            ctx.fill();
+
+            // center text
+            ctx.fillStyle = isDark ? '#fff' : '#1a1d21';
+            ctx.font = `bold 18px Outfit, sans-serif`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(total, cx, cy - 8);
+            ctx.font = `11px Outfit, sans-serif`;
+            ctx.fillStyle = isDark ? '#64748b' : '#718096';
+            ctx.fillText('total', cx, cy + 10);
+
+            if (legendId) {
+                document.getElementById(legendId).innerHTML = data
+                    .filter(d => d.val > 0)
+                    .map(d => `<div class="dash-legend-item">
+                        <div class="dash-legend-dot" style="background:${resolveColor(d.color)};"></div>
+                        <span>${d.label} (${d.val})</span>
+                    </div>`).join('');
+            }
+        }
+
+        // re-render charts on window resize (debounced)
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => { if (dashOpen) renderDashboard(); }, 200);
+        });
+
+        // also re-render when theme changes
+        const _origTheme = themeToggle.onclick;
+        themeToggle.onclick = () => {
+            _origTheme();
+            setTimeout(() => { if (dashOpen) renderDashboard(); }, 50);
+        };
+
+        // ═══════════════════════════════════════════════════════════
+        //  CHECKLIST DE MATERIAL
+        // ═══════════════════════════════════════════════════════════
+        const CHECK_MATERIALS = [
+            'DROP','CABO DE REDE','APC','UPC','RJ45',
+            'ONU','ONT','ROTEADOR','FONTE POE',
+            'CAM INTERNA','CAM EXTERNA','PLACA METRO',
+            'SWITCH','CAIXA DE EMENDA',
+            'AD. ONT','AD. ONU','AD. ROT'
+        ];
+        const CHECK_TOOLS = [
+            'ALIC. CORTE','ALIC. CRIMPAGEM','ALIC. UNIVERSAL',
+            'CANETA LASER','FIXA FIO'
+        ];
+
+        let checkPanelOpen = false;
+
+        // Toggle painel
+        document.getElementById('btnCheckToggle').onclick = () => {
+            checkPanelOpen = !checkPanelOpen;
+            const panel = document.getElementById('checkPanel');
+            const btn   = document.getElementById('btnCheckToggle');
+            panel.style.display = checkPanelOpen ? 'block' : 'none';
+            btn.classList.toggle('active', checkPanelOpen);
+            if (checkPanelOpen) {
+                buildCheckForm();
+                loadCheckHistory();
+                // Set today's date as default
+                const d = document.getElementById('checkDate');
+                if (!d.value) d.value = new Date().toISOString().slice(0,10);
+                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        };
+
+        function buildCheckForm() {
+            // Materials
+            const matContainer = document.getElementById('checkMaterials');
+            if (matContainer.children.length) return; // already built
+            matContainer.innerHTML = CHECK_MATERIALS.map(name => `
+                <div class="check-item" id="ci-${name.replace(/\W/g,'_')}">
+                    <span class="check-item-name">${name}</span>
+                    <div class="check-qty-wrap">
+                        <button class="check-qty-btn" onclick="chkQtyAdj('${name}',-1)" title="Diminuir">−</button>
+                        <input type="number" class="check-qty" id="qty-${name.replace(/\W/g,'_')}"
+                               value="0" min="0" max="9999"
+                               onchange="chkQtyChange('${name}', this.value)">
+                        <button class="check-qty-btn" onclick="chkQtyAdj('${name}',1)" title="Aumentar">+</button>
+                    </div>
+                </div>`).join('');
+
+            // Tools
+            const toolContainer = document.getElementById('checkTools');
+            if (toolContainer.children.length) return;
+            toolContainer.innerHTML = CHECK_TOOLS.map(name => `
+                <div class="check-tool" id="tool-${name.replace(/\W/g,'_')}" onclick="chkToolToggle('${name}')">
+                    <span class="check-tool-name">${name}</span>
+                    <div class="check-toggle"></div>
+                </div>`).join('');
+        }
+
+        window.chkQtyAdj = (name, delta) => {
+            const el = document.getElementById('qty-' + name.replace(/\W/g,'_'));
+            if (!el) return;
+            const newVal = Math.max(0, (parseInt(el.value)||0) + delta);
+            el.value = newVal;
+            chkQtyChange(name, newVal);
+        };
+
+        window.chkQtyChange = (name, val) => {
+            const item = document.getElementById('ci-' + name.replace(/\W/g,'_'));
+            if (item) item.classList.toggle('has-qty', parseInt(val) > 0);
+        };
+
+        window.chkToolToggle = (name) => {
+            const el = document.getElementById('tool-' + name.replace(/\W/g,'_'));
+            if (el) el.classList.toggle('checked');
+        };
+
+        // ── GET CURRENT STATE ──────────────────────────────────────
+        function getCheckState() {
+            const materials = {};
+            CHECK_MATERIALS.forEach(name => {
+                const el = document.getElementById('qty-' + name.replace(/\W/g,'_'));
+                materials[name] = el ? parseInt(el.value)||0 : 0;
+            });
+            const tools = {};
+            CHECK_TOOLS.forEach(name => {
+                const el = document.getElementById('tool-' + name.replace(/\W/g,'_'));
+                tools[name] = el ? el.classList.contains('checked') : false;
+            });
+            return {
+                tech:      document.getElementById('checkTech').value.trim(),
+                date:      document.getElementById('checkDate').value,
+                ref:       document.getElementById('checkRef').value.trim(),
+                obs:       document.getElementById('checkObs').value.trim(),
+                materials,
+                tools,
+                savedAt:   Date.now()
+            };
+        }
+
+        // ── APPLY STATE (ao carregar histórico) ──────────────────
+        function applyCheckState(state) {
+            buildCheckForm();
+            document.getElementById('checkTech').value = state.tech || '';
+            document.getElementById('checkDate').value = state.date || '';
+            document.getElementById('checkRef').value  = state.ref  || '';
+            document.getElementById('checkObs').value  = state.obs  || '';
+            CHECK_MATERIALS.forEach(name => {
+                const el = document.getElementById('qty-' + name.replace(/\W/g,'_'));
+                if (el) { el.value = state.materials?.[name] || 0; chkQtyChange(name, el.value); }
+            });
+            CHECK_TOOLS.forEach(name => {
+                const el = document.getElementById('tool-' + name.replace(/\W/g,'_'));
+                if (el) el.classList.toggle('checked', !!(state.tools?.[name]));
+            });
+        }
+
+        // ── CLEAR ─────────────────────────────────────────────────
+        document.getElementById('btnCheckClear').onclick = () => {
+            if (!confirm('Limpar todos os campos?')) return;
+            CHECK_MATERIALS.forEach(name => {
+                const el = document.getElementById('qty-' + name.replace(/\W/g,'_'));
+                if (el) { el.value = 0; chkQtyChange(name, 0); }
+            });
+            CHECK_TOOLS.forEach(name => {
+                const el = document.getElementById('tool-' + name.replace(/\W/g,'_'));
+                if (el) el.classList.remove('checked');
+            });
+            document.getElementById('checkTech').value = '';
+            document.getElementById('checkDate').value = new Date().toISOString().slice(0,10);
+            document.getElementById('checkRef').value  = '';
+            document.getElementById('checkObs').value  = '';
+            showToast('Checklist limpo!', 'info');
+        };
+
+        // ── SAVE ──────────────────────────────────────────────────
+        document.getElementById('btnCheckSave').onclick = async () => {
+            const state = getCheckState();
+            if (!state.tech) { showToast('Informe o técnico!', 'error'); return; }
+            await db.collection('checklists').add({ ...state, ownerUID: currentUser.uid });
+            showToast('Checklist salvo!', 'success');
+            loadCheckHistory();
+        };
+
+        // ── LOAD HISTORY ──────────────────────────────────────────
+        function loadCheckHistory() {
+            if (!currentUser) return;
+            db.collection('checklists')
+                .where('ownerUID','==', currentUser.uid)
+                .orderBy('savedAt','desc')
+                .limit(10)
+                .get()
+                .then(snap => {
+                    const list = [];
+                    snap.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
+                    renderCheckHistory(list);
+                });
+        }
+
+        function renderCheckHistory(list) {
+            const el = document.getElementById('checkHistory');
+            if (!list.length) {
+                el.innerHTML = `<div class="os-empty"><i class="fas fa-history"></i>Nenhum checklist salvo ainda.</div>`;
+                return;
+            }
+            const matCount = s => Object.values(s.materials||{}).reduce((a,v)=>a+(v>0?1:0),0);
+            const toolCount = s => Object.values(s.tools||{}).filter(Boolean).length;
+            el.innerHTML = list.map(s => {
+                const dt = new Date(s.savedAt).toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+                return `
+                <div class="check-hist-item">
+                    <div class="check-hist-meta">
+                        <div class="check-hist-name">
+                            <i class="fas fa-user-cog" style="color:var(--primary); margin-right:5px;"></i>${s.tech || 'Sem técnico'}
+                            ${s.ref ? `<span class="check-hist-badge" style="margin-left:6px;">${s.ref}</span>` : ''}
+                        </div>
+                        <div class="check-hist-sub">
+                            📅 ${s.date || dt} &nbsp;·&nbsp;
+                            📦 ${matCount(s)} material(is) &nbsp;·&nbsp;
+                            🔧 ${toolCount(s)} ferramenta(s)
+                            ${s.obs ? `<br>💬 ${s.obs.slice(0,60)}${s.obs.length>60?'…':''}` : ''}
+                        </div>
+                    </div>
+                    <div class="check-hist-actions">
+                        <button class="action-icon" style="color:var(--primary);" onclick="loadHistItem('${s.id}')" title="Carregar"><i class="fas fa-upload"></i></button>
+                        <button class="action-icon" style="color:var(--text-muted);" onclick="printHistItem('${s.id}')" title="Imprimir"><i class="fas fa-print"></i></button>
+                        <button class="action-icon" style="color:var(--secondary);" onclick="deleteHistItem('${s.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+            // cache list for quick access
+            window._checkHistCache = list;
+        }
+
+        window.loadHistItem = (id) => {
+            const s = (window._checkHistCache||[]).find(x=>x.id===id);
+            if (!s) return;
+            applyCheckState(s);
+            document.getElementById('checkPanel').scrollIntoView({ behavior:'smooth', block:'start' });
+            showToast('Checklist carregado!', 'info');
+        };
+
+        window.deleteHistItem = async (id) => {
+            if (!confirm('Excluir este registro?')) return;
+            await db.collection('checklists').doc(id).delete();
+            showToast('Registro excluído.', 'info');
+            loadCheckHistory();
+        };
+
+        // ── IMPRIMIR ──────────────────────────────────────────────
+        function buildPrintHtml(state) {
+            const matRows = CHECK_MATERIALS
+                .filter(n => (state.materials?.[n]||0) > 0)
+                .map(n => `<tr><td>${n}</td><td style="text-align:center; font-weight:bold;">${state.materials[n]}</td></tr>`)
+                .join('');
+            const toolRows = CHECK_TOOLS
+                .map(n => `<tr><td>${n}</td><td style="text-align:center;">${state.tools?.[n]?'✅ SIM':'❌ NÃO'}</td></tr>`)
+                .join('');
+            const dt = state.date || new Date().toLocaleDateString('pt-BR');
+            return `
+            <div style="font-family:Arial,sans-serif; max-width:500px; padding:20px; border:2px solid #000; margin:0 auto;">
+                <div style="text-align:center; border-bottom:2px dashed #000; padding-bottom:10px; margin-bottom:12px;">
+                    <strong style="font-size:1.3rem;">INFORWNET — CHECKLIST DE MATERIAL</strong>
+                </div>
+                <table style="width:100%; font-size:0.85rem; margin-bottom:10px;">
+                    <tr><td><b>Técnico:</b></td><td>${state.tech||'—'}</td></tr>
+                    <tr><td><b>Data:</b></td><td>${dt}</td></tr>
+                    <tr><td><b>Referência:</b></td><td>${state.ref||'—'}</td></tr>
+                </table>
+                <div style="border-top:1px dashed #000; padding-top:10px; margin-bottom:6px;"><strong>📦 MATERIAIS</strong></div>
+                ${matRows ? `<table style="width:100%; font-size:0.85rem; border-collapse:collapse;">
+                    <thead><tr style="background:#eee;"><th style="padding:4px 8px; text-align:left;">Item</th><th style="padding:4px 8px;">Qtd</th></tr></thead>
+                    <tbody>${matRows}</tbody>
+                </table>` : '<p style="color:#666; font-size:0.8rem;">Nenhum material selecionado.</p>'}
+                <div style="border-top:1px dashed #000; padding-top:10px; margin:10px 0 6px;"><strong>🔧 FERRAMENTAS</strong></div>
+                <table style="width:100%; font-size:0.85rem; border-collapse:collapse;">
+                    <tbody>${toolRows}</tbody>
+                </table>
+                ${state.obs ? `<div style="border-top:1px dashed #000; padding-top:8px; margin-top:10px; font-size:0.82rem;"><b>Obs:</b> ${state.obs}</div>` : ''}
+                <div style="border-top:2px dashed #000; margin-top:16px; padding-top:10px; text-align:center; font-size:0.75rem; color:#555;">
+                    Assinatura: ________________________
+                </div>
+            </div>`;
+        }
+
+        document.getElementById('btnCheckPrint').onclick = () => {
+            const state = getCheckState();
+            document.getElementById('checkPrintTarget').innerHTML = buildPrintHtml(state);
+            document.getElementById('checkPrintTarget').style.display = 'block';
+            window.print();
+            document.getElementById('checkPrintTarget').style.display = 'none';
+        };
+
+        window.printHistItem = (id) => {
+            const s = (window._checkHistCache||[]).find(x=>x.id===id);
+            if (!s) return;
+            document.getElementById('checkPrintTarget').innerHTML = buildPrintHtml(s);
+            document.getElementById('checkPrintTarget').style.display = 'block';
+            window.print();
+            document.getElementById('checkPrintTarget').style.display = 'none';
+        };
+
+        // ── INICIALIZAR QUANDO LOGADO ─────────────────────────────
+        auth.onAuthStateChanged(user => {
+            if (user && checkPanelOpen) loadCheckHistory();
         });
 
     </script>
