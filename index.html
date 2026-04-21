@@ -1008,6 +1008,20 @@
                 <option value="false">Em Aberto</option>
                 <option value="true">Finalizada ✅</option>
             </select>
+
+            <!-- FOTOS DA ANOTAÇÃO (modal) -->
+            <div class="photo-section">
+                <div class="photo-section-label"><i class="fas fa-camera"></i> Fotos</div>
+                <label class="photo-upload-btn">
+                    <input type="file" id="modalNotePhotoInput" accept="image/*" multiple style="display:none;" onchange="handleModalNotePhotos(this)">
+                    <i class="fas fa-plus"></i> Adicionar Foto
+                </label>
+                <div class="photo-uploading" id="modalNotePhotoUploading" style="display:none;">
+                    <i class="fas fa-spinner fa-spin"></i> Enviando...
+                </div>
+                <div class="photo-preview-grid" id="modalNotePhotoPreview"></div>
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <button class="btn-primary" id="btnModalSave">SALVAR</button>
                 <button class="btn-secondary" onclick="closeEditModal()">CANCELAR</button>
@@ -1124,6 +1138,20 @@
                                 <option value="false">Em Aberto</option>
                                 <option value="true">Finalizada ✅</option>
                             </select>
+
+                            <!-- FOTOS (editor lateral) -->
+                            <div class="photo-section" style="margin-bottom:1rem;">
+                                <div class="photo-section-label"><i class="fas fa-camera"></i> Fotos</div>
+                                <label class="photo-upload-btn">
+                                    <input type="file" id="sideNotePhotoInput" accept="image/*" multiple style="display:none;" onchange="handleSideNotePhotos(this)">
+                                    <i class="fas fa-plus"></i> Adicionar Foto
+                                </label>
+                                <div class="photo-uploading" id="sideNotePhotoUploading" style="display:none;">
+                                    <i class="fas fa-spinner fa-spin"></i> Enviando...
+                                </div>
+                                <div class="photo-preview-grid" id="sideNotePhotoPreview"></div>
+                            </div>
+
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                 <button class="btn-primary" id="btnSave">SALVAR</button>
                                 <button class="btn-secondary" id="btnCancel">LIMPAR</button>
@@ -1526,6 +1554,13 @@
             document.getElementById('modalNoteContent').value = n.content;
             document.getElementById('modalNotePublic').value = n.public.toString();
             document.getElementById('modalNoteCompleted').value = n.completed.toString();
+            // carregar fotos existentes
+            modalNotePhotos = n.photos ? [...n.photos] : [];
+            const grid = document.getElementById('modalNotePhotoPreview');
+            grid.innerHTML = '';
+            modalNotePhotos.forEach(url => addPhotoThumb(url, 'modalNotePhotoPreview', () => {
+                modalNotePhotos = modalNotePhotos.filter(u => u !== url);
+            }));
             document.getElementById('editModalOverlay').classList.add('open');
             setTimeout(() => document.getElementById('modalNoteTitle').focus(), 300);
         }
@@ -1533,6 +1568,8 @@
         function closeEditModal() {
             document.getElementById('editModalOverlay').classList.remove('open');
             editId = null;
+            modalNotePhotos = [];
+            document.getElementById('modalNotePhotoPreview').innerHTML = '';
         }
 
         // Fechar modal ao clicar fora
@@ -1645,6 +1682,7 @@
                         </button>
                     </div>
                     <p style="margin:10px 0; font-size:0.9rem; color:var(--text-secondary); padding-left:28px; white-space:pre-wrap; word-break:break-word;">${n.content}</p>
+                    ${n.photos?.length ? `<div class="os-card-photos" style="padding-left:28px; margin-bottom:6px;">${n.photos.map(u=>`<img class="os-card-photo" src="${u}" onclick="openLightbox('${u}')" alt="foto">`).join('')}</div>` : ''}
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; border-top:1px solid var(--border-alpha); padding-top:8px">
                         <span class="note-badge ${n.public ? 'badge-public' : 'badge-private'}">${n.public ? 'PÚBLICA' : 'PRIVADA'}</span>
                         <div>
@@ -1754,7 +1792,6 @@
         };
 
         // ─── EDITAR NOTA ──────────────────────────────────────────────────────────
-        // Sempre abre o modal centralizado para editar (melhor experiência em qualquer tela)
         window.editNote = (id) => {
             openEditModal(id);
         };
@@ -1768,7 +1805,8 @@
                 title,
                 content: document.getElementById('noteContent').value,
                 public: document.getElementById('notePublic').value === 'true',
-                completed: document.getElementById('noteCompleted').value === 'true',
+                completed: document.getElementById('noteCompleted').value === 'false' ? false : true,
+                photos: [...sideNotePhotos],
                 ownerUID: currentUser.uid,
                 ownerEmail: currentUser.email,
                 createdAt: editId ? allNotes.find(x => x.id === editId)?.createdAt || Date.now() : Date.now()
@@ -1800,6 +1838,8 @@
             document.getElementById('notePublic').value = 'true';
             document.getElementById('noteCompleted').value = 'false';
             editId = null;
+            sideNotePhotos = [];
+            document.getElementById('sideNotePhotoPreview').innerHTML = '';
         }
 
         document.getElementById('btnCancel').onclick = clearEditor;
@@ -1831,6 +1871,7 @@
                 content: document.getElementById('modalNoteContent').value,
                 public: document.getElementById('modalNotePublic').value === 'true',
                 completed: document.getElementById('modalNoteCompleted').value === 'true',
+                photos: [...modalNotePhotos],
                 ownerUID: currentUser.uid,
                 ownerEmail: currentUser.email,
                 createdAt: Date.now()
@@ -1838,7 +1879,6 @@
             await db.collection('notes').add(data);
             showToast('Anotação criada!', 'success');
             closeEditModal();
-            // Restaura o botão para editar
             document.getElementById('btnModalSave').onclick = null;
         }
 
@@ -1852,6 +1892,7 @@
                 content: document.getElementById('modalNoteContent').value,
                 public: document.getElementById('modalNotePublic').value === 'true',
                 completed: document.getElementById('modalNoteCompleted').value === 'true',
+                photos: [...modalNotePhotos],
                 ownerUID: currentUser.uid,
                 ownerEmail: currentUser.email,
                 createdAt: allNotes.find(x => x.id === editId)?.createdAt || Date.now()
@@ -2669,8 +2710,10 @@
         const CL_URL    = `https://api.cloudinary.com/v1_1/${CL_CLOUD}/image/upload`;
 
         // Arrays temporários de URLs enquanto o form está aberto
-        let osPhotos    = [];   // URLs das fotos da O.S. atual
-        let checkPhotos = [];   // URLs das fotos do checklist atual
+        let osPhotos       = [];   // fotos da O.S.
+        let checkPhotos    = [];   // fotos do checklist
+        let modalNotePhotos = [];  // fotos no modal de anotação
+        let sideNotePhotos  = [];  // fotos no editor lateral
 
         // ── UPLOAD genérico ────────────────────────────────────────
         async function uploadToCloudinary(file, folder) {
@@ -2715,6 +2758,44 @@
                     checkPhotos.push(url);
                     addPhotoThumb(url, 'checkPhotoPreview', () => {
                         checkPhotos = checkPhotos.filter(u => u !== url);
+                    });
+                } catch(e) { showToast('Erro ao enviar foto: ' + e.message, 'error'); }
+            }
+            upEl.style.display = 'none';
+            input.value = '';
+        };
+
+        // ── HANDLER — fotos do modal de anotação ───────────────────
+        window.handleModalNotePhotos = async (input) => {
+            const files = [...input.files];
+            if (!files.length) return;
+            const upEl = document.getElementById('modalNotePhotoUploading');
+            upEl.style.display = 'flex';
+            for (const file of files) {
+                try {
+                    const url = await uploadToCloudinary(file, 'notes');
+                    modalNotePhotos.push(url);
+                    addPhotoThumb(url, 'modalNotePhotoPreview', () => {
+                        modalNotePhotos = modalNotePhotos.filter(u => u !== url);
+                    });
+                } catch(e) { showToast('Erro ao enviar foto: ' + e.message, 'error'); }
+            }
+            upEl.style.display = 'none';
+            input.value = '';
+        };
+
+        // ── HANDLER — fotos do editor lateral ─────────────────────
+        window.handleSideNotePhotos = async (input) => {
+            const files = [...input.files];
+            if (!files.length) return;
+            const upEl = document.getElementById('sideNotePhotoUploading');
+            upEl.style.display = 'flex';
+            for (const file of files) {
+                try {
+                    const url = await uploadToCloudinary(file, 'notes');
+                    sideNotePhotos.push(url);
+                    addPhotoThumb(url, 'sideNotePhotoPreview', () => {
+                        sideNotePhotos = sideNotePhotos.filter(u => u !== url);
                     });
                 } catch(e) { showToast('Erro ao enviar foto: ' + e.message, 'error'); }
             }
