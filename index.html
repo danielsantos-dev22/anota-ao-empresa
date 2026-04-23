@@ -963,23 +963,25 @@
         .btn-pdf { background:rgba(255,0,76,0.1); border:1px solid rgba(255,0,76,0.3); color:var(--secondary); border-radius:8px; padding:6px 12px; font-size:0.78rem; cursor:pointer; transition:0.2s; font-family:'Outfit',sans-serif; font-weight:600; display:flex; align-items:center; gap:6px; white-space:nowrap; }
         .btn-pdf:hover { background:var(--secondary); color:white; }
 
-        /* ═══ INSTALL PWA BANNER ════════════════════════════════════ */
-        .pwa-banner { position:fixed; bottom:5rem; left:50%; transform:translateX(-50%) translateY(120px); z-index:9997; background:var(--bg-card); border:1px solid var(--primary); border-radius:var(--radius-xl); padding:1rem 1.5rem; display:flex; align-items:center; gap:1rem; box-shadow:0 8px 32px rgba(0,212,255,0.2); transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1); max-width:360px; width:90%; }
-        .pwa-banner.show { transform:translateX(-50%) translateY(0); }
-        .pwa-banner-text { flex:1; font-size:0.82rem; }
-        .pwa-banner-text strong { display:block; margin-bottom:2px; }
-        .pwa-banner-text span { color:var(--text-muted); font-size:0.72rem; }
+        /* ═══ INSTALL MODAL STEPS ══════════════════════════════════ */
+        .install-step { display:flex; align-items:flex-start; gap:14px; margin-bottom:1rem; font-size:0.88rem; color:var(--text-secondary); }
+        .install-num { background:var(--gradient-neural); color:white; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.8rem; flex-shrink:0; margin-top:1px; }
     </style>
 </head>
 
 <body>
     <div class="bg-glow"></div>
     <div class="offline-banner" id="offlineBanner">📡 Sem conexão — trabalhando offline. Os dados serão sincronizados quando voltar.</div>
-    <div class="pwa-banner" id="pwaBanner">
-        <i class="fas fa-mobile-alt" style="font-size:1.8rem; color:var(--primary);"></i>
-        <div class="pwa-banner-text"><strong>Instalar Inforwnet</strong><span>Adicione à tela inicial para acesso rápido</span></div>
-        <button class="btn-primary" id="btnPwaInstall" style="padding:8px 14px; font-size:0.8rem; white-space:nowrap;">Instalar</button>
-        <button onclick="document.getElementById('pwaBanner').classList.remove('show')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1.1rem;padding:4px;">✕</button>
+
+    <!-- MODAL INSTALAR APP -->
+    <div class="edit-modal-overlay" id="installModalOverlay" style="z-index:9999;">
+        <div class="edit-modal" style="max-width:400px;">
+            <div class="edit-modal-header">
+                <h3><i class="fas fa-mobile-alt"></i> INSTALAR APP</h3>
+                <button class="modal-close" onclick="document.getElementById('installModalOverlay').classList.remove('open')"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="installContent"></div>
+        </div>
     </div>
 
     <!-- TOAST -->
@@ -1173,6 +1175,7 @@
                     <button class="os-nav-btn" id="btnCheckToggle"><i class="fas fa-toolbox"></i> <span class="btn-label">MATERIAL</span></button>
                     <button class="view-toggle" id="viewToggle"><i class="fas fa-th-large"></i> <span class="btn-label">STICKY</span></button>
                     <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+                    <button class="os-nav-btn" id="btnInstallApp" title="Instalar App" onclick="openInstallModal()"><i class="fas fa-download"></i></button>
                     <button class="btn-secondary" id="btnLogout" style="height:38px; padding: 0 12px;"><i class="fas fa-power-off"></i></button>
                 </div>
             </header>
@@ -1508,17 +1511,71 @@
 
         // ── PWA INSTALL ────────────────────────────────────────────
         let deferredInstall = null;
+
         window.addEventListener('beforeinstallprompt', e => {
             e.preventDefault();
             deferredInstall = e;
-            setTimeout(() => document.getElementById('pwaBanner').classList.add('show'), 3000);
+            // highlight install button
+            const btn = document.getElementById('btnInstallApp');
+            if (btn) { btn.style.background = 'var(--gradient-neural)'; btn.style.color = 'white'; }
         });
-        document.getElementById('btnPwaInstall').onclick = async () => {
-            if (!deferredInstall) return;
-            deferredInstall.prompt();
-            const { outcome } = await deferredInstall.userChoice;
-            if (outcome === 'accepted') document.getElementById('pwaBanner').classList.remove('show');
+
+        window.addEventListener('appinstalled', () => {
             deferredInstall = null;
+            showToast('App instalado com sucesso! 🎉', 'success');
+            const btn = document.getElementById('btnInstallApp');
+            if (btn) { btn.style.background = ''; btn.style.color = ''; }
+        });
+
+        window.openInstallModal = () => {
+            const isIOS     = /iphone|ipad|ipod/i.test(navigator.userAgent);
+            const isAndroid = /android/i.test(navigator.userAgent);
+            const isChrome  = /chrome/i.test(navigator.userAgent);
+            const isSafari  = /safari/i.test(navigator.userAgent) && !isChrome;
+            const content   = document.getElementById('installContent');
+
+            if (deferredInstall) {
+                // Native prompt available — trigger it directly
+                document.getElementById('installModalOverlay').classList.remove('open');
+                deferredInstall.prompt();
+                deferredInstall.userChoice.then(({ outcome }) => {
+                    if (outcome === 'accepted') showToast('App instalado! 🎉', 'success');
+                    deferredInstall = null;
+                });
+                return;
+            }
+
+            // No native prompt — show manual instructions
+            if (isIOS && isSafari) {
+                content.innerHTML = `
+                    <div style="text-align:center; padding:0.5rem 0 1.5rem;">
+                        <i class="fas fa-apple" style="font-size:3rem; color:var(--primary); margin-bottom:1rem; display:block;"></i>
+                        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1.5rem;">Siga os passos no Safari:</p>
+                    </div>
+                    <div class="install-step"><span class="install-num">1</span><span>Toque no botão <strong>Compartilhar</strong> <i class="fas fa-share-square" style="color:var(--primary);"></i> na barra inferior do Safari</span></div>
+                    <div class="install-step"><span class="install-num">2</span><span>Role para baixo e toque em <strong>"Adicionar à Tela Inicial"</strong> <i class="fas fa-plus-square" style="color:var(--primary);"></i></span></div>
+                    <div class="install-step"><span class="install-num">3</span><span>Toque em <strong>Adicionar</strong> no canto superior direito</span></div>`;
+            } else if (isAndroid || isChrome) {
+                content.innerHTML = `
+                    <div style="text-align:center; padding:0.5rem 0 1.5rem;">
+                        <i class="fab fa-chrome" style="font-size:3rem; color:var(--primary); margin-bottom:1rem; display:block;"></i>
+                        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1.5rem;">Siga os passos no Chrome:</p>
+                    </div>
+                    <div class="install-step"><span class="install-num">1</span><span>Toque no menu <strong>⋮</strong> (três pontos) no canto superior direito</span></div>
+                    <div class="install-step"><span class="install-num">2</span><span>Toque em <strong>"Adicionar à tela inicial"</strong> ou <strong>"Instalar app"</strong></span></div>
+                    <div class="install-step"><span class="install-num">3</span><span>Confirme tocando em <strong>Instalar</strong></span></div>`;
+            } else {
+                content.innerHTML = `
+                    <div style="text-align:center; padding:0.5rem 0 1.5rem;">
+                        <i class="fas fa-desktop" style="font-size:3rem; color:var(--primary); margin-bottom:1rem; display:block;"></i>
+                        <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1.5rem;">Para instalar no computador:</p>
+                    </div>
+                    <div class="install-step"><span class="install-num">1</span><span>Abra o sistema pelo <strong>Google Chrome</strong></span></div>
+                    <div class="install-step"><span class="install-num">2</span><span>Clique no ícone <i class="fas fa-download" style="color:var(--primary);"></i> na barra de endereços</span></div>
+                    <div class="install-step"><span class="install-num">3</span><span>Clique em <strong>"Instalar"</strong> na janela que aparecer</span></div>
+                    <p style="font-size:0.78rem; color:var(--text-muted); margin-top:1rem; text-align:center;">⚠️ O arquivo precisa estar hospedado em HTTPS para instalação automática</p>`;
+            }
+            document.getElementById('installModalOverlay').classList.add('open');
         };
 
         let currentUser = null, allNotes = [], activeFilter = 'all', editId = null;
