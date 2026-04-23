@@ -2,13 +2,17 @@
 <html lang="pt-BR">
 
 <head>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="data:application/json,{%22name%22:%22Inforwnet%22,%22short_name%22:%22Inforwnet%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23080a0f%22,%22theme_color%22:%22%2300d4ff%22,%22icons%22:[{%22src%22:%22https://img.icons8.com/fluency/96/brain.png%22,%22sizes%22:%2296x96%22,%22type%22:%22image/png%22}]}">
     <meta name="theme-color" content="#080a0f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Inforwnet">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Inforwnet Anotação - Daniel Santos Dev</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
         :root {
@@ -912,11 +916,71 @@
             transition: 0.2s;
         }
         .os-card-photo:hover { opacity: 0.8; transform: scale(1.05); }
+        /* ═══ TAGS ═══════════════════════════════════════════════ */
+        .tag-input-wrap { display:flex; flex-wrap:wrap; gap:5px; align-items:center; background:var(--bg-input); border:1px solid var(--border-alpha); border-radius:var(--radius); padding:8px 10px; margin-bottom:1rem; cursor:text; }
+        .tag-input-wrap:focus-within { border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow); }
+        .tag-chip { background:rgba(0,212,255,0.15); color:var(--primary); border-radius:20px; padding:2px 10px; font-size:0.72rem; font-weight:700; display:flex; align-items:center; gap:4px; white-space:nowrap; }
+        .tag-chip-del { cursor:pointer; font-size:0.75rem; opacity:0.7; background:none; border:none; color:inherit; padding:0; line-height:1; }
+        .tag-chip-del:hover { opacity:1; }
+        .tag-input-field { flex:1; min-width:80px; background:none; border:none; outline:none; color:var(--text-primary); font-family:'Outfit',sans-serif; font-size:0.9rem; }
+        .tag-suggestions { position:absolute; z-index:500; background:var(--bg-card); border:1px solid var(--border-alpha); border-radius:10px; padding:4px; margin-top:2px; box-shadow:0 8px 24px rgba(0,0,0,0.3); display:none; }
+        .tag-suggestions.open { display:block; }
+        .tag-sug-item { padding:6px 12px; border-radius:7px; cursor:pointer; font-size:0.82rem; }
+        .tag-sug-item:hover { background:rgba(0,212,255,0.1); color:var(--primary); }
+        .note-tags { display:flex; flex-wrap:wrap; gap:4px; margin:6px 0 0 28px; }
+        .note-tag { background:rgba(0,212,255,0.12); color:var(--primary); border-radius:20px; padding:1px 8px; font-size:0.65rem; font-weight:700; cursor:pointer; }
+        .note-tag:hover { background:rgba(0,212,255,0.25); }
+        .tag-filter-strip { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:0.75rem; }
+        .tag-filter-btn { background:var(--bg-input); border:1px solid var(--border-alpha); color:var(--text-muted); border-radius:20px; padding:3px 12px; font-size:0.72rem; font-weight:700; cursor:pointer; transition:0.2s; }
+        .tag-filter-btn.active { background:rgba(0,212,255,0.15); border-color:var(--primary); color:var(--primary); }
+
+        /* ═══ BUSCA GLOBAL ══════════════════════════════════════════ */
+        .global-search-bar { position:relative; margin-bottom:1rem; }
+        .global-search-results { position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:600; background:var(--bg-card); border:1px solid var(--border-alpha); border-radius:var(--radius); box-shadow:0 12px 32px rgba(0,0,0,0.4); max-height:360px; overflow-y:auto; display:none; }
+        .global-search-results.open { display:block; }
+        .gsr-section { padding:8px 12px 4px; font-size:0.62rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); border-bottom:1px solid var(--border-alpha); }
+        .gsr-item { padding:10px 14px; cursor:pointer; border-bottom:1px solid var(--border-alpha); transition:0.15s; }
+        .gsr-item:hover { background:rgba(0,212,255,0.06); }
+        .gsr-item:last-child { border-bottom:none; }
+        .gsr-title { font-size:0.85rem; font-weight:700; margin-bottom:2px; }
+        .gsr-sub { font-size:0.72rem; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .gsr-badge { font-size:0.62rem; font-weight:700; padding:1px 7px; border-radius:20px; margin-left:6px; }
+
+        /* ═══ TIMER / CONTADOR DE TEMPO ════════════════════════════ */
+        .os-timer { font-size:0.68rem; color:var(--text-muted); display:flex; align-items:center; gap:4px; margin-bottom:4px; }
+        .os-timer.alerta { color:#ffaa00; }
+        .os-timer.critico-time { color:var(--secondary); font-weight:700; }
+
+        /* ═══ ORDENAÇÃO OS ══════════════════════════════════════════ */
+        .os-sort-btn { background:var(--bg-input); border:1px solid var(--border-alpha); color:var(--text-muted); border-radius:8px; padding:4px 10px; font-size:0.72rem; cursor:pointer; transition:0.2s; font-family:'Outfit',sans-serif; }
+        .os-sort-btn.active { background:rgba(0,212,255,0.12); border-color:var(--primary); color:var(--primary); }
+
+        /* ═══ OFFLINE BANNER ═══════════════════════════════════════ */
+        .offline-banner { position:fixed; top:0; left:0; right:0; z-index:9998; background:#ffaa00; color:#000; text-align:center; padding:8px; font-size:0.82rem; font-weight:700; display:none; }
+        .offline-banner.show { display:block; }
+
+        /* ═══ PDF EXPORT BTN ═══════════════════════════════════════ */
+        .btn-pdf { background:rgba(255,0,76,0.1); border:1px solid rgba(255,0,76,0.3); color:var(--secondary); border-radius:8px; padding:6px 12px; font-size:0.78rem; cursor:pointer; transition:0.2s; font-family:'Outfit',sans-serif; font-weight:600; display:flex; align-items:center; gap:6px; white-space:nowrap; }
+        .btn-pdf:hover { background:var(--secondary); color:white; }
+
+        /* ═══ INSTALL PWA BANNER ════════════════════════════════════ */
+        .pwa-banner { position:fixed; bottom:5rem; left:50%; transform:translateX(-50%) translateY(120px); z-index:9997; background:var(--bg-card); border:1px solid var(--primary); border-radius:var(--radius-xl); padding:1rem 1.5rem; display:flex; align-items:center; gap:1rem; box-shadow:0 8px 32px rgba(0,212,255,0.2); transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1); max-width:360px; width:90%; }
+        .pwa-banner.show { transform:translateX(-50%) translateY(0); }
+        .pwa-banner-text { flex:1; font-size:0.82rem; }
+        .pwa-banner-text strong { display:block; margin-bottom:2px; }
+        .pwa-banner-text span { color:var(--text-muted); font-size:0.72rem; }
     </style>
 </head>
 
 <body>
     <div class="bg-glow"></div>
+    <div class="offline-banner" id="offlineBanner">📡 Sem conexão — trabalhando offline. Os dados serão sincronizados quando voltar.</div>
+    <div class="pwa-banner" id="pwaBanner">
+        <i class="fas fa-mobile-alt" style="font-size:1.8rem; color:var(--primary);"></i>
+        <div class="pwa-banner-text"><strong>Instalar Inforwnet</strong><span>Adicione à tela inicial para acesso rápido</span></div>
+        <button class="btn-primary" id="btnPwaInstall" style="padding:8px 14px; font-size:0.8rem; white-space:nowrap;">Instalar</button>
+        <button onclick="document.getElementById('pwaBanner').classList.remove('show')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1.1rem;padding:4px;">✕</button>
+    </div>
 
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
@@ -1000,6 +1064,14 @@
             </div>
             <input type="text" id="modalNoteTitle" class="neural-input" placeholder="Título">
             <textarea id="modalNoteContent" class="neural-input" placeholder="Conteúdo" style="min-height: 260px; resize: vertical;"></textarea>
+            <!-- TAGS -->
+            <div style="position:relative;">
+                <div class="tag-input-wrap" id="modalTagWrap" onclick="document.getElementById('modalTagInput').focus()">
+                    <div id="modalTagChips"></div>
+                    <input type="text" id="modalTagInput" class="tag-input-field" placeholder="+ Tag (Enter)">
+                </div>
+                <div class="tag-suggestions" id="modalTagSuggestions"></div>
+            </div>
             <select id="modalNotePublic" class="neural-input">
                 <option value="true">🌐 Público</option>
                 <option value="false">🔒 Privado</option>
@@ -1012,10 +1084,16 @@
             <!-- FOTOS DA ANOTAÇÃO (modal) -->
             <div class="photo-section">
                 <div class="photo-section-label"><i class="fas fa-camera"></i> Fotos</div>
-                <label class="photo-upload-btn">
-                    <input type="file" id="modalNotePhotoInput" accept="image/*" multiple style="display:none;" onchange="handleModalNotePhotos(this)">
-                    <i class="fas fa-plus"></i> Adicionar Foto
-                </label>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0.75rem;">
+                    <label class="photo-upload-btn" style="margin-bottom:0;">
+                        <input type="file" id="modalNotePhotoInput" accept="image/*" multiple style="display:none;" onchange="handleModalNotePhotos(this)">
+                        <i class="fas fa-images"></i> Galeria
+                    </label>
+                    <label class="photo-upload-btn" style="margin-bottom:0;">
+                        <input type="file" id="modalNotePhotoCamera" accept="image/*" capture="environment" style="display:none;" onchange="handleModalNotePhotos(this)">
+                        <i class="fas fa-camera"></i> Câmera
+                    </label>
+                </div>
                 <div class="photo-uploading" id="modalNotePhotoUploading" style="display:none;">
                     <i class="fas fa-spinner fa-spin"></i> Enviando...
                 </div>
@@ -1054,10 +1132,16 @@
             <!-- FOTOS DA O.S. -->
             <div class="photo-section">
                 <div class="photo-section-label"><i class="fas fa-camera"></i> Fotos da O.S.</div>
-                <label class="photo-upload-btn" id="osPhotoLabel">
-                    <input type="file" id="osPhotoInput" accept="image/*" multiple style="display:none;" onchange="handleOsPhotos(this)">
-                    <i class="fas fa-plus"></i> Adicionar Foto
-                </label>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0.75rem;">
+                    <label class="photo-upload-btn" style="margin-bottom:0;">
+                        <input type="file" id="osPhotoInput" accept="image/*" multiple style="display:none;" onchange="handleOsPhotos(this)">
+                        <i class="fas fa-images"></i> Galeria
+                    </label>
+                    <label class="photo-upload-btn" style="margin-bottom:0;">
+                        <input type="file" id="osPhotoCamera" accept="image/*" capture="environment" style="display:none;" onchange="handleOsPhotos(this)">
+                        <i class="fas fa-camera"></i> Câmera
+                    </label>
+                </div>
                 <div class="photo-uploading" id="osPhotoUploading" style="display:none;">
                     <i class="fas fa-spinner fa-spin"></i> Enviando...
                 </div>
@@ -1079,6 +1163,11 @@
             <header class="header">
                 <span class="logo-text">Inforwnet Anotação</span>
                 <div class="header-actions">
+                    <!-- BUSCA GLOBAL -->
+                    <div class="global-search-bar" style="position:relative; flex:1; min-width:160px; max-width:300px;">
+                        <input type="text" id="globalSearch" class="neural-input" placeholder="🔍 Busca global..." style="margin:0; height:38px; padding:8px 12px; font-size:0.82rem;" autocomplete="off">
+                        <div class="global-search-results" id="globalSearchResults"></div>
+                    </div>
                     <button class="os-nav-btn" id="btnDashToggle"><i class="fas fa-chart-bar"></i> <span class="btn-label">DASH</span></button>
                     <button class="os-nav-btn" id="btnOsToggle"><i class="fas fa-clipboard-list"></i> <span class="btn-label">O.S.</span></button>
                     <button class="os-nav-btn" id="btnCheckToggle"><i class="fas fa-toolbox"></i> <span class="btn-label">MATERIAL</span></button>
@@ -1108,7 +1197,8 @@
                             <button class="tab-btn" data-filter="both">Todas</button>
                             <button class="tab-btn" data-filter="completed">Feitas</button>
                         </div>
-                        <input type="text" class="neural-input" id="searchInput" placeholder="Buscar...">
+                        <input type="text" class="neural-input" id="searchInput" placeholder="Buscar anotações...">
+                        <div class="tag-filter-strip" id="tagFilterStrip"></div>
 
                         <div class="drag-hint">
                             <i class="fas fa-grip-vertical"></i>
@@ -1130,6 +1220,14 @@
                         <div style="padding: clamp(0.75rem, 3vw, 1.5rem);">
                             <input type="text" id="noteTitle" class="neural-input" placeholder="Título">
                             <textarea id="noteContent" class="neural-input" placeholder="Conteúdo" style="min-height: 150px; resize: vertical;"></textarea>
+                            <!-- TAGS -->
+                            <div style="position:relative;">
+                                <div class="tag-input-wrap" id="sideTagWrap" onclick="document.getElementById('sideTagInput').focus()">
+                                    <div id="sideTagChips"></div>
+                                    <input type="text" id="sideTagInput" class="tag-input-field" placeholder="+ Tag (Enter)">
+                                </div>
+                                <div class="tag-suggestions" id="sideTagSuggestions"></div>
+                            </div>
                             <select id="notePublic" class="neural-input">
                                 <option value="true">🌐 Público</option>
                                 <option value="false">🔒 Privado</option>
@@ -1165,7 +1263,10 @@
             <section id="osPanel" class="neural-card" style="margin-top:1.5rem;">
                 <div class="card-header">
                     <h2><i class="fas fa-clipboard-list" style="color:var(--primary); margin-right:8px;"></i>ORDENS DE SERVIÇO</h2>
-                    <button class="btn-primary" onclick="openOsForm()" style="white-space:nowrap; font-size:0.82rem; padding:0.65rem 1rem;">+ NOVA O.S.</button>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <button class="btn-pdf" id="btnExportPdf"><i class="fas fa-file-pdf"></i> <span class="btn-label">PDF</span></button>
+                        <button class="btn-primary" onclick="openOsForm()" style="white-space:nowrap; font-size:0.82rem; padding:0.65rem 1rem;">+ NOVA O.S.</button>
+                    </div>
                 </div>
                 <div style="padding: clamp(0.75rem, 3vw, 1.5rem);">
                     <!-- stats -->
@@ -1200,6 +1301,12 @@
                         <input type="date" class="neural-input" id="osFilterDateTo" title="Até:" style="min-width:0; flex:1;">
                     </div>
                     <!-- board -->
+                    <div style="display:flex;gap:6px;align-items:center;margin-bottom:0.75rem;flex-wrap:wrap;">
+                        <span style="font-size:0.7rem;color:var(--text-muted);font-weight:700;">ORDENAR:</span>
+                        <button class="os-sort-btn active" data-sort="chegada">⏱ Chegada</button>
+                        <button class="os-sort-btn" data-sort="prioridade">🔥 Prioridade</button>
+                        <button class="os-sort-btn" data-sort="tempo">⌛ Mais Antigo</button>
+                    </div>
                     <div class="os-board">
                         <div class="os-column col-aguardando">
                             <div class="os-column-header">
@@ -1391,9 +1498,36 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // ── OFFLINE PERSISTENCE ────────────────────────────────────
+        db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+
+        // ── OFFLINE DETECTOR ───────────────────────────────────────
+        window.addEventListener('offline', () => document.getElementById('offlineBanner').classList.add('show'));
+        window.addEventListener('online',  () => document.getElementById('offlineBanner').classList.remove('show'));
+        if (!navigator.onLine) document.getElementById('offlineBanner').classList.add('show');
+
+        // ── PWA INSTALL ────────────────────────────────────────────
+        let deferredInstall = null;
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault();
+            deferredInstall = e;
+            setTimeout(() => document.getElementById('pwaBanner').classList.add('show'), 3000);
+        });
+        document.getElementById('btnPwaInstall').onclick = async () => {
+            if (!deferredInstall) return;
+            deferredInstall.prompt();
+            const { outcome } = await deferredInstall.userChoice;
+            if (outcome === 'accepted') document.getElementById('pwaBanner').classList.remove('show');
+            deferredInstall = null;
+        };
+
         let currentUser = null, allNotes = [], activeFilter = 'all', editId = null;
         let customOrder = [];
         let orderChanged = false;
+        let activeTagFilter = null;
+        let modalNoteTags = [], sideNoteTags = [];
+        let allTags = new Set();
+        let osSort = 'chegada';
 
         const themeToggle = document.getElementById('themeToggle');
         const viewToggle = document.getElementById('viewToggle');
@@ -1654,11 +1788,12 @@
             notesContainer.innerHTML = '';
 
             const filtered = allNotes.filter(n => {
-                const searchMatch = (n.title + n.content).toLowerCase().includes(query);
-                if (activeFilter === 'all') return n.public && !n.completed && searchMatch;
-                if (activeFilter === 'mine') return !n.public && n.ownerUID === currentUser?.uid && !n.completed && searchMatch;
-                if (activeFilter === 'completed') return n.completed && searchMatch;
-                return !n.completed && searchMatch;
+                const searchMatch = (n.title + n.content + (n.tags||[]).join(' ')).toLowerCase().includes(query);
+                const tagMatch = !activeTagFilter || (n.tags||[]).includes(activeTagFilter);
+                if (activeFilter === 'all') return n.public && !n.completed && searchMatch && tagMatch;
+                if (activeFilter === 'mine') return !n.public && n.ownerUID === currentUser?.uid && !n.completed && searchMatch && tagMatch;
+                if (activeFilter === 'completed') return n.completed && searchMatch && tagMatch;
+                return !n.completed && searchMatch && tagMatch;
             });
 
             const sorted = getSortedNotes(filtered);
@@ -2887,15 +3022,10 @@
         };
 
         // ── MOSTRAR FOTOS NOS CARDS DA O.S. ───────────────────────
-        // Patch renderOS to show photo strip — injected after main renderOS runs
         const _origRenderOS = renderOS;
-        // Override via monkey-patch on os card html — done inside renderOS itself below
-        // We'll override the os card photo rendering at the renderOS level:
         const _baseRenderOS = renderOS;
-        // The photo strip is already included in renderOS card template below via patch:
 
         // ── FOTOS NO CHECKLIST ────────────────────────────────────
-        // Extend getCheckState
         const _origGetCheckState = getCheckState;
         getCheckState = () => {
             const state = _origGetCheckState();
@@ -2903,7 +3033,6 @@
             return state;
         };
 
-        // Extend applyCheckState
         const _origApplyCheckState = applyCheckState;
         applyCheckState = (state) => {
             _origApplyCheckState(state);
@@ -2915,12 +3044,426 @@
             }));
         };
 
-        // Limpar fotos ao limpar checklist
         const _origBtnCheckClear = document.getElementById('btnCheckClear').onclick;
         document.getElementById('btnCheckClear').onclick = () => {
             _origBtnCheckClear();
             checkPhotos = [];
             document.getElementById('checkPhotoPreview').innerHTML = '';
+        };
+
+        // ═══════════════════════════════════════════════════════════
+        //  TAGS NAS ANOTAÇÕES
+        // ═══════════════════════════════════════════════════════════
+        function buildTagInput(chipContainerId, inputId, suggestionsId, tagsArray) {
+            const input = document.getElementById(inputId);
+            const chipsEl = document.getElementById(chipContainerId);
+            const sugEl   = document.getElementById(suggestionsId);
+
+            function refreshChips() {
+                chipsEl.innerHTML = tagsArray.map((t,i) => `
+                    <span class="tag-chip">${t}
+                        <button class="tag-chip-del" onclick="removeTag('${chipContainerId}','${inputId}','${suggestionsId}',${i})">×</button>
+                    </span>`).join('');
+                renderTagFilterStrip();
+            }
+
+            input.addEventListener('keydown', e => {
+                if ((e.key === 'Enter' || e.key === ',') && input.value.trim()) {
+                    e.preventDefault();
+                    const tag = input.value.trim().toLowerCase().replace(/,/g,'');
+                    if (tag && !tagsArray.includes(tag)) { tagsArray.push(tag); allTags.add(tag); }
+                    input.value = '';
+                    sugEl.classList.remove('open');
+                    refreshChips();
+                } else if (e.key === 'Backspace' && !input.value && tagsArray.length) {
+                    tagsArray.pop();
+                    refreshChips();
+                }
+            });
+
+            input.addEventListener('input', () => {
+                const q = input.value.toLowerCase();
+                if (!q) { sugEl.classList.remove('open'); return; }
+                const matches = [...allTags].filter(t => t.includes(q) && !tagsArray.includes(t));
+                if (!matches.length) { sugEl.classList.remove('open'); return; }
+                sugEl.innerHTML = matches.slice(0,6).map(t =>
+                    `<div class="tag-sug-item" onclick="pickTag('${chipContainerId}','${inputId}','${suggestionsId}','${t}')">${t}</div>`
+                ).join('');
+                sugEl.classList.add('open');
+            });
+
+            document.addEventListener('click', e => {
+                if (!e.target.closest(`#${suggestionsId}`) && e.target !== input) sugEl.classList.remove('open');
+            });
+
+            refreshChips();
+        }
+
+        window.removeTag = (chipId, inputId, sugId, idx) => {
+            const arr = inputId === 'modalTagInput' ? modalNoteTags : sideNoteTags;
+            arr.splice(idx, 1);
+            buildTagInput(chipId, inputId, sugId, arr);
+        };
+
+        window.pickTag = (chipId, inputId, sugId, tag) => {
+            const arr = inputId === 'modalTagInput' ? modalNoteTags : sideNoteTags;
+            if (!arr.includes(tag)) arr.push(tag);
+            document.getElementById(inputId).value = '';
+            document.getElementById(sugId).classList.remove('open');
+            buildTagInput(chipId, inputId, sugId, arr);
+        };
+
+        function renderTagFilterStrip() {
+            // collect all tags from notes
+            allTags = new Set();
+            allNotes.forEach(n => (n.tags||[]).forEach(t => allTags.add(t)));
+            const strip = document.getElementById('tagFilterStrip');
+            if (!strip || !allTags.size) { if(strip) strip.innerHTML=''; return; }
+            strip.innerHTML = `<button class="tag-filter-btn ${!activeTagFilter?'active':''}" onclick="setTagFilter(null)">Todas</button>` +
+                [...allTags].map(t => `<button class="tag-filter-btn ${activeTagFilter===t?'active':''}" onclick="setTagFilter('${t}')">#${t}</button>`).join('');
+        }
+
+        window.setTagFilter = (tag) => {
+            activeTagFilter = tag;
+            renderTagFilterStrip();
+            renderNotes();
+        };
+
+        // Patch openEditModal to load tags
+        const _origOpenEditModal = openEditModal;
+        openEditModal = (id) => {
+            _origOpenEditModal(id);
+            const n = allNotes.find(x => x.id === id);
+            modalNoteTags = n?.tags ? [...n.tags] : [];
+            buildTagInput('modalTagChips','modalTagInput','modalTagSuggestions', modalNoteTags);
+        };
+
+        // Patch closeEditModal to clear tags
+        const _origCloseEditModal = closeEditModal;
+        closeEditModal = () => {
+            _origCloseEditModal();
+            modalNoteTags = [];
+            document.getElementById('modalTagChips').innerHTML = '';
+        };
+
+        // Patch all save functions to include tags
+        const _origBtnModalSave = document.getElementById('btnModalSave').onclick;
+        document.getElementById('btnModalSave').onclick = async () => {
+            const title = document.getElementById('modalNoteTitle').value.trim();
+            if (!title) { showToast('Título obrigatório!', 'info'); return; }
+            if (!editId) return;
+            const data = {
+                title,
+                content: document.getElementById('modalNoteContent').value,
+                public: document.getElementById('modalNotePublic').value === 'true',
+                completed: document.getElementById('modalNoteCompleted').value === 'true',
+                tags: [...modalNoteTags],
+                photos: [...modalNotePhotos],
+                ownerUID: currentUser.uid,
+                ownerEmail: currentUser.email,
+                createdAt: allNotes.find(x => x.id === editId)?.createdAt || Date.now()
+            };
+            await db.collection('notes').doc(editId).update(data);
+            showToast('Anotação atualizada!', 'success');
+            closeEditModal();
+        };
+
+        const _origBtnSave = document.getElementById('btnSave').onclick;
+        document.getElementById('btnSave').onclick = async () => {
+            const title = document.getElementById('noteTitle').value.trim();
+            if (!title) { showToast('Título obrigatório!', 'info'); return; }
+            const data = {
+                title,
+                content: document.getElementById('noteContent').value,
+                public: document.getElementById('notePublic').value === 'true',
+                completed: document.getElementById('noteCompleted').value === 'true',
+                tags: [...sideNoteTags],
+                photos: [...sideNotePhotos],
+                ownerUID: currentUser.uid,
+                ownerEmail: currentUser.email,
+                createdAt: editId ? allNotes.find(x => x.id === editId)?.createdAt || Date.now() : Date.now()
+            };
+            if (editId) {
+                await db.collection('notes').doc(editId).update(data);
+                editId = null;
+                showToast('Anotação atualizada!', 'success');
+            } else {
+                await db.collection('notes').add(data);
+                showToast('Anotação criada!', 'success');
+            }
+            clearEditor();
+        };
+
+        // Init tag inputs when DOM ready
+        buildTagInput('modalTagChips','modalTagInput','modalTagSuggestions', modalNoteTags);
+        buildTagInput('sideTagChips','sideTagInput','sideTagSuggestions', sideNoteTags);
+
+        // Patch clearEditor to reset side tags
+        const _origClearEditor = clearEditor;
+        clearEditor = () => {
+            _origClearEditor();
+            sideNoteTags = [];
+            document.getElementById('sideTagChips').innerHTML = '';
+        };
+
+        // Patch renderNotes to show tags on cards and update allTags
+        const _origRenderNotes = renderNotes;
+        renderNotes = () => {
+            _origRenderNotes();
+            renderTagFilterStrip();
+            // inject tag chips into already-rendered cards
+            allNotes.forEach(n => {
+                if (!n.tags?.length) return;
+                const card = notesContainer.querySelector(`[data-id="${n.id}"]`);
+                if (!card) return;
+                const existing = card.querySelector('.note-tags');
+                if (existing) return;
+                const p = card.querySelector('p');
+                if (p) {
+                    const tagDiv = document.createElement('div');
+                    tagDiv.className = 'note-tags';
+                    tagDiv.innerHTML = n.tags.map(t=>`<span class="note-tag" onclick="setTagFilter('${t}')">#${t}</span>`).join('');
+                    p.after(tagDiv);
+                }
+            });
+        };
+
+        // ═══════════════════════════════════════════════════════════
+        //  BUSCA GLOBAL
+        // ═══════════════════════════════════════════════════════════
+        let globalSearchTimer;
+        document.getElementById('globalSearch').addEventListener('input', function() {
+            clearTimeout(globalSearchTimer);
+            globalSearchTimer = setTimeout(() => doGlobalSearch(this.value.trim()), 250);
+        });
+        document.getElementById('globalSearch').addEventListener('blur', () => {
+            setTimeout(() => document.getElementById('globalSearchResults').classList.remove('open'), 200);
+        });
+
+        function doGlobalSearch(q) {
+            const res = document.getElementById('globalSearchResults');
+            if (!q || q.length < 2) { res.classList.remove('open'); return; }
+            const ql = q.toLowerCase();
+            const notes = allNotes.filter(n => (n.title+n.content+(n.tags||[]).join(' ')).toLowerCase().includes(ql)).slice(0,5);
+            const os    = allOS.filter(o => (o.client+o.desc+(o.device||'')+(o.tech||'')).toLowerCase().includes(ql)).slice(0,5);
+            if (!notes.length && !os.length) { res.innerHTML='<div style="padding:12px;color:var(--text-muted);font-size:0.82rem;text-align:center;">Nenhum resultado</div>'; res.classList.add('open'); return; }
+            const statusColor = {aguardando:'#ffaa00',andamento:'var(--primary)',concluido:'var(--success)'};
+            let html = '';
+            if (notes.length) {
+                html += `<div class="gsr-section"><i class="fas fa-sticky-note"></i> Anotações</div>`;
+                html += notes.map(n => `<div class="gsr-item" onclick="editNote('${n.id}'); document.getElementById('globalSearch').value=''; document.getElementById('globalSearchResults').classList.remove('open');">
+                    <div class="gsr-title">${n.title}</div>
+                    <div class="gsr-sub">${n.content?.slice(0,60)||''}${n.tags?.length?` · #${n.tags.join(' #')}`:''}...</div>
+                </div>`).join('');
+            }
+            if (os.length) {
+                html += `<div class="gsr-section"><i class="fas fa-clipboard-list"></i> Ordens de Serviço</div>`;
+                html += os.map(o => `<div class="gsr-item" onclick="openOsForm('${o.id}'); document.getElementById('globalSearch').value=''; document.getElementById('globalSearchResults').classList.remove('open'); if(!osPanelOpen){document.getElementById('btnOsToggle').click();}">
+                    <div class="gsr-title">#${String(o.numero).padStart(4,'0')} ${o.client} <span class="gsr-badge" style="background:${statusColor[o.status]}20;color:${statusColor[o.status]};">${o.status}</span></div>
+                    <div class="gsr-sub">${o.desc?.slice(0,60)||''}...</div>
+                </div>`).join('');
+            }
+            res.innerHTML = html;
+            res.classList.add('open');
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        //  ORDENAÇÃO E CONTADOR DE TEMPO NAS O.S.
+        // ═══════════════════════════════════════════════════════════
+        document.querySelectorAll('.os-sort-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.os-sort-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                osSort = btn.dataset.sort;
+                renderOS();
+            };
+        });
+
+        // Patch renderOS to apply sorting and time counters
+        const _origRenderOSFinal = renderOS;
+        renderOS = () => {
+            // call original but intercept column list sorting
+            _origRenderOSFinal();
+        };
+
+        // Override the list sorting inside renderOS by patching cols sorting
+        const _prioWeight = { critico:0, urgente:1, normal:2 };
+        function sortOsList(list) {
+            if (osSort === 'prioridade') return [...list].sort((a,b) => (_prioWeight[a.priority]||2) - (_prioWeight[b.priority]||2));
+            if (osSort === 'tempo')      return [...list].sort((a,b) => a.createdAt - b.createdAt);
+            return [...list].sort((a,b) => a.numero - b.numero); // chegada
+        }
+
+        function formatElapsed(ms) {
+            const h = Math.floor(ms / 3600000);
+            const m = Math.floor((ms % 3600000) / 60000);
+            if (h >= 48) return { txt: `${Math.floor(h/24)}d ${h%24}h`, cls: 'critico-time' };
+            if (h >= 8)  return { txt: `${h}h ${m}min`, cls: 'alerta' };
+            return { txt: `${h}h ${m}min`, cls: '' };
+        }
+
+        // Full override of renderOS col rendering with sort + timer
+        const __origRenderOS = renderOS;
+        renderOS = function() {
+            const query   = (document.getElementById('osSearch')?.value || '').toLowerCase();
+            const stFil   = document.getElementById('osFilterStatus')?.value || 'all';
+            const prFil   = document.getElementById('osFilterPriority')?.value || 'all';
+            const dateFil = document.getElementById('osFilterDate')?.value || 'all';
+            const dateFrom = document.getElementById('osFilterDateFrom')?.value;
+            const dateTo   = document.getElementById('osFilterDateTo')?.value;
+            const now = Date.now();
+            const todayStart = startOfDay(now);
+            const weekStart  = todayStart - 6 * 86400000;
+            const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
+
+            const filtered = allOS.filter(os => {
+                const txt = (os.client + os.desc + (os.device||'') + (os.tech||'')).toLowerCase();
+                if (!txt.includes(query)) return false;
+                if (stFil !== 'all' && os.status !== stFil) return false;
+                if (prFil !== 'all' && os.priority !== prFil) return false;
+                const ts = os.createdAt || 0;
+                if (dateFil === 'today' && ts < todayStart) return false;
+                if (dateFil === 'week'  && ts < weekStart)  return false;
+                if (dateFil === 'month' && ts < monthStart.getTime()) return false;
+                if (dateFrom) { const from = new Date(dateFrom + 'T00:00:00').getTime(); if (ts < from) return false; }
+                if (dateTo)   { const to   = new Date(dateTo   + 'T23:59:59').getTime(); if (ts > to)   return false; }
+                return true;
+            });
+
+            const cols = { aguardando: [], andamento: [], concluido: [] };
+            filtered.forEach(os => { if (cols[os.status]) cols[os.status].push(os); });
+
+            ['aguardando', 'andamento', 'concluido'].forEach(status => {
+                const colId   = { aguardando:'colAguardando', andamento:'colAndamento', concluido:'colConcluido' }[status];
+                const countId = { aguardando:'colCountAguardando', andamento:'colCountAndamento', concluido:'colCountConcluido' }[status];
+                const col  = document.getElementById(colId);
+                const list = sortOsList(cols[status]);
+                document.getElementById(countId).textContent = list.length;
+
+                if (!list.length) { col.innerHTML = `<div class="os-empty"><i class="fas fa-inbox"></i>Nenhuma O.S.</div>`; return; }
+
+                col.innerHTML = list.map(os => {
+                    const num        = String(os.numero).padStart(4, '0');
+                    const dt         = new Date(os.createdAt).toLocaleDateString('pt-BR') + ' ' + new Date(os.createdAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+                    const prioClass  = { normal:'priority-normal', urgente:'priority-urgente', critico:'priority-critico' }[os.priority] || 'priority-normal';
+                    const prioIcon   = { normal:'📋', urgente:'⚡', critico:'🔥' }[os.priority] || '';
+                    const statusNext = { aguardando:'▶ Iniciar', andamento:'✅ Concluir', concluido:'↩ Reabrir' }[os.status];
+                    const photoStrip = os.photos?.length ? `<div class="os-card-photos">${os.photos.map(u=>`<img class="os-card-photo" src="${u}" onclick="openLightbox('${u}')" alt="foto">`).join('')}</div>` : '';
+                    // Timer — só para não concluídas
+                    let timerHtml = '';
+                    if (os.status !== 'concluido') {
+                        const el = formatElapsed(now - (os.createdAt||now));
+                        timerHtml = `<div class="os-timer ${el.cls}"><i class="fas fa-clock"></i> Aberta há ${el.txt}</div>`;
+                    }
+                    return `<div class="os-card status-${os.status}">
+                        <div class="os-card-num">O.S. #${num} · ${dt}</div>
+                        ${timerHtml}
+                        <div class="os-card-client">${os.client}</div>
+                        ${os.device ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;"><i class="fas fa-laptop" style="margin-right:4px;"></i>${os.device}</div>` : ''}
+                        <div class="os-card-desc">${os.desc}</div>
+                        ${os.tech ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;"><i class="fas fa-user-cog" style="margin-right:4px;"></i>${os.tech}</div>` : ''}
+                        ${photoStrip}
+                        <div class="os-card-meta">
+                            <span class="os-priority-badge ${prioClass}">${prioIcon} ${os.priority}</span>
+                            <div class="os-card-actions">
+                                <button onclick="osNextStatus('${os.id}')" title="${statusNext}" style="color:var(--primary);font-size:0.75rem;padding:3px 8px;border:1px solid var(--border-alpha);border-radius:6px;">${statusNext}</button>
+                                <button onclick="openOsForm('${os.id}')" title="Editar" style="color:var(--primary);"><i class="fas fa-edit"></i></button>
+                                <button onclick="printOs('${os.id}')" title="Imprimir" style="color:var(--text-muted);"><i class="fas fa-print"></i></button>
+                                <button onclick="deleteOs('${os.id}')" title="Excluir" style="color:var(--secondary);"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            });
+
+            updateOsStats();
+        };
+
+        // Re-render timers every minute
+        setInterval(() => { if (osPanelOpen) renderOS(); }, 60000);
+
+        // ═══════════════════════════════════════════════════════════
+        //  EXPORTAR PDF DAS O.S.
+        // ═══════════════════════════════════════════════════════════
+        document.getElementById('btnExportPdf').onclick = () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit:'mm', format:'a4' });
+            const now = new Date().toLocaleString('pt-BR');
+            const prioLabel   = { normal:'Normal', urgente:'Urgente', critico:'Crítico' };
+            const statusLabel = { aguardando:'Aguardando', andamento:'Em Andamento', concluido:'Concluído' };
+
+            // filtrar as OS visíveis no momento
+            const stFil = document.getElementById('osFilterStatus')?.value || 'all';
+            const list  = allOS
+                .filter(o => stFil === 'all' || o.status === stFil)
+                .sort((a,b) => a.numero - b.numero);
+
+            // Header
+            doc.setFillColor(8,10,15);
+            doc.rect(0,0,210,20,'F');
+            doc.setTextColor(0,212,255);
+            doc.setFontSize(14); doc.setFont('helvetica','bold');
+            doc.text('INFORWNET — Ordens de Serviço', 14, 13);
+            doc.setTextColor(180,180,192);
+            doc.setFontSize(8); doc.setFont('helvetica','normal');
+            doc.text(`Gerado em: ${now}  ·  Total: ${list.length} O.S.`, 14, 18);
+
+            let y = 28;
+            const pageH = 287;
+
+            list.forEach((os, i) => {
+                const lines = doc.splitTextToSize(os.desc || '', 170);
+                const blockH = 8 + 5 + 5 + 5 + (lines.length * 4.5) + 4;
+                if (y + blockH > pageH) { doc.addPage(); y = 15; }
+
+                // Card bg
+                doc.setFillColor(20,24,33);
+                doc.roundedRect(10, y, 190, blockH, 3, 3, 'F');
+
+                // Border color by status
+                const bc = { aguardando:[255,170,0], andamento:[0,212,255], concluido:[0,255,157] }[os.status] || [100,116,139];
+                doc.setFillColor(...bc);
+                doc.roundedRect(10, y, 3, blockH, 1, 1, 'F');
+
+                // OS number & date
+                doc.setTextColor(...bc);
+                doc.setFontSize(9); doc.setFont('helvetica','bold');
+                doc.text(`O.S. #${String(os.numero).padStart(4,'0')}`, 16, y+6);
+                doc.setTextColor(100,116,139);
+                doc.setFontSize(7); doc.setFont('helvetica','normal');
+                const dt = new Date(os.createdAt).toLocaleDateString('pt-BR');
+                doc.text(dt, 16, y+10.5);
+
+                // Client & status
+                doc.setTextColor(255,255,255);
+                doc.setFontSize(10); doc.setFont('helvetica','bold');
+                doc.text(os.client || '', 50, y+6);
+                doc.setFontSize(8); doc.setFont('helvetica','normal');
+                doc.setTextColor(180,180,192);
+                doc.text(`${statusLabel[os.status]} · ${prioLabel[os.priority]}`, 50, y+11);
+
+                // Tech
+                if (os.tech) {
+                    doc.setTextColor(100,116,139);
+                    doc.setFontSize(7);
+                    doc.text(`Técnico: ${os.tech}`, 50, y+16);
+                }
+
+                // Device
+                if (os.device) {
+                    doc.text(`Equip.: ${os.device}`, 130, y+11);
+                }
+
+                // Description
+                doc.setTextColor(176,176,192);
+                doc.setFontSize(8); doc.setFont('helvetica','normal');
+                doc.text(lines, 16, y + 18);
+
+                y += blockH + 4;
+            });
+
+            doc.save(`inforwnet-os-${new Date().toISOString().slice(0,10)}.pdf`);
+            showToast('PDF exportado!', 'success');
         };
 
     </script>
