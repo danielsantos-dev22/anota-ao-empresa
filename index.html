@@ -1757,11 +1757,13 @@
         }
 
         // ─── AUTH STATE ───────────────────────────────────────────────────────────
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async user => {
             currentUser = user;
             if (user) {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('mainContent').style.display = 'block';
+                // Migra notas antigas sem ownerUID para este usuário
+                await migrateOldNotes(user.uid, user.email);
                 loadNotes();
                 loadCustomOrder();
             } else {
@@ -1900,6 +1902,25 @@
                 renderNotes();
                 updateStats();
             });
+        }
+
+        // ── MIGRAÇÃO GLOBAL — roda uma vez ao logar ────────────────
+        async function migrateOldNotes(uid, email) {
+            try {
+                const snap = await db.collection('notes').get();
+                const batch = db.batch();
+                let count = 0;
+                snap.forEach(doc => {
+                    if (!doc.data().ownerUID) {
+                        batch.update(doc.ref, { ownerUID: uid, ownerEmail: email });
+                        count++;
+                    }
+                });
+                if (count > 0) {
+                    await batch.commit();
+                    showToast(`✅ ${count} anotação(ões) migrada(s) com sucesso!`, 'success');
+                }
+            } catch(e) { console.warn('Migração notas:', e.message); }
         }
 
         // ─── RENDER ───────────────────────────────────────────────────────────────
@@ -2210,7 +2231,19 @@
         };
 
         // ── LOAD OS ────────────────────────────────────────────────
-        function loadOS() {
+        async function loadOS() {
+            // migrar O.S. antigas sem ownerUID
+            const allSnap = await db.collection('ordens').get();
+            const batch = db.batch();
+            let count = 0;
+            allSnap.forEach(doc => {
+                if (!doc.data().ownerUID) {
+                    batch.update(doc.ref, { ownerUID: currentUser.uid });
+                    count++;
+                }
+            });
+            if (count > 0) await batch.commit();
+
             db.collection('ordens')
                 .where('ownerUID', '==', currentUser.uid)
                 .orderBy('numero', 'asc').onSnapshot(snap => {
@@ -2432,8 +2465,8 @@
         document.getElementById('osFilterDateTo').onchange = renderOS;
 
         // ── INICIALIZAR OS quando logado ───────────────────────────
-        auth.onAuthStateChanged(user => {
-            if (user) loadOS();
+        auth.onAuthStateChanged(async user => {
+            if (user) await loadOS();
         });
 
         // ═══════════════════════════════════════════════════════════
