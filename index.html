@@ -1893,19 +1893,49 @@
         btnSaveOrder.onclick = saveCustomOrder;
 
         // ─── LOAD NOTES ───────────────────────────────────────────────────────────
-        function loadNotes() {
+        // ── MIGRAÇÃO + LOAD ────────────────────────────────────────
+        // Estratégia: busca com ownerUID do usuário + notas sem ownerUID
+        // As regras do Firestore precisam permitir isso temporariamente
+        async function loadNotes() {
+            // 1) Notas já com ownerUID correto
+            const snapOwned = await db.collection('notes')
+                .where('ownerUID', '==', currentUser.uid)
+                .orderBy('createdAt', 'desc').get().catch(() => ({ docs: [] }));
+
+            // 2) Tenta buscar notas sem ownerUID (migração)
+            // Só funciona se a regra permitir — se bloquear, ignora silenciosamente
+            const snapOrphans = await db.collection('notes')
+                .where('ownerUID', '==', '')
+                .get().catch(() => ({ docs: [] }));
+
+            // Migra as órfãs em batch
+            if (snapOrphans.docs.length > 0) {
+                const batch = db.batch();
+                snapOrphans.docs.forEach(doc => {
+                    batch.update(doc.ref, {
+                        ownerUID: currentUser.uid,
+                        ownerEmail: currentUser.email
+                    });
+                });
+                await batch.commit().catch(() => {});
+                showToast(`✅ ${snapOrphans.docs.length} anotação(ões) recuperada(s)!`, 'success');
+            }
+
+            // 3) Listener em tempo real com filtro correto
             db.collection('notes')
                 .where('ownerUID', '==', currentUser.uid)
-                .orderBy('createdAt', 'desc').onSnapshot(snap => {
-                allNotes = [];
-                snap.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
-                renderNotes();
-                updateStats();
-            });
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snap => {
+                    allNotes = [];
+                    snap.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
+                    renderNotes();
+                    updateStats();
+                });
         }
 
-        // ── MIGRAÇÃO GLOBAL — roda uma vez ao logar ────────────────
         async function migrateOldNotes(uid, email) {
+            // Tentativa extra: notas sem ownerUID (campo ausente)
+            // Funciona apenas se as regras do Firestore permitirem leitura ampla
             try {
                 const snap = await db.collection('notes').get();
                 const batch = db.batch();
@@ -1918,9 +1948,12 @@
                 });
                 if (count > 0) {
                     await batch.commit();
-                    showToast(`✅ ${count} anotação(ões) migrada(s) com sucesso!`, 'success');
+                    showToast(`✅ ${count} anotação(ões) migrada(s)!`, 'success');
                 }
-            } catch(e) { console.warn('Migração notas:', e.message); }
+            } catch(e) {
+                // Regras bloquearam — vamos tentar via where com campo vazio
+                console.warn('Migração bloqueada pelas regras (normal após segurança ativada)');
+            }
         }
 
         // ─── RENDER ───────────────────────────────────────────────────────────────
@@ -3152,23 +3185,50 @@
         rules_version = '2';
         service cloud.firestore {
           match /databases/{database}/documents {
+
+            // ANOTAÇÕES
             match /notes/{id} {
-              allow read, write: if request.auth != null && request.auth.uid == resource.data.ownerUID;
-              allow create: if request.auth != null && request.resource.data.ownerUID == request.auth.uid;
+              // Lê/escreve se for o dono OU se não tiver ownerUID (migração)
+              allow read, write: if request.auth != null
+                && (resource.data.ownerUID == request.auth.uid
+                    || resource.data.ownerUID == null
+                    || resource.data.ownerUID == '');
+              allow create: if request.auth != null
+                && request.resource.data.ownerUID == request.auth.uid;
             }
+
+            // CONFIGURAÇÕES
             match /userSettings/{userId} {
               allow read, write: if request.auth != null && request.auth.uid == userId;
             }
+
+            // ORDENS DE SERVIÇO
             match /ordens/{id} {
-              allow read, write: if request.auth != null && request.auth.uid == resource.data.ownerUID;
-              allow create: if request.auth != null && request.resource.data.ownerUID == request.auth.uid;
+              allow read, write: if request.auth != null
+                && (resource.data.ownerUID == request.auth.uid
+                    || resource.data.ownerUID == null
+                    || resource.data.ownerUID == '');
+              allow create: if request.auth != null
+                && request.resource.data.ownerUID == request.auth.uid;
             }
+
+            // CHECKLISTS
             match /checklists/{id} {
-              allow read, write: if request.auth != null && request.auth.uid == resource.data.ownerUID;
-              allow create: if request.auth != null && request.resource.data.ownerUID == request.auth.uid;
+              allow read, write: if request.auth != null
+                && (resource.data.ownerUID == request.auth.uid
+                    || resource.data.ownerUID == null
+                    || resource.data.ownerUID == '');
+              allow create: if request.auth != null
+                && request.resource.data.ownerUID == request.auth.uid;
             }
           }
         }
+
+        APÓS A MIGRAÇÃO COMPLETAR (quando não aparecer mais toast de migração),
+        você pode trocar a regra de cada coleção para a versão mais restrita:
+          allow read, write: if request.auth != null
+            && resource.data.ownerUID == request.auth.uid;
+        ═══════════════════════════════════════════════════════════════
         */
 
         // ═══════════════════════════════════════════════════════════
