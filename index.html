@@ -966,6 +966,71 @@
         /* ═══ INSTALL MODAL STEPS ══════════════════════════════════ */
         .install-step { display:flex; align-items:flex-start; gap:14px; margin-bottom:1rem; font-size:0.88rem; color:var(--text-secondary); }
         .install-num { background:var(--gradient-neural); color:white; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.8rem; flex-shrink:0; margin-top:1px; }
+
+        /* ═══ ANIMAÇÃO DE PAINÉIS ═══════════════════════════════════ */
+        .panel-animated {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-12px);
+            transition: max-height 0.42s cubic-bezier(0.4,0,0.2,1),
+                        opacity   0.32s ease,
+                        transform 0.32s ease;
+            pointer-events: none;
+        }
+        .panel-animated.open {
+            max-height: 9000px;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        /* override display:none leftover */
+        #osPanel, #dashPanel, #checkPanel { display: block !important; }
+
+        /* ═══ HISTÓRICO DE STATUS DA O.S. ══════════════════════════ */
+        .os-history-toggle {
+            font-size: 0.68rem; color: var(--text-muted); cursor: pointer;
+            display: flex; align-items: center; gap: 4px;
+            background: none; border: none; font-family: 'Outfit', sans-serif;
+            padding: 4px 0; margin-top: 4px; transition: color 0.2s;
+        }
+        .os-history-toggle:hover { color: var(--primary); }
+        .os-history-panel {
+            margin-top: 8px; border-top: 1px solid var(--border-alpha);
+            padding-top: 8px; display: none;
+        }
+        .os-history-panel.open { display: block; }
+        .os-hist-entry {
+            display: flex; align-items: flex-start; gap: 8px;
+            font-size: 0.7rem; color: var(--text-muted);
+            margin-bottom: 6px; position: relative; padding-left: 14px;
+        }
+        .os-hist-entry::before {
+            content: ''; position: absolute; left: 3px; top: 6px;
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--border-alpha);
+        }
+        .os-hist-entry:first-child::before { background: var(--primary); }
+        .os-hist-dot-aguardando { background: #ffaa00 !important; }
+        .os-hist-dot-andamento  { background: var(--primary) !important; }
+        .os-hist-dot-concluido  { background: var(--success) !important; }
+        .os-hist-badge {
+            font-weight: 700; font-size: 0.65rem; padding: 1px 7px;
+            border-radius: 20px; white-space: nowrap;
+        }
+        .os-hist-badge-aguardando { background:rgba(255,170,0,0.15); color:#ffaa00; }
+        .os-hist-badge-andamento  { background:rgba(0,212,255,0.15); color:var(--primary); }
+        .os-hist-badge-concluido  { background:rgba(0,255,157,0.15); color:var(--success); }
+
+        /* ═══ PDF CHECKLIST ═════════════════════════════════════════ */
+        .btn-pdf-check {
+            background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3);
+            color: var(--primary); border-radius: 8px; padding: 6px 12px;
+            font-size: 0.78rem; cursor: pointer; transition: 0.2s;
+            font-family: 'Outfit', sans-serif; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-pdf-check:hover { background: var(--primary); color: white; }
     </style>
 </head>
 
@@ -1263,6 +1328,7 @@
             </main>
 
             <!-- ═══ PAINEL ORDEM DE SERVIÇO ═══ -->
+            <div class="panel-animated" id="osPanelWrap">
             <section id="osPanel" class="neural-card" style="margin-top:1.5rem;">
                 <div class="card-header">
                     <h2><i class="fas fa-clipboard-list" style="color:var(--primary); margin-right:8px;"></i>ORDENS DE SERVIÇO</h2>
@@ -1335,9 +1401,11 @@
                     </div>
                 </div>
             </section>
+            </div><!-- /osPanelWrap -->
 
             <!-- ═══ DASHBOARD ═══ -->
-            <section id="dashPanel" class="neural-card" style="margin-top:1.5rem; display:none;">
+            <div class="panel-animated" id="dashPanelWrap">
+            <section id="dashPanel" class="neural-card" style="margin-top:1.5rem;">
                 <div class="card-header">
                     <h2><i class="fas fa-chart-bar" style="color:var(--primary); margin-right:8px;"></i>DASHBOARD</h2>
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -1403,14 +1471,17 @@
 
                 </div>
             </section>
+            </div><!-- /dashPanelWrap -->
 
             <!-- ═══ CHECKLIST DE MATERIAL ═══ -->
-            <section id="checkPanel" class="neural-card" style="margin-top:1.5rem; display:none;">
+            <div class="panel-animated" id="checkPanelWrap">
+            <section id="checkPanel" class="neural-card" style="margin-top:1.5rem;">
                 <div class="card-header">
                     <h2><i class="fas fa-toolbox" style="color:var(--primary); margin-right:8px;"></i>CHECKLIST DE MATERIAL</h2>
                     <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
                         <button class="btn-secondary" id="btnCheckClear" style="font-size:0.78rem; padding:6px 12px; height:36px;"><i class="fas fa-undo"></i> <span class="btn-label">Limpar</span></button>
                         <button class="btn-primary" id="btnCheckSave" style="font-size:0.78rem; padding:6px 14px; height:36px;"><i class="fas fa-save"></i> <span class="btn-label">Salvar</span></button>
+                        <button class="btn-pdf-check" id="btnCheckPdfExport"><i class="fas fa-file-pdf"></i> PDF</button>
                         <button class="btn-secondary" id="btnCheckPrint" style="font-size:0.78rem; padding:6px 12px; height:36px;"><i class="fas fa-print"></i></button>
                     </div>
                 </div>
@@ -1467,6 +1538,7 @@
                     <div id="checkHistory"></div>
                 </div>
             </section>
+            </div><!-- /checkPanelWrap -->
 
             <div id="checkPrintTarget" style="display:none;"></div>
 
@@ -1685,11 +1757,13 @@
         }
 
         // ─── AUTH STATE ───────────────────────────────────────────────────────────
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async user => {
             currentUser = user;
             if (user) {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('mainContent').style.display = 'block';
+                // Migra notas antigas sem ownerUID para este usuário
+                await migrateOldNotes(user.uid, user.email);
                 loadNotes();
                 loadCustomOrder();
             } else {
@@ -1819,13 +1893,67 @@
         btnSaveOrder.onclick = saveCustomOrder;
 
         // ─── LOAD NOTES ───────────────────────────────────────────────────────────
-        function loadNotes() {
-            db.collection('notes').orderBy('createdAt', 'desc').onSnapshot(snap => {
-                allNotes = [];
-                snap.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
-                renderNotes();
-                updateStats();
-            });
+        // ── MIGRAÇÃO + LOAD ────────────────────────────────────────
+        // Estratégia: busca com ownerUID do usuário + notas sem ownerUID
+        // As regras do Firestore precisam permitir isso temporariamente
+        async function loadNotes() {
+            // 1) Notas já com ownerUID correto
+            const snapOwned = await db.collection('notes')
+                .where('ownerUID', '==', currentUser.uid)
+                .orderBy('createdAt', 'desc').get().catch(() => ({ docs: [] }));
+
+            // 2) Tenta buscar notas sem ownerUID (migração)
+            // Só funciona se a regra permitir — se bloquear, ignora silenciosamente
+            const snapOrphans = await db.collection('notes')
+                .where('ownerUID', '==', '')
+                .get().catch(() => ({ docs: [] }));
+
+            // Migra as órfãs em batch
+            if (snapOrphans.docs.length > 0) {
+                const batch = db.batch();
+                snapOrphans.docs.forEach(doc => {
+                    batch.update(doc.ref, {
+                        ownerUID: currentUser.uid,
+                        ownerEmail: currentUser.email
+                    });
+                });
+                await batch.commit().catch(() => {});
+                showToast(`✅ ${snapOrphans.docs.length} anotação(ões) recuperada(s)!`, 'success');
+            }
+
+            // 3) Listener em tempo real com filtro correto
+            db.collection('notes')
+                .where('ownerUID', '==', currentUser.uid)
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snap => {
+                    allNotes = [];
+                    snap.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
+                    renderNotes();
+                    updateStats();
+                });
+        }
+
+        async function migrateOldNotes(uid, email) {
+            // Tentativa extra: notas sem ownerUID (campo ausente)
+            // Funciona apenas se as regras do Firestore permitirem leitura ampla
+            try {
+                const snap = await db.collection('notes').get();
+                const batch = db.batch();
+                let count = 0;
+                snap.forEach(doc => {
+                    if (!doc.data().ownerUID) {
+                        batch.update(doc.ref, { ownerUID: uid, ownerEmail: email });
+                        count++;
+                    }
+                });
+                if (count > 0) {
+                    await batch.commit();
+                    showToast(`✅ ${count} anotação(ões) migrada(s)!`, 'success');
+                }
+            } catch(e) {
+                // Regras bloquearam — vamos tentar via where com campo vazio
+                console.warn('Migração bloqueada pelas regras (normal após segurança ativada)');
+            }
         }
 
         // ─── RENDER ───────────────────────────────────────────────────────────────
@@ -1867,14 +1995,14 @@
                             <span class="drag-handle" title="Arraste para reordenar">
                                 <i class="fas fa-grip-vertical"></i>
                             </span>
-                            <strong style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${n.title}</strong>
+                            <strong style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escHtml(n.title)}</strong>
                         </div>
                         <button onclick="quickToggle('${n.id}')" class="action-icon icon-complete ${n.completed ? 'is-done' : ''}">
                             <i class="fas ${n.completed ? 'fa-check-circle' : 'fa-bolt'}"></i>
                         </button>
                     </div>
-                    <p style="margin:10px 0; font-size:0.9rem; color:var(--text-secondary); padding-left:28px; white-space:pre-wrap; word-break:break-word;">${n.content}</p>
-                    ${n.photos?.length ? `<div class="os-card-photos" style="padding-left:28px; margin-bottom:6px;">${n.photos.map(u=>`<img class="os-card-photo" src="${u}" onclick="openLightbox('${u}')" alt="foto">`).join('')}</div>` : ''}
+                    <p style="margin:10px 0; font-size:0.9rem; color:var(--text-secondary); padding-left:28px; white-space:pre-wrap; word-break:break-word;">${escHtml(n.content)}</p>
+                    ${n.photos?.length ? `<div class="os-card-photos" style="padding-left:28px; margin-bottom:6px;">${n.photos.map(u=>`<img class="os-card-photo" src="${escHtml(u)}" onclick="openLightbox('${escHtml(u)}')" alt="foto">`).join('')}</div>` : ''}
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; border-top:1px solid var(--border-alpha); padding-top:8px">
                         <span class="note-badge ${n.public ? 'badge-public' : 'badge-private'}">${n.public ? 'PÚBLICA' : 'PRIVADA'}</span>
                         <div>
@@ -1980,11 +2108,14 @@
         // ─── QUICK TOGGLE ─────────────────────────────────────────────────────────
         window.quickToggle = async (id) => {
             const n = allNotes.find(x => x.id === id);
+            if (!n || n.ownerUID !== currentUser?.uid) { showToast('Sem permissão!', 'error'); return; }
             await db.collection('notes').doc(id).update({ completed: !n.completed });
         };
 
         // ─── EDITAR NOTA ──────────────────────────────────────────────────────────
         window.editNote = (id) => {
+            const n = allNotes.find(x => x.id === id);
+            if (!n || n.ownerUID !== currentUser?.uid) { showToast('Sem permissão para editar!', 'error'); return; }
             openEditModal(id);
         };
 
@@ -2016,9 +2147,11 @@
         };
 
         // ─── DELETE ───────────────────────────────────────────────────────────────
-        window.deleteNote = (id) => {
+        window.deleteNote = async (id) => {
+            const n = allNotes.find(x => x.id === id);
+            if (!n || n.ownerUID !== currentUser?.uid) { showToast('Sem permissão para excluir!', 'error'); return; }
             if (confirm("Deletar esta anotação?")) {
-                db.collection('notes').doc(id).delete();
+                await db.collection('notes').doc(id).delete();
                 customOrder = customOrder.filter(x => x !== id);
                 showToast('Anotação deletada.', 'info');
             }
@@ -2123,16 +2256,30 @@
         // Toggle painel OS
         document.getElementById('btnOsToggle').onclick = () => {
             osPanelOpen = !osPanelOpen;
-            const panel = document.getElementById('osPanel');
-            const btn = document.getElementById('btnOsToggle');
-            panel.classList.toggle('visible', osPanelOpen);
+            const wrap = document.getElementById('osPanelWrap');
+            const btn  = document.getElementById('btnOsToggle');
+            wrap.classList.toggle('open', osPanelOpen);
             btn.classList.toggle('active', osPanelOpen);
-            if (osPanelOpen) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (osPanelOpen) setTimeout(() => wrap.scrollIntoView({ behavior:'smooth', block:'start' }), 80);
         };
 
         // ── LOAD OS ────────────────────────────────────────────────
-        function loadOS() {
-            db.collection('ordens').orderBy('numero', 'asc').onSnapshot(snap => {
+        async function loadOS() {
+            // migrar O.S. antigas sem ownerUID
+            const allSnap = await db.collection('ordens').get();
+            const batch = db.batch();
+            let count = 0;
+            allSnap.forEach(doc => {
+                if (!doc.data().ownerUID) {
+                    batch.update(doc.ref, { ownerUID: currentUser.uid });
+                    count++;
+                }
+            });
+            if (count > 0) await batch.commit();
+
+            db.collection('ordens')
+                .where('ownerUID', '==', currentUser.uid)
+                .orderBy('numero', 'asc').onSnapshot(snap => {
                 allOS = [];
                 snap.forEach(doc => allOS.push({ id: doc.id, ...doc.data() }));
                 renderOS();
@@ -2142,7 +2289,9 @@
 
         // ── PRÓXIMO NÚMERO ─────────────────────────────────────────
         async function getNextOsNumber() {
-            const snap = await db.collection('ordens').orderBy('numero', 'desc').limit(1).get();
+            const snap = await db.collection('ordens')
+                .where('ownerUID', '==', currentUser.uid)
+                .orderBy('numero', 'desc').limit(1).get();
             if (snap.empty) return 1;
             return (snap.docs[0].data().numero || 0) + 1;
         }
@@ -2184,9 +2333,11 @@
         // ── SALVAR OS — movido para o módulo Cloudinary abaixo ────
 
         // ── DELETE OS ──────────────────────────────────────────────
-        window.deleteOs = (id) => {
+        window.deleteOs = async (id) => {
+            const os = allOS.find(x => x.id === id);
+            if (!os || os.ownerUID !== currentUser?.uid) { showToast('Sem permissão para excluir!', 'error'); return; }
             if (confirm('Excluir esta Ordem de Serviço?')) {
-                db.collection('ordens').doc(id).delete();
+                await db.collection('ordens').doc(id).delete();
                 showToast('O.S. excluída.', 'info');
             }
         };
@@ -2195,8 +2346,23 @@
         window.osNextStatus = async (id) => {
             const os = allOS.find(x => x.id === id);
             if (!os) return;
+            if (os.ownerUID !== currentUser?.uid) { showToast('Sem permissão!', 'error'); return; }
             const cycle = { aguardando: 'andamento', andamento: 'concluido', concluido: 'aguardando' };
-            await db.collection('ordens').doc(id).update({ status: cycle[os.status], updatedAt: Date.now() });
+            const newStatus = cycle[os.status];
+            const statusLabel = { aguardando:'Aguardando', andamento:'Em Andamento', concluido:'Concluído' };
+            const histEntry = {
+                de: os.status,
+                para: newStatus,
+                label: statusLabel[newStatus],
+                ts: Date.now(),
+                user: currentUser?.email || 'desconhecido'
+            };
+            const historico = [...(os.historico || []), histEntry];
+            await db.collection('ordens').doc(id).update({
+                status: newStatus,
+                updatedAt: Date.now(),
+                historico
+            });
         };
 
         // ── IMPRIMIR COMANDA ───────────────────────────────────────
@@ -2332,8 +2498,8 @@
         document.getElementById('osFilterDateTo').onchange = renderOS;
 
         // ── INICIALIZAR OS quando logado ───────────────────────────
-        auth.onAuthStateChanged(user => {
-            if (user) loadOS();
+        auth.onAuthStateChanged(async user => {
+            if (user) await loadOS();
         });
 
         // ═══════════════════════════════════════════════════════════
@@ -2343,13 +2509,13 @@
 
         document.getElementById('btnDashToggle').onclick = () => {
             dashOpen = !dashOpen;
-            const panel = document.getElementById('dashPanel');
-            const btn   = document.getElementById('btnDashToggle');
-            panel.style.display = dashOpen ? 'block' : 'none';
+            const wrap = document.getElementById('dashPanelWrap');
+            const btn  = document.getElementById('btnDashToggle');
+            wrap.classList.toggle('open', dashOpen);
             btn.classList.toggle('active', dashOpen);
             if (dashOpen) {
                 renderDashboard();
-                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setTimeout(() => wrap.scrollIntoView({ behavior:'smooth', block:'start' }), 80);
             }
         };
 
@@ -2644,17 +2810,16 @@
         // Toggle painel
         document.getElementById('btnCheckToggle').onclick = () => {
             checkPanelOpen = !checkPanelOpen;
-            const panel = document.getElementById('checkPanel');
-            const btn   = document.getElementById('btnCheckToggle');
-            panel.style.display = checkPanelOpen ? 'block' : 'none';
+            const wrap = document.getElementById('checkPanelWrap');
+            const btn  = document.getElementById('btnCheckToggle');
+            wrap.classList.toggle('open', checkPanelOpen);
             btn.classList.toggle('active', checkPanelOpen);
             if (checkPanelOpen) {
                 buildCheckForm();
                 loadCheckHistory();
-                // Set today's date as default
                 const d = document.getElementById('checkDate');
                 if (!d.value) d.value = new Date().toISOString().slice(0,10);
-                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setTimeout(() => wrap.scrollIntoView({ behavior:'smooth', block:'start' }), 80);
             }
         };
 
@@ -2880,23 +3045,194 @@
             document.getElementById('checkPrintTarget').style.display = 'none';
         };
 
+        // printHistItem — redefinido abaixo com PDF
+
+        // ── TOGGLE HISTÓRICO NO CARD ───────────────────────────────
+        window.toggleOsHistory = (btn) => {
+            const panel = btn.nextElementSibling;
+            const icon  = btn.querySelector('.fa-chevron-down');
+            panel.classList.toggle('open');
+            if (icon) icon.style.transform = panel.classList.contains('open') ? 'rotate(180deg)' : '';
+        };
+
+        // ── PDF DO CHECKLIST ───────────────────────────────────────
+        function exportCheckPdf(state) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit:'mm', format:'a4' });
+            const pageW = 210;
+            const now = new Date().toLocaleString('pt-BR');
+
+            // Header
+            doc.setFillColor(8,10,15);
+            doc.rect(0,0,pageW,22,'F');
+            doc.setTextColor(0,212,255);
+            doc.setFontSize(13); doc.setFont('helvetica','bold');
+            doc.text('INFORWNET — Checklist de Material', 14, 12);
+            doc.setTextColor(180,180,192);
+            doc.setFontSize(8); doc.setFont('helvetica','normal');
+            doc.text(`Gerado: ${now}`, 14, 18);
+
+            let y = 30;
+
+            // Info row
+            doc.setFillColor(20,24,33);
+            doc.roundedRect(10, y, 190, 18, 3, 3, 'F');
+            doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont('helvetica','bold');
+            doc.text(`Técnico: ${state.tech || '—'}`, 15, y+6);
+            doc.text(`Data: ${state.date || '—'}`, 90, y+6);
+            doc.text(`Ref: ${state.ref || '—'}`, 155, y+6);
+            if (state.obs) {
+                doc.setFont('helvetica','normal'); doc.setTextColor(180,180,192); doc.setFontSize(8);
+                doc.text(`Obs: ${state.obs.slice(0,80)}`, 15, y+13);
+            }
+            y += 24;
+
+            // Materiais
+            const matItems = Object.entries(state.materials||{}).filter(([,v])=>v>0);
+            if (matItems.length) {
+                doc.setFillColor(0,212,255);
+                doc.rect(10, y, 190, 7, 'F');
+                doc.setTextColor(8,10,15); doc.setFontSize(9); doc.setFont('helvetica','bold');
+                doc.text('MATERIAIS', 15, y+5);
+                y += 9;
+
+                // table header
+                doc.setFillColor(30,34,45); doc.rect(10,y,190,6,'F');
+                doc.setTextColor(180,180,192); doc.setFontSize(8); doc.setFont('helvetica','bold');
+                doc.text('Item', 15, y+4.5);
+                doc.text('Qtd', 185, y+4.5, {align:'right'});
+                y += 7;
+
+                matItems.forEach(([name, qty], i) => {
+                    if (y > 270) { doc.addPage(); y = 15; }
+                    doc.setFillColor(i%2===0 ? 24:28, i%2===0 ? 28:32, i%2===0 ? 38:42);
+                    doc.rect(10, y, 190, 6, 'F');
+                    doc.setTextColor(220,220,230); doc.setFontSize(8); doc.setFont('helvetica','normal');
+                    doc.text(name, 15, y+4.5);
+                    doc.setFont('helvetica','bold');
+                    doc.text(String(qty), 185, y+4.5, {align:'right'});
+                    y += 6;
+                });
+                y += 6;
+            }
+
+            // Ferramentas
+            if (y > 250) { doc.addPage(); y = 15; }
+            doc.setFillColor(0,212,255);
+            doc.rect(10, y, 190, 7, 'F');
+            doc.setTextColor(8,10,15); doc.setFontSize(9); doc.setFont('helvetica','bold');
+            doc.text('FERRAMENTAS', 15, y+5);
+            y += 9;
+
+            doc.setFillColor(30,34,45); doc.rect(10,y,190,6,'F');
+            doc.setTextColor(180,180,192); doc.setFontSize(8); doc.setFont('helvetica','bold');
+            doc.text('Ferramenta', 15, y+4.5);
+            doc.text('Status', 185, y+4.5, {align:'right'});
+            y += 7;
+
+            Object.entries(state.tools||{}).forEach(([name, has], i) => {
+                if (y > 270) { doc.addPage(); y = 15; }
+                doc.setFillColor(i%2===0 ? 24:28, i%2===0 ? 28:32, i%2===0 ? 38:42);
+                doc.rect(10, y, 190, 6, 'F');
+                doc.setTextColor(220,220,230); doc.setFontSize(8); doc.setFont('helvetica','normal');
+                doc.text(name, 15, y+4.5);
+                doc.setFont('helvetica','bold');
+                doc.setTextColor(has ? 0:255, has ? 200:80, has ? 100:80);
+                doc.text(has ? 'SIM' : 'NÃO', 185, y+4.5, {align:'right'});
+                y += 6;
+            });
+
+            // Assinatura
+            y += 10;
+            if (y > 260) { doc.addPage(); y = 15; }
+            doc.setDrawColor(100,116,139); doc.setLineWidth(0.4);
+            doc.line(14, y+14, 100, y+14);
+            doc.setTextColor(100,116,139); doc.setFontSize(7); doc.setFont('helvetica','normal');
+            doc.text('Assinatura do Técnico', 14, y+18);
+            doc.line(110, y+14, 196, y+14);
+            doc.text('Assinatura do Cliente', 110, y+18);
+
+            doc.save(`checklist-${(state.tech||'inforwnet').replace(/\s/g,'-')}-${state.date||'hoje'}.pdf`);
+            showToast('PDF do checklist exportado! 📄', 'success');
+        }
+
+        document.getElementById('btnCheckPdfExport').onclick = () => {
+            const state = getCheckState();
+            if (!state.tech) { showToast('Informe o técnico antes de exportar!', 'error'); return; }
+            exportCheckPdf(state);
+        };
+
         window.printHistItem = (id) => {
             const s = (window._checkHistCache||[]).find(x=>x.id===id);
             if (!s) return;
-            document.getElementById('checkPrintTarget').innerHTML = buildPrintHtml(s);
-            document.getElementById('checkPrintTarget').style.display = 'block';
-            window.print();
-            document.getElementById('checkPrintTarget').style.display = 'none';
+            exportCheckPdf(s);
         };
 
-        // ── INICIALIZAR QUANDO LOGADO ─────────────────────────────
-        auth.onAuthStateChanged(user => {
-            if (user && checkPanelOpen) loadCheckHistory();
-        });
+        // ═══════════════════════════════════════════════════════════
+        //  SEGURANÇA — SANITIZAÇÃO XSS
+        // ═══════════════════════════════════════════════════════════
+        function escHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+                .replace(/'/g,'&#039;');
+        }
+
+        /*
+        ═══ REGRAS FIRESTORE SEGURAS — Cole no Firebase Console → Firestore → Regras ═══
+
+        rules_version = '2';
+        service cloud.firestore {
+          match /databases/{database}/documents {
+
+            // ANOTAÇÕES
+            match /notes/{id} {
+              // Lê/escreve se for o dono OU se não tiver ownerUID (migração)
+              allow read, write: if request.auth != null
+                && (resource.data.ownerUID == request.auth.uid
+                    || resource.data.ownerUID == null
+                    || resource.data.ownerUID == '');
+              allow create: if request.auth != null
+                && request.resource.data.ownerUID == request.auth.uid;
+            }
+
+            // CONFIGURAÇÕES
+            match /userSettings/{userId} {
+              allow read, write: if request.auth != null && request.auth.uid == userId;
+            }
+
+            // ORDENS DE SERVIÇO
+            match /ordens/{id} {
+              allow read, write: if request.auth != null
+                && (resource.data.ownerUID == request.auth.uid
+                    || resource.data.ownerUID == null
+                    || resource.data.ownerUID == '');
+              allow create: if request.auth != null
+                && request.resource.data.ownerUID == request.auth.uid;
+            }
+
+            // CHECKLISTS
+            match /checklists/{id} {
+              allow read, write: if request.auth != null
+                && (resource.data.ownerUID == request.auth.uid
+                    || resource.data.ownerUID == null
+                    || resource.data.ownerUID == '');
+              allow create: if request.auth != null
+                && request.resource.data.ownerUID == request.auth.uid;
+            }
+          }
+        }
+
+        APÓS A MIGRAÇÃO COMPLETAR (quando não aparecer mais toast de migração),
+        você pode trocar a regra de cada coleção para a versão mais restrita:
+          allow read, write: if request.auth != null
+            && resource.data.ownerUID == request.auth.uid;
+        ═══════════════════════════════════════════════════════════════
+        */
 
         // ═══════════════════════════════════════════════════════════
         //  CLOUDINARY — UPLOAD DE FOTOS
-        // ═══════════════════════════════════════════════════════════
         const CL_CLOUD  = 'doku11ul8';
         const CL_PRESET = 'ml_default';
         const CL_URL    = `https://api.cloudinary.com/v1_1/${CL_CLOUD}/image/upload`;
@@ -3031,6 +3367,10 @@
         // ── INJETAR fotos ao abrir OS para editar ─────────────────
         const _origOpenOsForm = window.openOsForm;
         window.openOsForm = (id = null) => {
+            if (id) {
+                const os = allOS.find(x => x.id === id);
+                if (!os || os.ownerUID !== currentUser?.uid) { showToast('Sem permissão para editar!', 'error'); return; }
+            }
             osPhotos = [];
             document.getElementById('osPhotoPreview').innerHTML = '';
             _origOpenOsForm(id);
@@ -3054,24 +3394,45 @@
             if (!client) { showToast('Informe o cliente!', 'error'); return; }
             if (!desc)   { showToast('Descreva o serviço!', 'error'); return; }
 
+            const newStatus = document.getElementById('osStatus').value;
+            const statusLabel = { aguardando:'Aguardando', andamento:'Em Andamento', concluido:'Concluído' };
+
             const data = {
                 client,
                 device:   document.getElementById('osDevice').value.trim(),
                 desc,
                 priority: document.getElementById('osPriority').value,
                 tech:     document.getElementById('osTech').value.trim(),
-                status:   document.getElementById('osStatus').value,
+                status:   newStatus,
                 photos:   [...osPhotos],
                 ownerUID: currentUser.uid,
                 updatedAt: Date.now()
             };
 
             if (editOsId) {
+                const existingOs = allOS.find(x => x.id === editOsId);
+                // registrar mudança de status no histórico se mudou
+                if (existingOs && existingOs.status !== newStatus) {
+                    const histEntry = {
+                        de: existingOs.status,
+                        para: newStatus,
+                        label: statusLabel[newStatus],
+                        ts: Date.now(),
+                        user: currentUser?.email || 'desconhecido'
+                    };
+                    data.historico = [...(existingOs.historico || []), histEntry];
+                }
                 await db.collection('ordens').doc(editOsId).update(data);
                 showToast('O.S. atualizada!', 'success');
             } else {
                 data.numero    = await getNextOsNumber();
                 data.createdAt = Date.now();
+                data.historico = [{
+                    de: null, para: newStatus,
+                    label: statusLabel[newStatus],
+                    ts: Date.now(),
+                    user: currentUser?.email || 'desconhecido'
+                }];
                 await db.collection('ordens').add(data);
                 showToast(`O.S. #${String(data.numero).padStart(4,'0')} criada!`, 'success');
             }
@@ -3415,10 +3776,10 @@
                     return `<div class="os-card status-${os.status}">
                         <div class="os-card-num">O.S. #${num} · ${dt}</div>
                         ${timerHtml}
-                        <div class="os-card-client">${os.client}</div>
-                        ${os.device ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;"><i class="fas fa-laptop" style="margin-right:4px;"></i>${os.device}</div>` : ''}
-                        <div class="os-card-desc">${os.desc}</div>
-                        ${os.tech ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;"><i class="fas fa-user-cog" style="margin-right:4px;"></i>${os.tech}</div>` : ''}
+                        <div class="os-card-client">${escHtml(os.client)}</div>
+                        ${os.device ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;"><i class="fas fa-laptop" style="margin-right:4px;"></i>${escHtml(os.device)}</div>` : ''}
+                        <div class="os-card-desc">${escHtml(os.desc)}</div>
+                        ${os.tech ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;"><i class="fas fa-user-cog" style="margin-right:4px;"></i>${escHtml(os.tech)}</div>` : ''}
                         ${photoStrip}
                         <div class="os-card-meta">
                             <span class="os-priority-badge ${prioClass}">${prioIcon} ${os.priority}</span>
@@ -3429,6 +3790,20 @@
                                 <button onclick="deleteOs('${os.id}')" title="Excluir" style="color:var(--secondary);"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
+                        ${os.historico?.length ? `
+                        <button class="os-history-toggle" onclick="toggleOsHistory(this)">
+                            <i class="fas fa-history"></i> Histórico (${os.historico.length})
+                            <i class="fas fa-chevron-down" style="margin-left:auto; transition:0.2s;"></i>
+                        </button>
+                        <div class="os-history-panel">
+                            ${os.historico.map(h => {
+                                const dt2 = new Date(h.ts).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+                                return `<div class="os-hist-entry">
+                                    <span class="os-hist-badge os-hist-badge-${h.para}">${h.label}</span>
+                                    <span>${dt2} · ${h.user}</span>
+                                </div>`;
+                            }).join('')}
+                        </div>` : ''}
                     </div>`;
                 }).join('');
             });
