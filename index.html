@@ -1031,12 +1031,115 @@
             display: inline-flex; align-items: center; gap: 6px;
         }
         .btn-pdf-check:hover { background: var(--primary); color: white; }
+
+        /* ═══ SELETOR DE MÓDULO ═════════════════════════════════════ */
+        .module-select-overlay {
+            position: fixed; inset: 0; z-index: 5000;
+            background: var(--bg-primary);
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.35s, visibility 0.35s;
+        }
+        .module-select-overlay.open { opacity: 1; visibility: visible; }
+        .module-select-card {
+            background: var(--bg-card); border: 1px solid var(--border-alpha);
+            border-radius: var(--radius-xl); padding: 2.5rem 2rem;
+            width: 100%; max-width: 480px; text-align: center;
+        }
+        .module-select-title {
+            font-size: 1.4rem; font-weight: 800;
+            background: var(--gradient-neural); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; margin-bottom: 0.3rem;
+        }
+        .module-select-sub {
+            font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2rem;
+        }
+        .module-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 1rem; margin-bottom: 1rem;
+        }
+        .module-btn {
+            background: var(--bg-input); border: 2px solid var(--border-alpha);
+            border-radius: var(--radius); padding: 1.5rem 1rem;
+            cursor: pointer; transition: 0.25s; display: flex;
+            flex-direction: column; align-items: center; gap: 0.75rem;
+            font-family: 'Outfit', sans-serif;
+        }
+        .module-btn:hover { border-color: var(--primary); background: rgba(0,212,255,0.06); transform: translateY(-3px); }
+        .module-btn.selected { border-color: var(--primary); background: rgba(0,212,255,0.1); }
+        .module-btn-icon { font-size: 2.2rem; }
+        .module-btn-label { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-primary); }
+        .module-btn-desc { font-size: 0.7rem; color: var(--text-muted); line-height: 1.4; }
+
+        /* ═══ MATERIAIS UTILIZADOS NA O.S. ══════════════════════════ */
+        .mat-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem; margin-bottom: 1rem;
+        }
+        @media (max-width: 500px) { .mat-grid { grid-template-columns: repeat(2,1fr); } }
+        .mat-item {
+            background: var(--bg-input); border: 1px solid var(--border-alpha);
+            border-radius: var(--radius); padding: 0.6rem 0.75rem;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 0.5rem; transition: 0.2s;
+        }
+        .mat-item.has-qty { border-color: rgba(0,212,255,0.4); background: rgba(0,212,255,0.04); }
+        .mat-item-name { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); flex: 1; }
+        .mat-qty-wrap { display: flex; align-items: center; gap: 3px; }
+        .mat-qty-btn {
+            background: var(--bg-card); border: 1px solid var(--border-alpha);
+            color: var(--text-primary); width: 24px; height: 24px;
+            border-radius: 6px; cursor: pointer; font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.15s; line-height: 1;
+        }
+        .mat-qty-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .mat-qty-input {
+            width: 36px; height: 24px; text-align: center;
+            background: var(--bg-card); border: 1px solid var(--border-alpha);
+            color: var(--text-primary); border-radius: 6px;
+            font-size: 0.82rem; font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            -moz-appearance: textfield;
+        }
+        .mat-qty-input::-webkit-inner-spin-button,
+        .mat-qty-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+        .mat-summary { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+        .mat-badge {
+            background: rgba(0,212,255,0.12); color: var(--primary);
+            border-radius: 20px; padding: 2px 10px; font-size: 0.68rem; font-weight: 700;
+        }
     </style>
 </head>
 
 <body>
     <div class="bg-glow"></div>
     <div class="offline-banner" id="offlineBanner">📡 Sem conexão — trabalhando offline. Os dados serão sincronizados quando voltar.</div>
+
+    <!-- ═══ SELETOR DE MÓDULO ═══ -->
+    <div class="module-select-overlay" id="moduleSelectOverlay">
+        <div class="module-select-card">
+            <div style="font-size:2.5rem; margin-bottom:0.5rem;">🌐</div>
+            <div class="module-select-title">INFORWNET</div>
+            <div class="module-select-sub">Olá, <span id="moduleUserName"></span>! Escolha o módulo:</div>
+            <div class="module-grid">
+                <button class="module-btn" onclick="selectModule('notas')">
+                    <div class="module-btn-icon">📝</div>
+                    <div class="module-btn-label">Anotações</div>
+                    <div class="module-btn-desc">Notas, lembretes e registros rápidos</div>
+                </button>
+                <button class="module-btn" onclick="selectModule('suporte')">
+                    <div class="module-btn-icon">🔧</div>
+                    <div class="module-btn-label">Suporte Técnico</div>
+                    <div class="module-btn-desc">O.S., Checklist de material e atendimentos</div>
+                </button>
+            </div>
+            <button class="btn-secondary" onclick="selectModule('ambos')" style="width:100%; font-size:0.82rem;">
+                <i class="fas fa-th-large"></i> Abrir tudo
+            </button>
+        </div>
+    </div>
 
     <!-- MODAL INSTALAR APP -->
     <div class="edit-modal-overlay" id="installModalOverlay" style="z-index:9999;">
@@ -1195,6 +1298,14 @@
                 <option value="andamento">🔧 Em Andamento</option>
                 <option value="concluido">✅ Concluído</option>
             </select>
+
+            <!-- MATERIAIS UTILIZADOS -->
+            <div id="osMaterialsSection">
+                <div style="font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:0.75rem; display:flex; align-items:center; gap:6px;">
+                    <i class="fas fa-boxes" style="color:var(--primary);"></i> Materiais Utilizados
+                </div>
+                <div class="mat-grid" id="osMaterialsGrid"></div>
+            </div>
 
             <!-- FOTOS DA O.S. -->
             <div class="photo-section">
@@ -1762,13 +1873,17 @@
             if (user) {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('mainContent').style.display = 'block';
-                // Migra notas antigas sem ownerUID para este usuário
                 await migrateOldNotes(user.uid, user.email);
                 loadNotes();
                 loadCustomOrder();
+                // Mostra seletor de módulo
+                document.getElementById('moduleUserName').textContent =
+                    user.displayName || user.email.split('@')[0];
+                document.getElementById('moduleSelectOverlay').classList.add('open');
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('mainContent').style.display = 'none';
+                document.getElementById('moduleSelectOverlay').classList.remove('open');
             }
         });
 
@@ -3780,6 +3895,8 @@
                         ${os.device ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;"><i class="fas fa-laptop" style="margin-right:4px;"></i>${escHtml(os.device)}</div>` : ''}
                         <div class="os-card-desc">${escHtml(os.desc)}</div>
                         ${os.tech ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;"><i class="fas fa-user-cog" style="margin-right:4px;"></i>${escHtml(os.tech)}</div>` : ''}
+                        ${os.materiais && Object.values(os.materiais).some(v=>v>0) ? `
+                        <div class="mat-summary">${Object.entries(os.materiais).filter(([,v])=>v>0).map(([k,v])=>`<span class="mat-badge">${k}: ${v}</span>`).join('')}</div>` : ''}
                         ${photoStrip}
                         <div class="os-card-meta">
                             <span class="os-priority-badge ${prioClass}">${prioIcon} ${os.priority}</span>
@@ -3897,6 +4014,212 @@
             doc.save(`inforwnet-os-${new Date().toISOString().slice(0,10)}.pdf`);
             showToast('PDF exportado!', 'success');
         };
+
+        // ═══════════════════════════════════════════════════════════
+        //  SELETOR DE MÓDULO
+        // ═══════════════════════════════════════════════════════════
+        const MODULES = {
+            notas:   { notes: true,  os: false, check: false },
+            suporte: { notes: false, os: true,  check: true  },
+            ambos:   { notes: true,  os: true,  check: true  }
+        };
+
+        window.selectModule = (mod) => {
+            const cfg = MODULES[mod] || MODULES.ambos;
+            // Salva preferência
+            localStorage.setItem('inforwnet_module', mod);
+
+            // Mostra/oculta seções do main-grid
+            const notesCol  = document.querySelector('.main-grid');
+            const mainArea  = document.getElementById('mainContent');
+
+            // Controla visibilidade das colunas
+            const notesSection = document.querySelector('.main-grid > main');
+            const editorAside  = document.querySelector('.main-grid > aside');
+            if (notesSection) notesSection.style.display = cfg.notes ? '' : 'none';
+            if (editorAside)  editorAside.style.display  = cfg.notes ? '' : 'none';
+
+            // Painel OS e Checklist
+            const osWrap    = document.getElementById('osPanelWrap');
+            const checkWrap = document.getElementById('checkPanelWrap');
+            const btnOs     = document.getElementById('btnOsToggle');
+            const btnCheck  = document.getElementById('btnCheckToggle');
+
+            if (osWrap)    osWrap.style.display    = cfg.os    ? '' : 'none';
+            if (checkWrap) checkWrap.style.display  = cfg.check ? '' : 'none';
+            if (btnOs)     btnOs.style.display      = cfg.os    ? '' : 'none';
+            if (btnCheck)  btnCheck.style.display   = cfg.check ? '' : 'none';
+
+            // Auto-abrir painéis do módulo suporte
+            if (mod === 'suporte') {
+                if (!osPanelOpen) document.getElementById('btnOsToggle').click();
+            }
+
+            // Fecha o overlay com animação
+            document.getElementById('moduleSelectOverlay').classList.remove('open');
+        };
+
+        // Restaura módulo preferido ao logar
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                const saved = localStorage.getItem('inforwnet_module');
+                if (saved) {
+                    // pequeno delay para o DOM estar pronto
+                    setTimeout(() => selectModule(saved), 400);
+                }
+            }
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        //  MATERIAIS UTILIZADOS NA O.S.
+        // ═══════════════════════════════════════════════════════════
+        const OS_MATERIAIS = [
+            'APC','RJ45','ONT','ROTEADOR','DROP',
+            'ACOPLADOR','CABO REDE','ONU','UPC',
+            'FONTE POE','SWITCH','CAIXA EMENDA'
+        ];
+
+        let osMateriais = {}; // { 'APC': 2, 'RJ45': 5, ... }
+
+        function buildOsMaterialsGrid() {
+            const grid = document.getElementById('osMaterialsGrid');
+            if (!grid) return;
+            grid.innerHTML = OS_MATERIAIS.map(name => {
+                const key = name.replace(/\s/g,'_');
+                return `<div class="mat-item" id="mat-item-${key}">
+                    <span class="mat-item-name">${name}</span>
+                    <div class="mat-qty-wrap">
+                        <button class="mat-qty-btn" onclick="matAdj('${name}',-1)">−</button>
+                        <input type="number" class="mat-qty-input" id="mat-${key}"
+                            value="0" min="0"
+                            onchange="matChange('${name}',this.value)">
+                        <button class="mat-qty-btn" onclick="matAdj('${name}',1)">+</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        window.matAdj = (name, delta) => {
+            const key = name.replace(/\s/g,'_');
+            const el  = document.getElementById('mat-' + key);
+            if (!el) return;
+            const val = Math.max(0, (parseInt(el.value)||0) + delta);
+            el.value = val;
+            matChange(name, val);
+        };
+
+        window.matChange = (name, val) => {
+            const key = name.replace(/\s/g,'_');
+            osMateriais[name] = parseInt(val) || 0;
+            const item = document.getElementById('mat-item-' + key);
+            if (item) item.classList.toggle('has-qty', osMateriais[name] > 0);
+        };
+
+        function getOsMateriais() {
+            const result = {};
+            OS_MATERIAIS.forEach(name => {
+                const val = osMateriais[name] || 0;
+                if (val > 0) result[name] = val;
+            });
+            return result;
+        }
+
+        function loadOsMateriais(materiais) {
+            osMateriais = {};
+            buildOsMaterialsGrid();
+            if (!materiais) return;
+            Object.entries(materiais).forEach(([name, val]) => {
+                const key = name.replace(/\s/g,'_');
+                const el  = document.getElementById('mat-' + key);
+                if (el) {
+                    el.value = val;
+                    matChange(name, val);
+                }
+            });
+        }
+
+        function clearOsMateriais() {
+            osMateriais = {};
+            buildOsMaterialsGrid();
+        }
+
+        // Build grid on page load
+        buildOsMaterialsGrid();
+
+        // Patch openOsForm to load materials
+        const __origOpenOsForm = window.openOsForm;
+        window.openOsForm = (id = null) => {
+            __origOpenOsForm(id);
+            if (id) {
+                const os = allOS.find(x => x.id === id);
+                loadOsMateriais(os?.materiais || {});
+            } else {
+                clearOsMateriais();
+            }
+        };
+
+        // Patch closeOsForm to clear materials
+        const __origCloseOsForm = window.closeOsForm;
+        window.closeOsForm = () => {
+            __origCloseOsForm();
+            clearOsMateriais();
+        };
+
+        // Patch OS save button to include materials
+        const _savedBtnOsSave = document.getElementById('btnOsSave').onclick;
+        document.getElementById('btnOsSave').onclick = async () => {
+            const client = document.getElementById('osClient').value.trim();
+            const desc   = document.getElementById('osDesc').value.trim();
+            if (!client) { showToast('Informe o cliente!', 'error'); return; }
+            if (!desc)   { showToast('Descreva o serviço!', 'error'); return; }
+
+            const newStatus = document.getElementById('osStatus').value;
+            const statusLabel = { aguardando:'Aguardando', andamento:'Em Andamento', concluido:'Concluído' };
+
+            const data = {
+                client,
+                device:    document.getElementById('osDevice').value.trim(),
+                desc,
+                priority:  document.getElementById('osPriority').value,
+                tech:      document.getElementById('osTech').value.trim(),
+                status:    newStatus,
+                photos:    [...osPhotos],
+                materiais: getOsMateriais(),
+                ownerUID:  currentUser.uid,
+                updatedAt: Date.now()
+            };
+
+            if (editOsId) {
+                const existingOs = allOS.find(x => x.id === editOsId);
+                if (existingOs && existingOs.status !== newStatus) {
+                    const histEntry = {
+                        de: existingOs.status, para: newStatus,
+                        label: statusLabel[newStatus],
+                        ts: Date.now(), user: currentUser?.email || 'desconhecido'
+                    };
+                    data.historico = [...(existingOs.historico || []), histEntry];
+                }
+                await db.collection('ordens').doc(editOsId).update(data);
+                showToast('O.S. atualizada!', 'success');
+            } else {
+                data.numero    = await getNextOsNumber();
+                data.createdAt = Date.now();
+                data.historico = [{
+                    de: null, para: newStatus, label: statusLabel[newStatus],
+                    ts: Date.now(), user: currentUser?.email || 'desconhecido'
+                }];
+                await db.collection('ordens').add(data);
+                showToast(`O.S. #${String(data.numero).padStart(4,'0')} criada!`, 'success');
+            }
+            window.closeOsForm();
+        };
+
+        // Botão para voltar ao seletor de módulo
+        document.getElementById('themeToggle').insertAdjacentHTML('beforebegin',
+            `<button class="os-nav-btn" onclick="document.getElementById('moduleSelectOverlay').classList.add('open')" title="Trocar módulo" style="font-size:0.9rem;">
+                <i class="fas fa-th-large"></i>
+            </button>`
+        );
 
     </script>
 </body>
