@@ -137,19 +137,86 @@
 
         #notesContainer.grid-mode {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 15px;
         }
         #notesContainer.grid-mode .note-item { margin-bottom: 0; }
 
+        @keyframes noteSlideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
         .note-item {
             background: var(--bg-input); border-radius: var(--radius);
-            padding: 1.1rem; margin-bottom: 0.85rem; border-left: 4px solid var(--primary); transition: 0.25s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 1.1rem; margin-bottom: 0.85rem; border-left: 4px solid var(--primary); transition: box-shadow 0.25s, transform 0.25s, opacity 0.25s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             position: relative;
+            animation: noteSlideIn 0.3s ease both;
+        }
+        .note-item:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+            transform: translateY(-2px);
         }
         .note-item.private { border-left-color: var(--secondary); }
-        .note-item.completed { opacity: 0.6; border-left-color: var(--success); }
+        .note-item.completed { opacity: 0.55; border-left-color: var(--success); }
+
+        /* NOTE TAGS */
+        .note-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; padding-left: 28px; }
+        .note-tag {
+            font-size: 0.65rem; font-weight: 700; padding: 2px 9px; border-radius: 20px;
+            background: rgba(0,212,255,0.12); color: var(--primary);
+            cursor: pointer; transition: 0.15s; border: 1px solid rgba(0,212,255,0.2);
+            text-transform: uppercase; letter-spacing: 0.04em;
+        }
+        .note-tag:hover { background: rgba(0,212,255,0.25); }
+
+        /* NOTE META (data + copiar) */
+        .note-meta {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.68rem; color: var(--text-muted);
+        }
+        .note-copy-btn {
+            background: none; border: none; color: var(--text-muted); cursor: pointer;
+            font-size: 0.75rem; padding: 2px 6px; border-radius: 6px; transition: 0.15s;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .note-copy-btn:hover { color: var(--primary); background: rgba(0,212,255,0.1); }
+
+        /* NOTE char counter */
+        .note-char-counter {
+            font-size: 0.7rem; color: var(--text-muted); text-align: right;
+            margin-top: -0.5rem; margin-bottom: 0.75rem; transition: color 0.2s;
+        }
+        .note-char-counter.warn { color: #ffaa00; }
+        .note-char-counter.over { color: var(--secondary); }
+
+        /* SEARCH HIGHLIGHT */
+        mark.search-hl {
+            background: rgba(0,212,255,0.25); color: inherit;
+            border-radius: 3px; padding: 0 2px;
+        }
+
+        /* TAGS INPUT */
+        .tags-input-wrap {
+            display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+            background: var(--bg-input); border: 1px solid var(--border-alpha);
+            border-radius: var(--radius); padding: 0.6rem 0.9rem;
+            margin-bottom: 1rem; cursor: text; transition: 0.3s;
+        }
+        .tags-input-wrap:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+        .tag-chip {
+            background: rgba(0,212,255,0.15); color: var(--primary);
+            border-radius: 20px; padding: 2px 10px; font-size: 0.72rem; font-weight: 700;
+            display: flex; align-items: center; gap: 5px; border: 1px solid rgba(0,212,255,0.25);
+        }
+        .tag-chip-del { background: none; border: none; cursor: pointer; color: var(--primary); font-size: 0.65rem; padding: 0; line-height: 1; }
+        .tags-real-input {
+            border: none; background: none; outline: none; color: var(--text-primary);
+            font-family: 'Outfit', sans-serif; font-size: 0.85rem; min-width: 100px; flex: 1;
+            padding: 0;
+        }
+        .tags-hint { font-size: 0.68rem; color: var(--text-muted); margin-bottom: 1rem; margin-top: -0.5rem; }
 
         /* DRAG & DROP */
         .drag-handle {
@@ -217,8 +284,18 @@
         }
         .drag-hint i { color: var(--primary); }
 
-        /* SAVE ORDER BUTTON */
-        #btnSaveOrder {
+        /* SEARCH ENHANCED */
+        .search-wrap {
+            position: relative; display: flex; align-items: center;
+        }
+        .search-wrap .neural-input { padding-right: 3rem; }
+        .search-clear-btn {
+            position: absolute; right: 12px; background: none; border: none;
+            color: var(--text-muted); cursor: pointer; font-size: 0.85rem;
+            padding: 4px; border-radius: 6px; transition: 0.15s; display: none;
+        }
+        .search-clear-btn.visible { display: flex; }
+        .search-clear-btn:hover { color: var(--secondary); }
             display: none;
             margin-top: 10px;
             width: 100%;
@@ -995,11 +1072,18 @@
     <div class="edit-modal-overlay" id="editModalOverlay">
         <div class="edit-modal">
             <div class="edit-modal-header">
-                <h3><i class="fas fa-edit"></i> EDITAR ANOTAÇÃO</h3>
+                <h3><i class="fas fa-edit"></i> <span id="editModalTitle">EDITAR ANOTAÇÃO</span></h3>
                 <button class="modal-close" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
             </div>
             <input type="text" id="modalNoteTitle" class="neural-input" placeholder="Título">
-            <textarea id="modalNoteContent" class="neural-input" placeholder="Conteúdo" style="min-height: 260px; resize: vertical;"></textarea>
+            <textarea id="modalNoteContent" class="neural-input" placeholder="Conteúdo" style="min-height: 220px; resize: vertical;" oninput="updateModalCharCount(this)"></textarea>
+            <div class="note-char-counter" id="modalCharCounter">0 caracteres</div>
+            <!-- TAGS -->
+            <div class="tags-input-wrap" id="modalTagsWrap" onclick="document.getElementById('modalTagInput').focus()">
+                <div id="modalTagChips"></div>
+                <input type="text" id="modalTagInput" class="tags-real-input" placeholder="Adicionar tag (Enter)...">
+            </div>
+            <p class="tags-hint"><i class="fas fa-tag" style="color:var(--primary);"></i> Pressione Enter para adicionar uma tag</p>
             <select id="modalNotePublic" class="neural-input">
                 <option value="true">🌐 Público</option>
                 <option value="false">🔒 Privado</option>
@@ -1108,7 +1192,10 @@
                             <button class="tab-btn" data-filter="both">Todas</button>
                             <button class="tab-btn" data-filter="completed">Feitas</button>
                         </div>
-                        <input type="text" class="neural-input" id="searchInput" placeholder="Buscar...">
+                        <div class="search-wrap">
+                            <input type="text" class="neural-input" id="searchInput" placeholder="🔍 Buscar por título, conteúdo ou tag..." style="margin-bottom:1rem;">
+                            <button class="search-clear-btn" id="searchClearBtn" onclick="clearSearch()" title="Limpar busca"><i class="fas fa-times"></i></button>
+                        </div>
 
                         <div class="drag-hint">
                             <i class="fas fa-grip-vertical"></i>
@@ -1129,7 +1216,14 @@
                         <div class="card-header"><h3>EDITOR</h3></div>
                         <div style="padding: clamp(0.75rem, 3vw, 1.5rem);">
                             <input type="text" id="noteTitle" class="neural-input" placeholder="Título">
-                            <textarea id="noteContent" class="neural-input" placeholder="Conteúdo" style="min-height: 150px; resize: vertical;"></textarea>
+                            <textarea id="noteContent" class="neural-input" placeholder="Conteúdo" style="min-height: 150px; resize: vertical;" oninput="updateSideCharCount(this)"></textarea>
+                            <div class="note-char-counter" id="sideCharCounter">0 caracteres</div>
+                            <!-- TAGS EDITOR LATERAL -->
+                            <div class="tags-input-wrap" id="sideTagsWrap" onclick="document.getElementById('sideTagInput').focus()">
+                                <div id="sideTagChips"></div>
+                                <input type="text" id="sideTagInput" class="tags-real-input" placeholder="Tag (Enter)...">
+                            </div>
+                            <p class="tags-hint"><i class="fas fa-tag" style="color:var(--primary);"></i> Pressione Enter para adicionar tag</p>
                             <select id="notePublic" class="neural-input">
                                 <option value="true">🌐 Público</option>
                                 <option value="false">🔒 Privado</option>
@@ -1546,30 +1640,15 @@
         document.getElementById('btnLogout').onclick = () => auth.signOut();
 
         // ─── MODAL DE EDIÇÃO ──────────────────────────────────────────────────────
-        function openEditModal(id) {
-            const n = allNotes.find(x => x.id === id);
-            if (!n) return;
-            editId = id;
-            document.getElementById('modalNoteTitle').value = n.title;
-            document.getElementById('modalNoteContent').value = n.content;
-            document.getElementById('modalNotePublic').value = n.public.toString();
-            document.getElementById('modalNoteCompleted').value = n.completed.toString();
-            // carregar fotos existentes
-            modalNotePhotos = n.photos ? [...n.photos] : [];
-            const grid = document.getElementById('modalNotePhotoPreview');
-            grid.innerHTML = '';
-            modalNotePhotos.forEach(url => addPhotoThumb(url, 'modalNotePhotoPreview', () => {
-                modalNotePhotos = modalNotePhotos.filter(u => u !== url);
-            }));
-            document.getElementById('editModalOverlay').classList.add('open');
-            setTimeout(() => document.getElementById('modalNoteTitle').focus(), 300);
-        }
+        // (openEditModal redefinido com suporte a tags abaixo)
 
         function closeEditModal() {
             document.getElementById('editModalOverlay').classList.remove('open');
             editId = null;
             modalNotePhotos = [];
+            modalTags = [];
             document.getElementById('modalNotePhotoPreview').innerHTML = '';
+            document.getElementById('modalTagChips').innerHTML = '';
         }
 
         // Fechar modal ao clicar fora
@@ -1582,7 +1661,7 @@
             if (e.key === 'Escape') closeEditModal();
         });
 
-        // Salvar pelo modal
+        // Salvar pelo modal (com tags)
         document.getElementById('btnModalSave').onclick = async () => {
             const title = document.getElementById('modalNoteTitle').value.trim();
             if (!title) { showToast('Título obrigatório!', 'info'); return; }
@@ -1590,6 +1669,7 @@
             const data = {
                 title,
                 content: document.getElementById('modalNoteContent').value,
+                tags: [...modalTags],
                 public: document.getElementById('modalNotePublic').value === 'true',
                 completed: document.getElementById('modalNoteCompleted').value === 'true',
                 ownerUID: currentUser.uid,
@@ -1649,12 +1729,30 @@
             });
         }
 
+        function highlightText(text, query) {
+            if (!query) return text;
+            const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            return text.replace(new RegExp(`(${escaped})`, 'gi'), '<mark class="search-hl">$1</mark>');
+        }
+
+        function formatNoteDate(ts) {
+            if (!ts) return '';
+            const d = new Date(ts);
+            const now = new Date();
+            const diff = now - d;
+            if (diff < 60000) return 'agora';
+            if (diff < 3600000) return `${Math.floor(diff/60000)}min atrás`;
+            if (diff < 86400000) return `${Math.floor(diff/3600000)}h atrás`;
+            if (diff < 604800000) return `${Math.floor(diff/86400000)}d atrás`;
+            return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year: d.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+        }
+
         function renderNotes() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             notesContainer.innerHTML = '';
 
             const filtered = allNotes.filter(n => {
-                const searchMatch = (n.title + n.content).toLowerCase().includes(query);
+                const searchMatch = (n.title + n.content + (n.tags||[]).join(' ')).toLowerCase().includes(query);
                 if (activeFilter === 'all') return n.public && !n.completed && searchMatch;
                 if (activeFilter === 'mine') return !n.public && n.ownerUID === currentUser?.uid && !n.completed && searchMatch;
                 if (activeFilter === 'completed') return n.completed && searchMatch;
@@ -1663,11 +1761,18 @@
 
             const sorted = getSortedNotes(filtered);
 
-            sorted.forEach((n) => {
+            sorted.forEach((n, i) => {
                 const div = document.createElement('div');
                 div.className = `note-item ${!n.public ? 'private' : ''} ${n.completed ? 'completed' : ''}`;
                 div.dataset.id = n.id;
-                // draggable controlado pelo handle
+                div.style.animationDelay = `${i * 40}ms`;
+
+                const titleHL   = highlightText(n.title, query);
+                const contentHL = highlightText(n.content, query);
+                const tags = n.tags || [];
+                const tagsHTML = tags.length
+                    ? `<div class="note-tags">${tags.map(t => `<span class="note-tag" onclick="filterByTag('${t}')">#${t}</span>`).join('')}</div>`
+                    : '';
 
                 div.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -1675,17 +1780,22 @@
                             <span class="drag-handle" title="Arraste para reordenar">
                                 <i class="fas fa-grip-vertical"></i>
                             </span>
-                            <strong style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${n.title}</strong>
+                            <strong style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${titleHL}</strong>
                         </div>
-                        <button onclick="quickToggle('${n.id}')" class="action-icon icon-complete ${n.completed ? 'is-done' : ''}">
+                        <button onclick="quickToggle('${n.id}')" class="action-icon icon-complete ${n.completed ? 'is-done' : ''}" title="${n.completed ? 'Reabrir' : 'Concluir'}">
                             <i class="fas ${n.completed ? 'fa-check-circle' : 'fa-bolt'}"></i>
                         </button>
                     </div>
-                    <p style="margin:10px 0; font-size:0.9rem; color:var(--text-secondary); padding-left:28px; white-space:pre-wrap; word-break:break-word;">${n.content}</p>
-                    ${n.photos?.length ? `<div class="os-card-photos" style="padding-left:28px; margin-bottom:6px;">${n.photos.map(u=>`<img class="os-card-photo" src="${u}" onclick="openLightbox('${u}')" alt="foto">`).join('')}</div>` : ''}
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; border-top:1px solid var(--border-alpha); padding-top:8px">
-                        <span class="note-badge ${n.public ? 'badge-public' : 'badge-private'}">${n.public ? 'PÚBLICA' : 'PRIVADA'}</span>
-                        <div>
+                    <p style="margin:10px 0 4px; font-size:0.9rem; color:var(--text-secondary); padding-left:28px; white-space:pre-wrap; word-break:break-word;">${contentHL}</p>
+                    ${tagsHTML}
+                    ${n.photos?.length ? `<div class="os-card-photos" style="padding-left:28px; margin-bottom:6px; margin-top:8px;">${n.photos.map(u=>`<img class="os-card-photo" src="${u}" onclick="openLightbox('${u}')" alt="foto">`).join('')}</div>` : ''}
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; border-top:1px solid var(--border-alpha); padding-top:8px; flex-wrap:wrap; gap:6px;">
+                        <div class="note-meta">
+                            <span class="note-badge ${n.public ? 'badge-public' : 'badge-private'}">${n.public ? 'PÚBLICA' : 'PRIVADA'}</span>
+                            <span title="${n.createdAt ? new Date(n.createdAt).toLocaleString('pt-BR') : ''}">${formatNoteDate(n.createdAt)}</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:2px;">
+                            <button onclick="copyNoteContent('${n.id}')" class="note-copy-btn" title="Copiar conteúdo"><i class="fas fa-copy"></i></button>
                             <button onclick="editNote('${n.id}')" class="action-icon" style="color:var(--primary)" title="Editar"><i class="fas fa-edit"></i></button>
                             <button onclick="deleteNote('${n.id}')" class="action-icon" style="color:var(--secondary)" title="Deletar"><i class="fas fa-trash"></i></button>
                         </div>
@@ -1785,7 +1895,103 @@
             return false;
         }
 
-        // ─── QUICK TOGGLE ─────────────────────────────────────────────────────────
+        // ─── TAGS ─────────────────────────────────────────────────────────────────
+        let modalTags = [], sideTags = [];
+
+        function renderTagChips(tags, containerId, arr, inputId) {
+            const wrap = document.getElementById(containerId);
+            wrap.innerHTML = '';
+            tags.forEach((t, i) => {
+                const chip = document.createElement('span');
+                chip.className = 'tag-chip';
+                chip.innerHTML = `#${t} <button class="tag-chip-del" onclick="removeTag(${i},'${containerId}','${inputId}')">×</button>`;
+                wrap.appendChild(chip);
+            });
+        }
+
+        window.removeTag = (idx, containerId, inputId) => {
+            if (containerId === 'modalTagChips') { modalTags.splice(idx, 1); renderTagChips(modalTags, 'modalTagChips', modalTags, 'modalTagInput'); }
+            else { sideTags.splice(idx, 1); renderTagChips(sideTags, 'sideTagChips', sideTags, 'sideTagInput'); }
+        };
+
+        function setupTagInput(inputId, arr, chipsId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    const val = input.value.trim().replace(/,/g,'').toLowerCase().replace(/\s+/g,'-');
+                    if (val && !arr.includes(val) && arr.length < 8) {
+                        arr.push(val);
+                        renderTagChips(arr, chipsId, arr, inputId);
+                    }
+                    input.value = '';
+                }
+                if (e.key === 'Backspace' && !input.value && arr.length) {
+                    arr.pop();
+                    renderTagChips(arr, chipsId, arr, inputId);
+                }
+            });
+        }
+        setupTagInput('modalTagInput', modalTags, 'modalTagChips');
+        setupTagInput('sideTagInput', sideTags, 'sideTagChips');
+
+        // ─── CHAR COUNTER ─────────────────────────────────────────────────────────
+        const MAX_NOTE_CHARS = 2000;
+        window.updateModalCharCount = (textarea) => {
+            const el = document.getElementById('modalCharCounter');
+            const len = textarea.value.length;
+            el.textContent = `${len} / ${MAX_NOTE_CHARS} caracteres`;
+            el.className = 'note-char-counter' + (len > MAX_NOTE_CHARS ? ' over' : len > MAX_NOTE_CHARS * 0.8 ? ' warn' : '');
+        };
+        window.updateSideCharCount = (textarea) => {
+            const el = document.getElementById('sideCharCounter');
+            const len = textarea.value.length;
+            el.textContent = `${len} / ${MAX_NOTE_CHARS} caracteres`;
+            el.className = 'note-char-counter' + (len > MAX_NOTE_CHARS ? ' over' : len > MAX_NOTE_CHARS * 0.8 ? ' warn' : '');
+        };
+
+        // ─── COPIAR CONTEÚDO ──────────────────────────────────────────────────────
+        window.copyNoteContent = (id) => {
+            const n = allNotes.find(x => x.id === id);
+            if (!n) return;
+            const text = `${n.title}\n\n${n.content}`;
+            navigator.clipboard.writeText(text).then(() => showToast('Copiado!', 'success')).catch(() => showToast('Erro ao copiar', 'error'));
+        };
+
+        // ─── FILTRAR POR TAG ──────────────────────────────────────────────────────
+        window.filterByTag = (tag) => {
+            document.getElementById('searchInput').value = tag;
+            renderNotes();
+            document.getElementById('searchInput').focus();
+        };
+
+        // ─── TAGS NO OPENEDITEMODAL ───────────────────────────────────────────────
+        function openEditModal(id) {
+            const n = allNotes.find(x => x.id === id);
+            if (!n) return;
+            editId = id;
+            document.getElementById('editModalTitle').textContent = 'EDITAR ANOTAÇÃO';
+            document.getElementById('modalNoteTitle').value = n.title;
+            document.getElementById('modalNoteContent').value = n.content;
+            updateModalCharCount(document.getElementById('modalNoteContent'));
+            document.getElementById('modalNotePublic').value = n.public.toString();
+            document.getElementById('modalNoteCompleted').value = n.completed.toString();
+            // Tags
+            modalTags = n.tags ? [...n.tags] : [];
+            renderTagChips(modalTags, 'modalTagChips', modalTags, 'modalTagInput');
+            // Fotos
+            modalNotePhotos = n.photos ? [...n.photos] : [];
+            const grid = document.getElementById('modalNotePhotoPreview');
+            grid.innerHTML = '';
+            modalNotePhotos.forEach(url => addPhotoThumb(url, 'modalNotePhotoPreview', () => {
+                modalNotePhotos = modalNotePhotos.filter(u => u !== url);
+            }));
+            document.getElementById('editModalOverlay').classList.add('open');
+            setTimeout(() => document.getElementById('modalNoteTitle').focus(), 300);
+        }
+
+        // ─── SALVAR DO MODAL COM TAGS ─────────────────────────────────────────────
         window.quickToggle = async (id) => {
             const n = allNotes.find(x => x.id === id);
             await db.collection('notes').doc(id).update({ completed: !n.completed });
@@ -1804,6 +2010,7 @@
             const data = {
                 title,
                 content: document.getElementById('noteContent').value,
+                tags: [...sideTags],
                 public: document.getElementById('notePublic').value === 'true',
                 completed: document.getElementById('noteCompleted').value === 'false' ? false : true,
                 photos: [...sideNotePhotos],
@@ -1837,7 +2044,11 @@
             document.getElementById('noteContent').value = '';
             document.getElementById('notePublic').value = 'true';
             document.getElementById('noteCompleted').value = 'false';
+            document.getElementById('sideCharCounter').textContent = '0 caracteres';
+            document.getElementById('sideCharCounter').className = 'note-char-counter';
             editId = null;
+            sideTags = [];
+            renderTagChips(sideTags, 'sideTagChips', sideTags, 'sideTagInput');
             sideNotePhotos = [];
             document.getElementById('sideNotePhotoPreview').innerHTML = '';
         }
@@ -1846,13 +2057,16 @@
 
         document.getElementById('btnNew').onclick = () => {
             if (isSmallScreen()) {
-                // Em tela pequena, abre modal vazio para nova nota
                 editId = null;
                 document.getElementById('modalNoteTitle').value = '';
                 document.getElementById('modalNoteContent').value = '';
                 document.getElementById('modalNotePublic').value = 'true';
                 document.getElementById('modalNoteCompleted').value = 'false';
-                // Redireciona o botão salvar do modal para criar
+                document.getElementById('modalCharCounter').textContent = '0 caracteres';
+                document.getElementById('modalCharCounter').className = 'note-char-counter';
+                modalTags = [];
+                renderTagChips(modalTags, 'modalTagChips', modalTags, 'modalTagInput');
+                document.getElementById('editModalTitle').textContent = 'NOVA ANOTAÇÃO';
                 document.getElementById('btnModalSave').onclick = saveNewFromModal;
                 document.getElementById('editModalOverlay').classList.add('open');
                 setTimeout(() => document.getElementById('modalNoteTitle').focus(), 300);
@@ -1869,6 +2083,7 @@
             const data = {
                 title,
                 content: document.getElementById('modalNoteContent').value,
+                tags: [...modalTags],
                 public: document.getElementById('modalNotePublic').value === 'true',
                 completed: document.getElementById('modalNoteCompleted').value === 'true',
                 photos: [...modalNotePhotos],
@@ -1919,7 +2134,17 @@
                 renderNotes();
             };
         });
-        document.getElementById('searchInput').oninput = renderNotes;
+
+        window.clearSearch = () => {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchClearBtn').classList.remove('visible');
+            renderNotes();
+        };
+
+        document.getElementById('searchInput').oninput = function() {
+            document.getElementById('searchClearBtn').classList.toggle('visible', this.value.length > 0);
+            renderNotes();
+        };
 
         // ═══════════════════════════════════════════════════════════
         //  MÓDULO: ORDEM DE SERVIÇO
