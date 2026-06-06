@@ -1832,7 +1832,7 @@
                 const isDestinatario = !n.destinatario || n.destinatario === currentUser?.uid || n.ownerUID === currentUser?.uid;
                 if (!isDestinatario) return false;
                 if (activeFilter === 'all') return n.public && !n.completed && searchMatch;
-                if (activeFilter === 'mine') return !n.public && n.ownerUID === currentUser?.uid && !n.completed && searchMatch;
+                if (activeFilter === 'mine') return !n.public && (n.ownerUID === currentUser?.uid || n.destinatario === currentUser?.uid) && !n.completed && searchMatch;
                 if (activeFilter === 'completed') return n.completed && searchMatch;
                 return !n.completed && searchMatch;
             });
