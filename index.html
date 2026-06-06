@@ -1616,7 +1616,7 @@
                 // Sempre usa só a lista do Firestore — usuários deletados do console não aparecem
                 allUsers = fromFirestore;
                 populateUserSelects();
-            }, () => { buildUsersFromNotes(); });
+            }, () => { populateUserSelects(); });
         }
 
         function buildUsersFromNotes() {
@@ -1642,8 +1642,14 @@
                 if (!sel) return;
                 const prev = sel.value;
                 sel.innerHTML = '<option value="">\u{1F465} Todos os usu\u00e1rios</option>';
-                const others = allUsers.filter(u => u.uid !== currentUser?.uid);
-                const list = others.length > 0 ? others : allUsers;
+                const blockedEmails = [
+                    'camilathailla5@gmail.com',
+                    'jhonatarosa13@gmail.com',
+                    'juanwillyans15@gmail.com',
+                    'jeffersonvasconcelos407@gmail.com'
+                ];
+                const others = allUsers.filter(u => u.uid !== currentUser?.uid && !blockedEmails.includes(u.email));
+                const list = others.length > 0 ? others : allUsers.filter(u => !blockedEmails.includes(u.email));
                 list.forEach(u => {
                     const opt = document.createElement('option');
                     opt.value = u.uid;
