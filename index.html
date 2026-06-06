@@ -1613,12 +1613,9 @@
                     const displayName = d.name || d.displayName || d.nome || d.email || doc.id;
                     fromFirestore.push({ uid: doc.id, name: displayName, email: d.email || '' });
                 });
-                if (fromFirestore.length > 0) {
-                    allUsers = fromFirestore;
-                    populateUserSelects();
-                } else {
-                    buildUsersFromNotes();
-                }
+                // Sempre usa só a lista do Firestore — usuários deletados do console não aparecem
+                allUsers = fromFirestore;
+                populateUserSelects();
             }, () => { buildUsersFromNotes(); });
         }
 
