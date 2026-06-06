@@ -1088,6 +1088,14 @@
                 <option value="true">🌐 Público</option>
                 <option value="false">🔒 Privado</option>
             </select>
+            <div style="position:relative; margin-bottom:1rem;">
+                <label style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); display:flex; align-items:center; gap:5px; margin-bottom:6px;">
+                    <i class="fas fa-user-tag" style="color:var(--primary);"></i> Destinatário
+                </label>
+                <select id="modalNoteDestinatario" class="neural-input" style="margin-bottom:0;">
+                    <option value="">👥 Todos os usuários</option>
+                </select>
+            </div>
             <select id="modalNoteCompleted" class="neural-input">
                 <option value="false">Em Aberto</option>
                 <option value="true">Finalizada ✅</option>
@@ -1228,6 +1236,14 @@
                                 <option value="true">🌐 Público</option>
                                 <option value="false">🔒 Privado</option>
                             </select>
+                            <div style="position:relative; margin-bottom:1rem;">
+                                <label style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); display:flex; align-items:center; gap:5px; margin-bottom:6px;">
+                                    <i class="fas fa-user-tag" style="color:var(--primary);"></i> Destinatário
+                                </label>
+                                <select id="noteDestinatario" class="neural-input" style="margin-bottom:0;">
+                                    <option value="">👥 Todos os usuários</option>
+                                </select>
+                            </div>
                             <select id="noteCompleted" class="neural-input">
                                 <option value="false">Em Aberto</option>
                                 <option value="true">Finalizada ✅</option>
@@ -1488,6 +1504,7 @@
         let currentUser = null, allNotes = [], activeFilter = 'all', editId = null;
         let customOrder = [];
         let orderChanged = false;
+        let allUsers = [];
 
         const themeToggle = document.getElementById('themeToggle');
         const viewToggle = document.getElementById('viewToggle');
@@ -1587,6 +1604,60 @@
             return map[code] || 'Erro: ' + code;
         }
 
+        // ─── LOAD USERS ──────────────────────────────────────────────────────────
+        function loadUsers() {
+            db.collection('users').onSnapshot(snap => {
+                const fromFirestore = [];
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const displayName = d.name || d.displayName || d.nome || d.email || doc.id;
+                    fromFirestore.push({ uid: doc.id, name: displayName, email: d.email || '' });
+                });
+                if (fromFirestore.length > 0) {
+                    allUsers = fromFirestore;
+                    populateUserSelects();
+                } else {
+                    buildUsersFromNotes();
+                }
+            }, () => { buildUsersFromNotes(); });
+        }
+
+        function buildUsersFromNotes() {
+            db.collection('notes').get().then(snap => {
+                const map = {};
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (d.ownerUID && !map[d.ownerUID]) {
+                        map[d.ownerUID] = { uid: d.ownerUID, name: d.ownerEmail || d.ownerUID, email: d.ownerEmail || '' };
+                    }
+                });
+                allUsers = Object.values(map);
+                populateUserSelects();
+            });
+        }
+
+        function populateUserSelects() {
+            const selects = [
+                document.getElementById('noteDestinatario'),
+                document.getElementById('modalNoteDestinatario')
+            ];
+            selects.forEach(sel => {
+                if (!sel) return;
+                const prev = sel.value;
+                sel.innerHTML = '<option value="">\u{1F465} Todos os usu\u00e1rios</option>';
+                const others = allUsers.filter(u => u.uid !== currentUser?.uid);
+                const list = others.length > 0 ? others : allUsers;
+                list.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.uid;
+                    const label = (u.name && u.name !== u.uid) ? u.name : (u.email || u.uid);
+                    opt.textContent = '\u{1F464} ' + label;
+                    sel.appendChild(opt);
+                });
+                if (prev) sel.value = prev;
+            });
+        }
+
         // ─── AUTH STATE ───────────────────────────────────────────────────────────
         auth.onAuthStateChanged(user => {
             currentUser = user;
@@ -1595,6 +1666,7 @@
                 document.getElementById('mainContent').style.display = 'block';
                 loadNotes();
                 loadCustomOrder();
+                loadUsers();
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('mainContent').style.display = 'none';
@@ -1672,6 +1744,7 @@
                 tags: [...modalTags],
                 public: document.getElementById('modalNotePublic').value === 'true',
                 completed: document.getElementById('modalNoteCompleted').value === 'true',
+                destinatario: document.getElementById('modalNoteDestinatario').value || null,
                 ownerUID: currentUser.uid,
                 ownerEmail: currentUser.email,
                 createdAt: editId ? allNotes.find(x => x.id === editId)?.createdAt || Date.now() : Date.now()
@@ -1714,6 +1787,8 @@
                 snap.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
                 renderNotes();
                 updateStats();
+                // Re-populate user selects after notes load (fallback uses note authors)
+                if (allUsers.length === 0) buildUsersFromNotes();
             });
         }
 
@@ -1753,6 +1828,9 @@
 
             const filtered = allNotes.filter(n => {
                 const searchMatch = (n.title + n.content + (n.tags||[]).join(' ')).toLowerCase().includes(query);
+                // Verificar se anotação é destinada ao usuário atual ou para todos
+                const isDestinatario = !n.destinatario || n.destinatario === currentUser?.uid || n.ownerUID === currentUser?.uid;
+                if (!isDestinatario) return false;
                 if (activeFilter === 'all') return n.public && !n.completed && searchMatch;
                 if (activeFilter === 'mine') return !n.public && n.ownerUID === currentUser?.uid && !n.completed && searchMatch;
                 if (activeFilter === 'completed') return n.completed && searchMatch;
@@ -1774,6 +1852,18 @@
                     ? `<div class="note-tags">${tags.map(t => `<span class="note-tag" onclick="filterByTag('${t}')">#${t}</span>`).join('')}</div>`
                     : '';
 
+                // Badge de destinatário
+                let destinatarioHTML = '';
+                if (n.destinatario) {
+                    const destUser = allUsers.find(u => u.uid === n.destinatario);
+                    const destName = destUser ? (destUser.name || destUser.email) : 'Usuário';
+                    destinatarioHTML = `<div style="display:flex; align-items:center; gap:5px; padding-left:28px; margin-top:6px;">
+                        <span style="font-size:0.65rem; font-weight:700; padding:2px 9px; border-radius:20px; background:rgba(255,170,0,0.12); color:#ffaa00; border:1px solid rgba(255,170,0,0.25);">
+                            <i class="fas fa-user-check"></i> Para: ${destName}
+                        </span>
+                    </div>`;
+                }
+
                 div.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <div style="display:flex; align-items:center; gap:4px; flex:1; min-width:0;">
@@ -1788,6 +1878,7 @@
                     </div>
                     <p style="margin:10px 0 4px; font-size:0.9rem; color:var(--text-secondary); padding-left:28px; white-space:pre-wrap; word-break:break-word;">${contentHL}</p>
                     ${tagsHTML}
+                    ${destinatarioHTML}
                     ${n.photos?.length ? `<div class="os-card-photos" style="padding-left:28px; margin-bottom:6px; margin-top:8px;">${n.photos.map(u=>`<img class="os-card-photo" src="${u}" onclick="openLightbox('${u}')" alt="foto">`).join('')}</div>` : ''}
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; border-top:1px solid var(--border-alpha); padding-top:8px; flex-wrap:wrap; gap:6px;">
                         <div class="note-meta">
@@ -1977,6 +2068,7 @@
             updateModalCharCount(document.getElementById('modalNoteContent'));
             document.getElementById('modalNotePublic').value = n.public.toString();
             document.getElementById('modalNoteCompleted').value = n.completed.toString();
+            document.getElementById('modalNoteDestinatario').value = n.destinatario || '';
             // Tags
             modalTags = n.tags ? [...n.tags] : [];
             renderTagChips(modalTags, 'modalTagChips', modalTags, 'modalTagInput');
@@ -2014,6 +2106,7 @@
                 public: document.getElementById('notePublic').value === 'true',
                 completed: document.getElementById('noteCompleted').value === 'false' ? false : true,
                 photos: [...sideNotePhotos],
+                destinatario: document.getElementById('noteDestinatario').value || null,
                 ownerUID: currentUser.uid,
                 ownerEmail: currentUser.email,
                 createdAt: editId ? allNotes.find(x => x.id === editId)?.createdAt || Date.now() : Date.now()
@@ -2044,6 +2137,7 @@
             document.getElementById('noteContent').value = '';
             document.getElementById('notePublic').value = 'true';
             document.getElementById('noteCompleted').value = 'false';
+            document.getElementById('noteDestinatario').value = '';
             document.getElementById('sideCharCounter').textContent = '0 caracteres';
             document.getElementById('sideCharCounter').className = 'note-char-counter';
             editId = null;
@@ -2062,6 +2156,7 @@
                 document.getElementById('modalNoteContent').value = '';
                 document.getElementById('modalNotePublic').value = 'true';
                 document.getElementById('modalNoteCompleted').value = 'false';
+                document.getElementById('modalNoteDestinatario').value = '';
                 document.getElementById('modalCharCounter').textContent = '0 caracteres';
                 document.getElementById('modalCharCounter').className = 'note-char-counter';
                 modalTags = [];
@@ -2087,6 +2182,7 @@
                 public: document.getElementById('modalNotePublic').value === 'true',
                 completed: document.getElementById('modalNoteCompleted').value === 'true',
                 photos: [...modalNotePhotos],
+                destinatario: document.getElementById('modalNoteDestinatario').value || null,
                 ownerUID: currentUser.uid,
                 ownerEmail: currentUser.email,
                 createdAt: Date.now()
